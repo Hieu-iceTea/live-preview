@@ -1,0 +1,68 @@
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* fonts */
+  --body-s-regular: Manrope;
+
+  /* font sizes */
+  --body-s-regular-size: 14px;
+  --button-m-size: 15px;
+  --body-xs-regular-size: 12px;
+  --button-l-size: 16px;
+  --heading-xs-bold-size: 20px;
+
+  /* Colors */
+  --color-gray-100: #181a1b;
+  --color-gray-200: rgba(0, 0, 0, 0.1);
+  --color-gray-300: rgba(0, 0, 0, 0.4);
+  --color-gray-400: rgba(0, 0, 0, 0.2);
+  --color-white: #fff;
+  --color-whitesmoke: #f7f7f8;
+  --main: #0070f4;
+  --color-royalblue-100: #005ac3;
+  --color-dimgray: #61676b;
+  --color-aliceblue: #f0faff;
+
+  /* Spacing */
+  --min-w: 1400px;
+  --max-w: 1980px;
+  --spacing-xs: 16px;
+  --spacing-s: 24px;
+  --spacing-3xs: 8px;
+  --spacing-4xs: 4px;
+  --radius-radius-button: 8px;
+  --radius-old-radius-sm: 8px;
+  --radius-radius-2xs: undefinedpx;
+  --radius-radius-pill: 500px;
+  --radius-old-radius-pill: 500px;
+  --radius-radius-xs: 8px;
+  --spacing-8: 8px;
+  --spacing-8xl: 144px;
+  --spacing-old-spacing-8: 8px;
+  --spacing-primitives-spacing-8: 8px;
+  --radius-radius-input: 8px;
+
+  /* Gaps */
+  --gap-base: 16px;
+  --gap-5xs: 8px;
+  --gap-7xs: 6px;
+  --gap-9xs: 4px;
+  --gap-11xs: 2px;
+
+  /* Paddings */
+  --padding-base: 16px;
+  --padding-9xs: 4px;
+  --padding-5xs: 8px;
+
+  /* Border radiuses */
+  --br-5xs: 8px;
+  --br-481xl: 500px;
+  --br-81xl: 100px;
+  --br-9xs: 4px;
+
+  /* Effects */
+  --elevation-light-1-bottom: 0px 1px 2px rgba(78, 81, 83, 0.1);
+}
