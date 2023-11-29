@@ -1,0 +1,147 @@
+@media only screen and (min-width: 992px) {
+    .logo-icon-only {
+        display: none;
+    }
+
+    .header-search-btn {
+        display: none;
+    }
+
+    .hamburger-menu {
+        display: none;
+    }
+
+    .btn-close-nav {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .template-components-header {
+        gap: unset;
+    }
+
+    .search-user-menu {
+        padding: 0;
+    }
+
+    .header-search-input {
+        display: none;
+    }
+
+    .header-search-btn {
+        /*display: none;*/
+    }
+
+    .user {
+        padding: 0;
+    }
+
+    .user .user-label, .user .left-icon {
+        display: none;
+    }
+
+    .logo-full {
+        display: none;
+    }
+
+    .logo-icon-only {
+
+    }
+
+    .hamburger-menu {
+        cursor: pointer;
+    }
+
+    .template-components-header1 {
+        box-sizing: border-box;
+
+        background-color: rgba(0, 0, 0, 0.5);
+
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: end;
+
+        padding: 0;
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        min-height: 100vh;
+
+        z-index: 2;
+    }
+
+    .template-components-header1.hide {
+        display: none;
+    }
+
+    .menu-nav {
+        width: calc(100% - 155px);
+        background-color: #0070f4;
+
+        height: 100%;
+        min-height: 100vh;
+
+        padding: 16px;
+    }
+
+    .nav-items {
+        display: flex;
+        justify-content: start;
+        flex-direction: column;
+        align-items: stretch;
+
+        width: 100%;
+    }
+
+    .button-toggleable, .button-toggleable2 {
+        justify-content: start;
+    }
+
+    .btn-close-nav {
+        cursor: pointer;
+        text-align: right;
+        height: 44px;
+        line-height: 44px;
+
+        border-bottom: 1px solid #FFFFFF33;
+    }
+
+    .btn-close-nav img {
+        padding: 10px;
+    }
+
+    .state-layer3 {
+        width: 100%;
+    }
+
+    .state-layer3 .label-text {
+        flex-grow: 1;
+    }
+
+    .master-assets-tab-button .sentiment-satisfied-icon1,
+    .master-assets-tab-button1 .sentiment-satisfied-icon1 {
+        display: unset;
+    }
+
+    .master-assets-tab-button .tab-name,
+    .master-assets-tab-button1 .tab-name {
+        display: none;
+    }
+
+    .btn-table-action .text-container2, .btn-table-action .left-icon {
+        display: none;
+    }
+}
+
+.container4 {
+    overflow: scroll;
+}
+
+.container5 {
+    min-width: var(--min-w);
+}

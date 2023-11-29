@@ -522,7 +522,6 @@
 .container7 {
   flex: 1;
   border-radius: var(--radius-radius-xs);
-  background-color: var(--color-gray-100);
   overflow: hidden;
   flex-direction: column;
   padding: var(--spacing-4xs) var(--spacing-4xs);
@@ -1067,6 +1066,7 @@
   justify-content: flex-start;
   min-width: var(--min-w);
   max-width: var(--max-w);
+  min-height: 100vh;
   text-align: left;
   font-size: var(--body-s-regular-size);
   color: var(--color-gray-100);

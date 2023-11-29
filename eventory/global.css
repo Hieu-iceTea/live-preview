@@ -27,7 +27,7 @@ body {
   --color-aliceblue: #f0faff;
 
   /* Spacing */
-  --min-w: 1400px;
+  --min-w: 375px;
   --max-w: 1980px;
   --spacing-xs: 16px;
   --spacing-s: 24px;
