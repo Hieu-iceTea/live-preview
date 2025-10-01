@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang quản lý nhân viên SBU1 Dev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Thư viện để tạo file Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Thư viện để tạo file ZIP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .group-card, .master-card, .ai-card {
+            transition: all 0.3s ease;
+        }
+
+        .group-card:hover, .master-card:hover, .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        #ai-modal {
+            display: none;
+            /* Hidden by default */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800 p-4 lg:p-8">
+
+<div class="container mx-auto">
+    <header class="text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-700">Danh sách Nhân viên SBU1 Dev</h1>
+        <p class="text-gray-500 mt-2">Xem, lọc và xuất dữ liệu một cách hiệu quả.</p>
+    </header>
+
+    <!-- Gemini AI Assistant -->
+    <div id="gemini-assistant-container" class="mb-8">
+        <div class="ai-card bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg shadow-lg h-full flex flex-col">
+            <h2 class="text-2xl font-bold mb-4 text-center">✨ Trợ lý Dự án AI Gemini</h2>
+            <p class="text-center mb-4 text-blue-100">Chọn nhóm và dự án để tự động tạo bản tóm tắt, phân vai trò và soạn email khởi động.</p>
+            <div class="flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <select id="ai-group-select" class="p-2 border rounded-md text-gray-800 w-full sm:w-auto">
+                    <option value="1">Group 1</option>
+                    <option value="2">Group 2</option>
+                    <option value="3">Group 3</option>
+                </select>
+                <select id="ai-project-select" class="p-2 border rounded-md text-gray-800 w-full sm:w-auto flex-grow">
+                    <!-- Options will be populated by JS -->
+                </select>
+                <button id="generate-brief-btn" class="btn bg-white hover:bg-gray-200 text-purple-600 font-bold py-2 px-6 rounded-lg shadow-lg w-full sm:w-auto">
+                    Tạo Brief
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng dữ liệu tổng -->
+    <div id="master-table-container" class="mb-8"></div>
+
+    <!-- Khu vực tải file -->
+    <div class="mb-8 p-4 bg-white rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold text-center mb-4">Tải xuống & Tùy chọn</h2>
+        <div class="flex flex-wrap justify-center items-center gap-4">
+            <button id="downloadAllExcelBtn" class="btn bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-down"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="m15 15-3 3-3-3"/></svg>
+                Tải Toàn Bộ Dữ Liệu (.xlsx)
+            </button>
+            <button id="downloadZipBtn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+                Tải ZIP (3 file Excel)
+            </button>
+            <button id="downloadPdfBtn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-type-2"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 17h4"/><path d="M4 14v6"/><path d="M11 18h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2v6z"/></svg>
+                Tải File PDF Gốc
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid chứa 3 nhóm -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div id="group-1-container"></div>
+        <div id="group-2-container"></div>
+        <div id="group-3-container"></div>
+    </div>
+</div>
+
+<!-- AI Modal -->
+<div id="ai-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div class="p-4 border-b flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-800">✨ Kết quả từ Trợ lý AI Gemini</h3>
+            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">&times;</button>
+        </div>
+        <div id="modal-content" class="p-6 overflow-y-auto">
+            <!-- Loading spinner -->
+            <div id="modal-loader" class="text-center">
+                <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-2 text-gray-600">Đang xử lý, vui lòng chờ...</p>
+            </div>
+            <!-- Content will be inserted here -->
+        </div>
+        <div class="p-4 border-t bg-gray-50 text-right">
+            <button id="copy-modal-content-btn" class="btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg">Sao chép nội dung</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DỮ LIỆU TỔNG HỢP ---
+    const allData = [
+        // Group 1
+        { "Họ tên": "Cao Xuân Thông", "Email": "thongcx@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Bảo Trung", "Email": "trungnb@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Trân Nam Linh", "Email": "linhtn@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Đoàn Văn Linh", "Email": "linhdv@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Thị Kiều Oanh", "Email": "oanhntk@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Huy Hoàng", "Email": "hoangnh@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Thành Sơn", "Email": "sonnt@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Đình Tới", "Email": "toind@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Phạm Văn Thao", "Email": "thaopv@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Ngô Tuấn Long", "Email": "longnt@kaopiz.com", "Dự án": "LiveCall-202507", "Group": 1 },
+        { "Họ tên": "Hoàng Minh Hiếu", "Email": "hieuhm@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Trần Văn Khang", "Email": "khangtv@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Phùng Nhật Tùng", "Email": "tungpn@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Vũ Tuấn Anh", "Email": "anhvt@kaopiz.com", "Dự án": "Invoice system Maintaince", "Group": 1 },
+        { "Họ tên": "Lê Sỹ Hùng", "Email": "hungls@kaopiz.com", "Dự án": "Invoice system Maintaince", "Group": 1 },
+        { "Họ tên": "Trân Thế Chiến", "Email": "chientt@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Sỹ Khải", "Email": "khains@kaopiz.com", "Dự án": "Breakout", "Group": 1 },
+        { "Họ tên": "Phạm Đức Do", "Email": "dopd@kaopiz.com", "Dự án": "Yamamoto Project", "Group": 1 },
+        { "Họ tên": "Trần Văn Nam", "Email": "namtv@kaopiz.com", "Dự án": "LiveCall-202507", "Group": 1 },
+        { "Họ tên": "Trịnh Huy Đạt", "Email": "datth@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Vũ Quang Anh", "Email": "anhvq@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Phạm Tiên Phát", "Email": "phatpt@kaopiz.com", "Dự án": "Breakout", "Group": 1 },
+        { "Họ tên": "Nguyễn Đình Hiểu", "Email": "hieund@kaopiz.com", "Dự án": "Redance", "Group": 1 },
+        { "Họ tên": "Đỗ Ngọc Bồn", "Email": "bondn@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Xuân Thành", "Email": "thanhnx@kaopiz.com", "Dự án": "LiveCall-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Mạnh Cường", "Email": "cuongnm@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Ngọc Nhiên", "Email": "nhiennn@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Đào Hải Long", "Email": "longdh@kaopiz.com", "Dự án": "ITSprix-202507", "Group": 1 },
+        { "Họ tên": "Lê Xuân Quỳnh", "Email": "quynhlx@kaopiz.com", "Dự án": "Active Record Service", "Group": 1 },
+        { "Họ tên": "Vương Ngọc Quỳnh Hương", "Email": "huongvnq@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Ngọc hải", "Email": "hainn@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Trần Hoài Linh", "Email": "linhth1@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Nguyễn Trinh Vũ", "Email": "vunt@kaopiz.com", "Dự án": "TOFAS-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Minh Hải", "Email": "hainm1@kaopiz.com", "Dự án": "DOJO-202507", "Group": 1 },
+        { "Họ tên": "Pham Đình Nghĩa", "Email": "nghiapd@kaopiz.com", "Dự án": "LiveCall-202507", "Group": 1 },
+        { "Họ tên": "Nguyễn Đức Hải", "Email": "haind@kaopiz.com", "Dự án": "Rex Trial", "Group": 1 },
+        { "Họ tên": "Trân Đức Mạnh", "Email": "manhtd@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Lê Trung Hiếu", "Email": "hieult@kaopiz.com", "Dự án": "Dự án", "Group": 1 },
+        { "Họ tên": "Nguyễn Trắc Hùng", "Email": "hungnt@kaopiz.com", "Dự án": "Active Record Service", "Group": 1 },
+        { "Họ tên": "Trịnh Đình Đại", "Email": "daitd@kaopiz.com", "Dự án": "Yamamoto Project", "Group": 1 },
+        { "Họ tên": "Đặng Mạnh Cường", "Email": "cuongdm@kaopiz.com", "Dự án": "JobCard", "Group": 1 },
+        { "Họ tên": "Lê Thế Khương", "Email": "khuonglt@kaopiz.com", "Dự án": "MatchSolve System", "Group": 1 },
+        { "Họ tên": "Đoàn Duy Chinh", "Email": "chinhdd@kaopiz.com", "Dự án": "TOFAS-202510", "Group": 1 },
+        { "Họ tên": "Nguyễn Văn Thiệu", "Email": "thieunv1@kaopiz.com", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Trần Quốc Dũng", "Email": "dungtq@kaopiz.com", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Lê Lan Anh", "Email": "anhll@kaobiz.com", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Phạm Khắc Duy", "Email": "duypk@kaopiz.com", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Nguyễn Kim Thi (1/10)", "Email": "Không có", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Nguyễn Đăng Duy (1/10)", "Email": "Không có", "Dự án": "Sprix Upgrade", "Group": 1 },
+        { "Họ tên": "Nguyễn Đạt Trọng", "Email": "trongnd1@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Bùi Mình Đức", "Email": "ducbm@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Nguyễn Minh Duy", "Email": "duynm@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Phan Thị Hồng Thắm", "Email": "thampth@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Nguyễn Hữu Hiếu", "Email": "hieunh@kaopiz.com", "Dự án": "Web Architecture", "Group": 1 },
+        { "Họ tên": "Lê Đình Hoàng Anh", "Email": "anhidh@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        { "Họ tên": "Nguyễn Trường Sơn", "Email": "sonnt4@kaopiz.com", "Dự án": "Không có", "Group": 1 },
+        // Group 2
+        { "Họ tên": "Hoàng Văn Luân", "Email": "luanhv@kaopiz.com", "Dự án": "DCS-202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Trung Nghĩa", "Email": "nghiant@kaopiz.com", "Dự án": "MapEdit-202507", "Group": 2 },
+        { "Họ tên": "Trịnh Minh Hùng", "Email": "hungtm@kaopiz.com", "Dự án": "Không có", "Group": 2 },
+        { "Họ tên": "Quách Trung Nguyên", "Email": "nguyenqt@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Hà Quang Ngà", "Email": "ngahq@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Đặng Đình Chung", "Email": "chungdd@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Nguyễn Thị Bắc", "Email": "bacnt@kaopiz.com", "Dự án": "Assetview-202507", "Group": 2 },
+        { "Họ tên": "Hoàng Đức Mạnh", "Email": "manhhd@kaopiz.com", "Dự án": "PDRAI202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Đỗ Cao Sơn", "Email": "sonndc@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Hà Manh Tuân", "Email": "tuanhm@kaopiz.com", "Dự án": "NoBorder", "Group": 2 },
+        { "Họ tên": "Trần Đức Lương", "Email": "luongtd@kaopiz.com", "Dự án": "MapEdit-202507", "Group": 2 },
+        { "Họ tên": "Trần Văn Bính", "Email": "binhtv@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Nguyễn Quý Chí", "Email": "ching@kaopiz.com", "Dự án": "BP-202507", "Group": 2 },
+        { "Họ tên": "Nguyên Thanh Bình", "Email": "binhnt@kaopiz.com", "Dự án": "Hammock Backend", "Group": 2 },
+        { "Họ tên": "Hoàng Thanh Tuân", "Email": "tuanht@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Đặng Vũ Quang Huy", "Email": "huydvq@kaopiz.com", "Dự án": "Assetview-202507", "Group": 2 },
+        { "Họ tên": "Trần Thu Thủy", "Email": "thuytt@kaopiz.com", "Dự án": "BP-202507", "Group": 2 },
+        { "Họ tên": "Lê Thị Minh Hồng", "Email": "hongitm@kaopiz.com", "Dự án": "Không có", "Group": 2 },
+        { "Họ tên": "Trinh Văn Quốc", "Email": "quoctv@kaopiz.com", "Dự án": "MEC Informatica", "Group": 2 },
+        { "Họ tên": "Phạm Văn Thảo", "Email": "thaopy1@kaopiz.com", "Dự án": "Assetview-202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Xuân Vũ", "Email": "vunx@kaopiz.com", "Dự án": "Assetview-202507", "Group": 2 },
+        { "Họ tên": "Đặng Văn Hùng", "Email": "hungdv@kaopiz.com", "Dự án": "BP-202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Huy Tân", "Email": "tannh@kaopiz.com", "Dự án": "Pitally labo", "Group": 2 },
+        { "Họ tên": "Đăng Thái Huy", "Email": "huydt@kaopiz.com", "Dự án": "Rakutesu", "Group": 2 },
+        { "Họ tên": "Bùi Hoàng Hiệp", "Email": "hiepbh@kaopiz.com", "Dự án": "Assetview-202507", "Group": 2 },
+        { "Họ tên": "Hà Văn Huy", "Email": "huyhv@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Đồng Thị Thu Dung", "Email": "dungdtt@kaopiz.com", "Dự án": "O Product labor developm", "Group": 2 },
+        { "Họ tên": "Nguyễn Văn Quang", "Email": "quangnv@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Lê Văn Việt", "Email": "vietlv@kaopiz.com", "Dự án": "PHP Upgrade", "Group": 2 },
+        { "Họ tên": "Nguyễn Thị Thanh Lam", "Email": "lamntt@kaopiz.com", "Dự án": "MapEdit-202507", "Group": 2 },
+        { "Họ tên": "Nguyên Xuân Trường", "Email": "truongnx@kaopiz.com", "Dự án": "MapEdit-202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Đức Hà", "Email": "hand@kaopiz.com", "Dự án": "PDRAI202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Mạnh Hiếu", "Email": "hieunm2@kaopiz.com", "Dự án": "BP-202507", "Group": 2 },
+        { "Họ tên": "Nguyên Văn Duy", "Email": "duynv1@kaopiz.com", "Dự án": "PDRAI202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Đăng Dương", "Email": "duongnd@kaopiz.com", "Dự án": "Informatica-202507", "Group": 2 },
+        { "Họ tên": "Pham Quang Vinh", "Email": "vinhpq@kaopiz.com", "Dự án": "Informatica-202507", "Group": 2 },
+        { "Họ tên": "Đỗ Khoa Hải Phong", "Email": "phongdkh@kaopiz.com", "Dự án": "MapEdit-202507", "Group": 2 },
+        { "Họ tên": "Nguyễn Minh Hiếu", "Email": "hieunm3@kaopiz.com", "Dự án": "MEC Informatica", "Group": 2 },
+        { "Họ tên": "Nguyễn Huy Phong", "Email": "phongnh@kaopiz.com", "Dự án": "Rex Trial", "Group": 2 },
+        { "Họ tên": "Đỗ Minh Sáng", "Email": "sangdm@kaopiz.com", "Dự án": "LMS", "Group": 2 },
+        { "Họ tên": "Nguyễn Văn Khương (1/10)", "Email": "Không có", "Dự án": "MapEdit-202510", "Group": 2 },
+        { "Họ tên": "Vũ Thành Vinh (1/10)", "Email": "Không có", "Dự án": "Ông Bác Đạt", "Group": 2 },
+        { "Họ tên": "Nguyễn Quang Thắng (20/10)", "Email": "Không có", "Dự án": "Gigantic", "Group": 2 },
+        { "Họ tên": "Nguyễn Thảo Linh", "Email": "linhnt1@kaopiz.com", "Dự án": "Không có", "Group": 2 },
+        { "Họ tên": "Pham Duy Linh", "Email": "linhpd@kaopiz.com", "Dự án": "Không có", "Group": 2 },
+        // Group 3
+        { "Họ tên": "Nguyễn Trung Kiên", "Email": "kiennt@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Bùi Trung Hiếu", "Email": "hieubt@kaopiz.com", "Dự án": "Không có", "Group": 3 },
+        { "Họ tên": "Nguyễn Việt Dũng", "Email": "dungnv@kaopiz.com", "Dự án": "Informatica-202507", "Group": 3 },
+        { "Họ tên": "Nguyễn Đức Phương", "Email": "phuongnd1@kaopiz.com", "Dự án": "Pittaly", "Group": 3 },
+        { "Họ tên": "Nguyễn Trung Kiên", "Email": "kiennt1@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Nguyễn Văn Long", "Email": "longnv@kaopiz.com", "Dự án": "Restar", "Group": 3 },
+        { "Họ tên": "Hoàng Huy Quân", "Email": "quanhh@kaopiz.com", "Dự án": "Active Record Service", "Group": 3 },
+        { "Họ tên": "Bùi Quang Trường", "Email": "truongbq@kaopiz.com", "Dự án": "GMS-202507", "Group": 3 },
+        { "Họ tên": "Nguyễn Văn Minh", "Email": "minhnv@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Bùi Linh Tâm", "Email": "tambl@kaopiz.com", "Dự án": "Presto", "Group": 3 },
+        { "Họ tên": "Trần Quốc Anh", "Email": "anhtq@kaopiz.com", "Dự án": "GMS-202507", "Group": 3 },
+        { "Họ tên": "Lương Bá Trung", "Email": "trunglb@kaopiz.com", "Dự án": "Restar Maintaince", "Group": 3 },
+        { "Họ tên": "Mai Anh Tiến", "Email": "tienma@kaopiz.com", "Dự án": "Restar Maintaince", "Group": 3 },
+        { "Họ tên": "Nguyễn Chí Hiếu", "Email": "hieunc@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Đào Quang Huy", "Email": "huydq1@kaopiz.com", "Dự án": "QR Code Order", "Group": 3 },
+        { "Họ tên": "Bùi Thị Ngọc", "Email": "ngocbt2@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Trần Vĩnh Hoàng", "Email": "hoangtv@kaopiz.com", "Dự án": "Tradelog Labo", "Group": 3 },
+        { "Họ tên": "Nguyễn Tuân Kiệt", "Email": "kietnt@kaopiz.com", "Dự án": "Dự án", "Group": 3 },
+        { "Họ tên": "Nguyễn Khả Tú", "Email": "tunk@kaopiz.com", "Dự án": "Không có", "Group": 3 },
+        { "Họ tên": "Đào Duy Anh", "Email": "anhdd2@kaopiz.com", "Dự án": "Pitally labo", "Group": 3 },
+        { "Họ tên": "Lê Xuân Đông", "Email": "donglx@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Nguyễn Hồng Sơn", "Email": "sonnh3@kaopiz.com", "Dự án": "Mobile Create Labo", "Group": 3 },
+        { "Họ tên": "Phạm Ngọc Bình (1/10)", "Email": "Không có", "Dự án": "PlayNext", "Group": 3 },
+        { "Họ tên": "Vũ Ngọc Oai (1/10)", "Email": "Không có", "Dự án": "PlayNext", "Group": 3 },
+        { "Họ tên": "Lâm Tiến Đạt (6/10)", "Email": "Không có", "Dự án": "Tradelog", "Group": 3 },
+        { "Họ tên": "Trần Nguyễn Tấn Tài", "Email": "taitnt@kaopiz.com", "Dự án": "Không có", "Group": 3 },
+        { "Họ tên": "Hoàng Anh Tuân", "Email": "tuanha@kaopiz.com", "Dự án": "Không có", "Group": 3 },
+        { "Họ tên": "Nguyễn Bùi An Duy", "Email": "duynba@kaopiz.com", "Dự án": "Không có", "Group": 3 }
+    ];
+
+    // --- LỌC DỮ LIỆU BAN ĐẦU THEO NHÓM ---
+    const group1Data = allData.filter(p => p.Group === 1);
+    const group2Data = allData.filter(p => p.Group === 2);
+    const group3Data = allData.filter(p => p.Group === 3);
+
+    // --- CÁC BIẾN LƯU TRỮ TRẠNG THÁI LỌC ---
+    let filteredAllData = [...allData];
+    let filteredGroup1 = [...group1Data];
+    let filteredGroup2 = [...group2Data];
+    let filteredGroup3 = [...group3Data];
+
+    // --- CÁC HÀM TẠO GIAO DIỆN ---
+    function createMasterTableUI() {
+        const container = document.getElementById('master-table-container');
+        const uniqueProjects = ["all", ...new Set(allData.map(item => item['Dự án']))];
+        const uniqueGroups = ["all", "1", "2", "3"];
+        let projectOptions = uniqueProjects.map(p => `<option value="${p}">${p === 'all' ? 'Tất cả dự án' : p}</option>`).join('');
+        let groupOptions = uniqueGroups.map(g => `<option value="${g}">${g === 'all' ? 'Tất cả group' : `Group ${g}`}</option>`).join('');
+        container.innerHTML = `<div class="master-card bg-white p-4 rounded-lg shadow-md h-full flex flex-col"><h2 class="text-2xl font-bold mb-4 text-center text-gray-700">Bảng Dữ Liệu Tổng <span id="count-master" class="text-lg font-medium text-gray-500">(${allData.length} TV)</span></h2><div class="flex flex-col md:flex-row gap-2 mb-4"><input type="text" id="search-master" placeholder="Tìm theo tên, email..." class="flex-grow p-2 border rounded-md focus:ring-2 focus:ring-blue-500"><select id="project-filter-master" class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500">${projectOptions}</select><select id="group-filter-master" class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500">${groupOptions}</select></div><div class="flex-grow overflow-auto border rounded-lg" style="max-height: 500px;"><table class="min-w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"><tr><th scope="col" class="py-3 px-6">Họ tên</th><th scope="col" class="py-3 px-6">Email</th><th scope="col" class="py-3 px-6">Dự án</th><th scope="col" class="py-3 px-6">Group</th></tr></thead><tbody id="table-body-master"></tbody></table></div></div>`;
+    }
+
+    function createGroupUI(groupNum, groupData, containerId) {
+        const container = document.getElementById(containerId);
+        const uniqueProjects = ["all", ...new Set(groupData.map(item => item['Dự án']))];
+        let projectOptions = uniqueProjects.map(p => `<option value="${p}">${p === 'all' ? 'Tất cả dự án' : p}</option>`).join('');
+        container.innerHTML = `<div class="group-card bg-white p-4 rounded-lg shadow-md h-full flex flex-col"><h2 class="text-2xl font-bold mb-4 text-center text-blue-600">Group ${groupNum} <span id="count-${groupNum}" class="text-lg font-medium text-gray-500">(${groupData.length} TV)</span></h2><div class="flex flex-col md:flex-row lg:flex-col gap-2 mb-4"><input type="text" id="search-${groupNum}" placeholder="Tìm theo tên, email..." class="flex-grow p-2 border rounded-md focus:ring-2 focus:ring-blue-500"><select id="project-filter-${groupNum}" class="p-2 border rounded-md focus:ring-2 focus:ring-blue-500">${projectOptions}</select></div><div class="flex-grow overflow-auto border rounded-lg" style="max-height: 400px;"><table class="min-w-full text-sm text-left text-gray-500"><thead class="text-xs text-gray-700 uppercase bg-gray-50 sticky top-0"><tr><th scope="col" class="py-3 px-6">Họ tên</th><th scope="col" class="py-3 px-6">Email</th><th scope="col" class="py-3 px-6">Dự án</th></tr></thead><tbody id="table-body-${groupNum}"></tbody></table></div><div class="mt-4 text-center"><button id="download-excel-${groupNum}" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-lg flex items-center gap-2 mx-auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-spreadsheet"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h1a2 2 0 1 0 0-4h-1v4Z"/><path d="M12 13h4"/><path d="M12 17h4"/><path d="M8 17h1a2 2 0 1 1 0-4h-1v4Z"/></svg> Tải Excel (Group ${groupNum})</button></div></div>`;
+    }
+
+    // --- CÁC HÀM RENDER DỮ LIỆU ---
+    function renderMasterTable(data) {
+        const tableBody = document.getElementById(`table-body-master`);
+        const countSpan = document.getElementById(`count-master`);
+        tableBody.innerHTML = '';
+        if (data.length === 0) { tableBody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Không tìm thấy kết quả.</td></tr>`; }
+        else { data.forEach(item => { tableBody.innerHTML += `<tr class="bg-white border-b hover:bg-gray-50"><td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">${item['Họ tên']}</td><td class="py-4 px-6">${item['Email']}</td><td class="py-4 px-6">${item['Dự án']}</td><td class="py-4 px-6 font-semibold">Group ${item['Group']}</td></tr>`; }); }
+        countSpan.textContent = `(${data.length} TV)`;
+    }
+
+    function renderGroupTable(groupNum, data) {
+        const tableBody = document.getElementById(`table-body-${groupNum}`);
+        const countSpan = document.getElementById(`count-${groupNum}`);
+        tableBody.innerHTML = '';
+        if (data.length === 0) { tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-4">Không tìm thấy kết quả.</td></tr>`;}
+        else { data.forEach(item => { tableBody.innerHTML += `<tr class="bg-white border-b hover:bg-gray-50"><td class="py-4 px-6 font-medium text-gray-900 whitespace-nowrap">${item['Họ tên']}</td><td class="py-4 px-6">${item['Email']}</td><td class="py-4 px-6">${item['Dự án']}</td></tr>`; }); }
+        countSpan.textContent = `(${data.length} TV)`;
+    }
+
+    // --- CÁC HÀM LỌC DỮ LIỆU ---
+    function applyMasterFilters() {
+        const searchTerm = document.getElementById('search-master').value.toLowerCase();
+        const selectedProject = document.getElementById('project-filter-master').value;
+        const selectedGroup = document.getElementById('group-filter-master').value;
+        filteredAllData = allData.filter(item => (item['Họ tên'].toLowerCase().includes(searchTerm) || item['Email'].toLowerCase().includes(searchTerm)) && (selectedProject === 'all' || item['Dự án'] === selectedProject) && (selectedGroup === 'all' || item['Group'] == selectedGroup));
+        renderMasterTable(filteredAllData);
+    }
+
+    function applyGroupFilters(groupNum, originalData) {
+        const searchTerm = document.getElementById(`search-${groupNum}`).value.toLowerCase();
+        const selectedProject = document.getElementById(`project-filter-${groupNum}`).value;
+        let filteredData = originalData.filter(item => (item['Họ tên'].toLowerCase().includes(searchTerm) || item['Email'].toLowerCase().includes(searchTerm)) && (selectedProject === 'all' || item['Dự án'] === selectedProject));
+        if (groupNum === 1) filteredGroup1 = filteredData;
+        if (groupNum === 2) filteredGroup2 = filteredData;
+        if (groupNum === 3) filteredGroup3 = filteredData;
+        renderGroupTable(groupNum, filteredData);
+    }
+
+    // --- HÀM XUẤT EXCEL ---
+    function exportToExcel(data, fileName) {
+        if (data.length === 0) { alert("Không có dữ liệu để xuất."); return; }
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+        XLSX.writeFile(workbook, `${fileName}.xlsx`);
+    }
+
+    // --- CÁC HÀM TẢI XUỐNG ---
+    function setupDownloadListeners() {
+        document.getElementById('downloadZipBtn').addEventListener('click', () => {
+            const zip = new JSZip();
+            const button = document.getElementById('downloadZipBtn');
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Đang tạo file...';
+            button.disabled = true;
+            zip.file("Group_1_Data.xlsx", XLSX.write(XLSX.utils.book_new_from_json_sheet(group1Data, "Group 1"), {bookType:'xlsx', type:'array'}));
+            zip.file("Group_2_Data.xlsx", XLSX.write(XLSX.utils.book_new_from_json_sheet(group2Data, "Group 2"), {bookType:'xlsx', type:'array'}));
+            zip.file("Group_3_Data.xlsx", XLSX.write(XLSX.utils.book_new_from_json_sheet(group3Data, "Group 3"), {bookType:'xlsx', type:'array'}));
+            zip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "SBU1_Dev_All_Groups.zip");
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        });
+        document.getElementById('downloadAllExcelBtn').addEventListener('click', () => { exportToExcel(allData, 'SBU1_Dev_Toan_Bo_Nhan_Vien'); });
+
+        // Sửa lỗi nút tải PDF: Chuyển sang dùng JavaScript để tạo link tải file một cách đáng tin cậy.
+        document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = 'SBU1_Dev_NEW.pdf';
+            link.download = 'SBU1_Dev_NEW.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        document.getElementById('download-excel-1').addEventListener('click', () => exportToExcel(filteredGroup1, 'Group_1_Filtered_Data'));
+        document.getElementById('download-excel-2').addEventListener('click', () => exportToExcel(filteredGroup2, 'Group_2_Filtered_Data'));
+        document.getElementById('download-excel-3').addEventListener('click', () => exportToExcel(filteredGroup3, 'Group_3_Filtered_Data'));
+    }
+
+    // --- GEMINI AI ASSISTANT LOGIC ---
+    const aiGroupSelect = document.getElementById('ai-group-select');
+    const aiProjectSelect = document.getElementById('ai-project-select');
+    const generateBtn = document.getElementById('generate-brief-btn');
+    const modal = document.getElementById('ai-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalContent = document.getElementById('modal-content');
+    const modalLoader = document.getElementById('modal-loader');
+    const copyModalBtn = document.getElementById('copy-modal-content-btn');
+
+    function updateProjectOptions() {
+        const selectedGroup = aiGroupSelect.value;
+        let projects = [];
+        if (selectedGroup === '1') projects = group1Data.map(p => p['Dự án']);
+        else if (selectedGroup === '2') projects = group2Data.map(p => p['Dự án']);
+        else if (selectedGroup === '3') projects = group3Data.map(p => p['Dự án']);
+
+        const uniqueProjects = [...new Set(projects)];
+        aiProjectSelect.innerHTML = uniqueProjects.map(p => `<option value="${p}">${p}</option>`).join('');
+    }
+
+    async function callGeminiApi(prompt) {
+        const apiKey = ""; // API key will be injected by the environment
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+        const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                throw new Error(`API call failed with status: ${response.status}`);
+            }
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            return text || "Không nhận được phản hồi hợp lệ từ AI.";
+        } catch (error) {
+            console.error("Gemini API Error:", error);
+            return `Đã xảy ra lỗi khi gọi AI. Vui lòng thử lại. Lỗi: ${error.message}`;
+        }
+    }
+
+    function showModal(isLoading = true) {
+        modal.style.display = 'flex';
+        modalLoader.style.display = isLoading ? 'block' : 'none';
+        if (isLoading) {
+            modalContent.innerHTML = ''; // Clear previous content
+            modalContent.appendChild(modalLoader);
+        }
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+    }
+
+    generateBtn.addEventListener('click', async () => {
+        showModal(true);
+
+        const selectedGroup = aiGroupSelect.value;
+        const selectedProject = aiProjectSelect.value;
+        const groupData = allData.filter(p => p.Group == selectedGroup && p['Dự án'] === selectedProject);
+        const memberNames = groupData.map(p => p['Họ tên']).join(', ');
+
+        const prompt = `Bạn là một quản lý dự án chuyên nghiệp. Cho một dự án tên là '${selectedProject}', đội ngũ từ 'Group ${selectedGroup}' bao gồm các thành viên: ${memberNames}.
+
+Dựa trên thông tin này, hãy tạo một bản tóm tắt dự án ngắn gọn bằng tiếng Việt, bao gồm các phần sau:
+
+1. **Tổng quan dự án:** Một mô tả ngắn gọn, một câu về dự án dựa trên tên của nó.
+2. **Thành phần đội ngũ:** Liệt kê các thành viên.
+3. **Vai trò đề xuất:** Dựa trên tên dự án và một đội ngũ công nghệ tiêu chuẩn, đề xuất các vai trò tiềm năng cho các thành viên (ví dụ: Trưởng dự án, Lập trình viên chính, Lập trình viên, QA).
+4. **Email khởi động dự án (bản nháp):** Soạn một email nháp gửi cho đội ngũ để khởi động dự án. Email phải chuyên nghiệp, thân thiện và tạo không khí tích cực. Sử dụng placeholder như [Tên người quản lý] cho tên người gửi.
+
+Hãy định dạng câu trả lời rõ ràng với các tiêu đề được in đậm.`;
+
+        const result = await callGeminiApi(prompt);
+
+        modalLoader.style.display = 'none';
+        modalContent.innerHTML = result.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<h3>$1</h3>');
+    });
+
+    closeModalBtn.addEventListener('click', hideModal);
+    copyModalBtn.addEventListener('click', () => {
+        const content = modalContent.innerText;
+        const textarea = document.createElement('textarea');
+        textarea.value = content;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Đã sao chép nội dung!');
+    });
+    aiGroupSelect.addEventListener('change', updateProjectOptions);
+
+    // --- KHỞI TẠO ---
+    function initialize() {
+        // Tạo UI
+        createMasterTableUI();
+        createGroupUI(1, group1Data, 'group-1-container');
+        createGroupUI(2, group2Data, 'group-2-container');
+        createGroupUI(3, group3Data, 'group-3-container');
+
+        // Hiển thị dữ liệu ban đầu
+        renderMasterTable(allData);
+        renderGroupTable(1, group1Data);
+        renderGroupTable(2, group2Data);
+        renderGroupTable(3, group3Data);
+
+        // Khởi tạo tùy chọn cho AI Assistant
+        updateProjectOptions();
+
+        // Gắn sự kiện cho bộ lọc
+        document.getElementById('search-master').addEventListener('input', applyMasterFilters);
+        document.getElementById('project-filter-master').addEventListener('change', applyMasterFilters);
+        document.getElementById('group-filter-master').addEventListener('change', applyMasterFilters);
+        document.getElementById('search-1').addEventListener('input', () => applyGroupFilters(1, group1Data));
+        document.getElementById('project-filter-1').addEventListener('change', () => applyGroupFilters(1, group1Data));
+        document.getElementById('search-2').addEventListener('input', () => applyGroupFilters(2, group2Data));
+        document.getElementById('project-filter-2').addEventListener('change', () => applyGroupFilters(2, group2Data));
+        document.getElementById('search-3').addEventListener('input', () => applyGroupFilters(3, group3Data));
+        document.getElementById('project-filter-3').addEventListener('change', () => applyGroupFilters(3, group3Data));
+
+        // Gắn sự kiện cho các nút tải xuống
+        setupDownloadListeners();
+    }
+
+    XLSX.utils.book_new_from_json_sheet = function(json, sheetName) {
+        var ws = XLSX.utils.json_to_sheet(json);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        return wb;
+    };
+
+    document.addEventListener('DOMContentLoaded', initialize);
+
+</script>
