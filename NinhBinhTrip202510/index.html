@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiếu & Chi - Lộ Trình Chuyến Đi Ninh Bình 202510</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Một màu nền nhẹ nhàng */
+        }
+        /* Tùy chỉnh thanh cuộn */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* CSS cho đường timeline */
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2.5rem; /* 40px */
+            padding-left: 2.5rem; /* 40px */
+            transition: all 0.3s ease;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        /* Đường dọc */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 5px;
+            bottom: 0;
+            width: 2px;
+            background-color: #e2e8f0; /* slate-200 */
+        }
+        .timeline-item:last-child::before {
+            height: 0;
+        }
+        /* Dấu chấm tròn */
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            z-index: 10;
+        }
+
+        /* Trạng thái */
+        .status-completed {
+            opacity: 0.6;
+        }
+        .status-completed .timeline-card {
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .status-current .timeline-card {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border: 2px solid #3b82f6; /* blue-500 */
+        }
+        .status-current .timeline-icon {
+            background-color: #3b82f6 !important; /* Buộc màu nền xanh */
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+
+        /* Chi tiết (ẩn/hiện) */
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+        .details-content.open {
+            max-height: 600px; /* Tăng chiều cao tối đa */
+            transition: max-height 0.5s ease-in;
+        }
+        .details-toggle {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #2563eb; /* blue-600 */
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .details-toggle svg {
+            transition: transform 0.3s ease;
+            margin-left: 4px;
+        }
+        .details-toggle.open svg {
+            transform: rotate(180deg);
+        }
+        .details-content h4 { /* Thêm style cho tiêu đề nhỏ */
+            font-weight: 600; /* semibold */
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* text-gray-600 */
+            margin-bottom: 4px;
+            margin-top: 8px;
+        }
+        .details-content p { /* Cập nhật style cho đoạn văn */
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* text-gray-500 */
+            margin-bottom: 8px;
+        }
+        .details-content ul { /* Style cho list */
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+    </style>
+</head>
+<body class="text-gray-800">
+
+<!-- Header -->
+<div class="bg-white shadow-md sticky top-0 z-20">
+    <div class="max-w-4xl mx-auto px-4 py-4">
+        <h1 class="text-3xl font-bold text-blue-600 text-center">Hiếu & Chi - Lộ Trình Chuyến Đi Ninh Bình 202510</h1>
+        <p class="text-center text-gray-600 text-lg mt-1">2 Ngày 1 Đêm (Phiên bản Tối ưu)</p>
+
+        <!-- Đồng hồ thời gian thực -->
+        <div id="realtime-clock" class="mt-4 p-4 bg-gray-100 rounded-lg text-center">
+            <p class="text-sm text-gray-500">Giờ hiện tại</p>
+            <p id="clock" class="text-2xl font-semibold text-gray-900">--:--:--</p>
+            <p id="date" class="text-sm text-gray-500 mb-2">--/--/----</p>
+
+            <div class="bg-blue-100 border border-blue-200 p-3 rounded-md">
+                <p class="text-xs text-blue-700 font-medium" id="tracking-status">Đang theo dõi...</p>
+                <p id="current-activity" class="text-lg font-semibold text-blue-800">Đang tải lịch trình...</p>
+            </div>
+        </div>
+        <p class="text-xs text-center text-gray-500 mt-2">Lịch trình này được đặt vào ngày **15-16/11/2025**. Các mục sẽ được tự động đánh dấu khi đến đúng ngày giờ đó.</p>
+    </div>
+</div>
+
+<!-- Nội dung Lịch trình -->
+<div id="timeline-container" class="max-w-4xl mx-auto p-4 md:p-8">
+
+    <!-- NGÀY 1: THỨ 7 (15/11/2025) -->
+    <div>
+        <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b-2 border-blue-200 pb-2">Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)</h2>
+        <ol class="relative">
+
+            <!-- Mục 1: Xuất phát -->
+            <li class="timeline-item" data-start-time="2025-11-15T05:30:00" data-end-time="2025-11-15T07:15:00">
+                <div class="timeline-icon bg-gray-400">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">05:30 – 07:15 (1 giờ 45 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Xuất phát từ Hà Nội">Xuất phát từ Hà Nội</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe máy, di chuyển đến Trung tâm TP. Ninh Bình.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h.</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 2: Gửi đồ, Ăn sáng -->
+            <li class="timeline-item" data-start-time="2025-11-15T07:15:00" data-end-time="2025-11-15T08:15:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">07:15 – 08:15 (1 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Gửi đồ & Ăn sáng">Gửi đồ & Ăn sáng</h3>
+                    <p class="text-sm font-normal text-gray-500">Tới nhà nghỉ (TTTP) gửi hành lý miễn phí. Ăn sáng (Gợi ý: Miến Lươn).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Nhà nghỉ (TTTP):</strong> Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm.</li>
+                            <li><strong>Quán Miến Lươn:</strong> Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn).</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 3: Cụm Tam Cốc -->
+            <li class="timeline-item" data-start-time="2025-11-15T08:15:00" data-end-time="2025-11-15T11:30:00">
+                <div class="timeline-icon bg-green-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.363-.44A2 2 0 0115 13.033V11.5a2.5 2.5 0 00-5 0v1.533a2 2 0 01-1.043 1.408l-2.363.44a2 2 0 00-1.022.547l-1.172 2.345a1 1 0 00.15 1.013l.046.051a1 1 0 00.675.31H19.75a1 1 0 00.675-.31l.046-.051a1 1 0 00.15-.1013l-1.172-2.345zM12 11.5a2.5 2.5 0 00-5 0v1.533a2 2 0 01-1.043 1.408l-2.363.44a2 2 0 00-1.022.547l-1.172 2.345a1 1 0 00.15 1.013l.046.051a1 1 0 00.675.31H19.75a1 1 0 00.675-.31l.046-.051a1 1 0 00.15-.1013l-1.172-2.345a2 2 0 00-1.022-.547l-2.363-.44A2 2 0 0115 13.033V11.5zM12 6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">08:15 – 11:30 (3 giờ 15 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Tham quan Cụm Tam Cốc">Cụm Tam Cốc</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe ra Tam Cốc (30p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <ul>
+                            <li>TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).</li>
+                            <li>Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy).</li>
+                        </ul>
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Bến thuyền Tam Cốc:</strong> Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.</li>
+                            <li><strong>Chùa Bích Động:</strong> "Nam thiên đệ nhị động", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm "kinh điển". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 4: Ăn trưa, nghỉ ngơi -->
+            <li class="timeline-item" data-start-time="2025-11-15T11:30:00" data-end-time="2025-11-15T13:30:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v1.9l-2.35 6.1a1 1 0 00.8 1.5h11.1a1 1 0 00.8-1.5L14 4.9V3m-4 7v6m4-6v6m-4-6h4"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">11:30 – 13:30 (2 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Ăn trưa & Nghỉ ngơi tại Tam Cốc">Ăn trưa & Nghỉ ngơi</h3>
+                    <p class="text-sm font-normal text-gray-500">Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng tại quán cà phê.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Nhà hàng Tam Cốc:</strong> Rất nhiều lựa chọn từ bình dân đến cao cấp dọc khu vực bến thuyền.</li>
+                            <li><strong>Quán cà phê Tam Cốc:</strong> Nhiều quán có view đẹp ra đồng lúa/núi non.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 5: Cụm Hoa Lư -->
+            <li class="timeline-item" data-start-time="2025-11-15T13:30:00" data-end-time="2025-11-15T16:45:00">
+                <div class="timeline-icon bg-green-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 1v4m0 0h-4m4 0l-5-5"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">13:30 – 16:45 (3 giờ 15 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc">Cụm Hoa Lư</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe ra Hoa Lư (30p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <ul>
+                            <li>Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).</li>
+                            <li>Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút).</li>
+                        </ul>
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Cố đô Hoa Lư:</strong> Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm.</li>
+                            <li><strong>Tuyệt Tình Cốc (Động Am Tiên):</strong> Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp "sống ảo". Có chùa nhỏ trong động phía trên.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 6: Về nhà nghỉ -->
+            <li class="timeline-item" data-start-time="2025-11-15T16:45:00" data-end-time="2025-11-15T18:15:00">
+                <div class="timeline-icon bg-red-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10H5a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2v-3.828a1 1 0 00-.293-.707l-2.414-2.414zM6 18V9.657M16 12H5.021m13.957 0A5.002 5.002 0 0014 8h-1a5 5 0 00-5 5v2m6-4V3a1 1 0 00-1-1H9a1 1 0 00-1 1v5"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">16:45 – 18:15 (1 giờ 30 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Về Nhà nghỉ & Tắm rửa">Về Nhà nghỉ & Tắm rửa</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe về TTTP (20p). Nhận phòng (lấy lại đồ), tắm rửa và nghỉ ngơi (1h 10p).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy).</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15).</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 7: Ăn tối -->
+            <li class="timeline-item" data-start-time="2025-11-15T18:15:00" data-end-time="2025-11-15T19:15:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v1.9l-2.35 6.1a1 1 0 00.8 1.5h11.1a1 1 0 00.8-1.5L14 4.9V3m-4 7v6m4-6v6m-4-6h4"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">18:15 – 19:15 (1 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Ăn tối tại Phố 8">Ăn tối tại Phố 8</h3>
+                    <p class="text-sm font-normal text-gray-500">Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Thông tin địa điểm:</h4>
+                        <p><strong>Phố 8 (Cù Chính Lan):</strong> Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất "khám phá ẩm thực" (lẩu, nướng) địa phương.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 8: Chơi tối -->
+            <li class="timeline-item" data-start-time="2025-11-15T19:15:00" data-end-time="2025-11-15T23:00:00">
+                <div class="timeline-icon bg-purple-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">19:15 – 23:00 (3 giờ 45 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)">Dạo chơi Phố đêm</h3>
+                    <p class="text-sm font-normal text-gray-500">Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút).</p>
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Phố đi bộ (Phố 8):</strong> Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần.</li>
+                            <li><strong>Phố cổ Hoa Lư:</strong> Khu phố tái hiện, lung linh đèn lồng về đêm. Có các gian hàng, hoạt động văn nghệ.</li>
+                            <li><strong>Tháp Tứ Ân & Đền Mẫu (Chùa Bạc):</strong> Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 9: Về ngủ -->
+            <li class="timeline-item" data-start-time="2025-11-15T23:00:00" data-end-time="2025-11-16T07:30:00">
+                <div class="timeline-icon bg-red-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">23:00 – 07:30</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Về nhà nghỉ">Về nhà nghỉ</h3>
+                    <p class="text-sm font-normal text-gray-500">Kết thúc Ngày 1, nghỉ ngơi.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Lý do chọn:</h4>
+                        <p>Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn.</p>
+                    </div>
+                </div>
+            </li>
+        </ol>
+    </div>
+
+    <!-- NGÀY 2: CHỦ NHẬT (16/11/2025) -->
+    <div class="mt-8">
+        <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b-2 border-blue-200 pb-2">Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)</h2>
+        <ol class="relative">
+
+            <!-- Mục 1: Ăn sáng, Trả phòng -->
+            <li class="timeline-item" data-start-time="2025-11-16T07:30:00" data-end-time="2025-11-16T08:15:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v1.9l-2.35 6.1a1 1 0 00.8 1.5h11.1a1 1 0 00.8-1.5L14 4.9V3m-4 7v6m4-6v6m-4-6h4"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">07:30 – 08:15 (45 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Ăn sáng & Trả phòng">Ăn sáng & Trả phòng</h3>
+                    <p class="text-sm font-normal text-gray-500">Ăn sáng tại TTTP. Quay về nhà nghỉ, làm thủ tục Check-out. (Hành lý mang theo).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Lý do chọn:</h4>
+                        <p>Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 2: Cụm Tràng An (Sáng) -->
+            <li class="timeline-item" data-start-time="2025-11-16T08:15:00" data-end-time="2025-11-16T12:15:00">
+                <div class="timeline-icon bg-green-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.363-.44A2 2 0 0115 13.033V11.5a2.5 2.5 0 00-5 0v1.533a2 2 0 01-1.043 1.408l-2.363.44a2 2 0 00-1.022.547l-1.172 2.345a1 1 0 00.15 1.013l.046.051a1 1 0 00.675.31H19.75a1 1 0 00.675-.31l.046-.051a1 1 0 00.15-.1013l-1.172-2.345zM12 11.5a2.5 2.5 0 00-5 0v1.533a2 2 0 01-1.043 1.408l-2.363.44a2 2 0 00-1.022.547l-1.172 2.345a1 1 0 00.15 1.013l.046.051a1 1 0 00.675.31H19.75a1 1 0 00.675-.31l.046-.051a1 1 0 00.15-.1013l-1.172-2.345a2 2 0 00-1.022-.547l-2.363-.44A2 2 0 0115 13.033V11.5zM12 6.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">08:15 – 12:15 (4 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Tham quan Cụm Tràng An">Cụm Tràng An (Điểm nhấn chính)</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe ra Tràng An (30p). Gửi hành lý tại quầy (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy).</p>
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Bến thuyền Tràng An:</strong> Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ.</li>
+                            <li><strong>Dịch vụ gửi đồ:</strong> Có tại khu vực nhà điều hành/bán vé.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Trải nghiệm Di sản UNESCO "phải đi" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 3: Ăn trưa -->
+            <li class="timeline-item" data-start-time="2025-11-16T12:15:00" data-end-time="2025-11-16T13:15:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v1.9l-2.35 6.1a1 1 0 00.8 1.5h11.1a1 1 0 00.8-1.5L14 4.9V3m-4 7v6m4-6v6m-4-6h4"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">12:15 – 13:15 (1 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Ăn trưa Dê núi Cơm cháy">Ăn trưa Đặc sản</h3>
+                    <p class="text-sm font-normal text-gray-500">Ăn trưa Dê núi Cơm cháy tại nhà hàng khu Tràng An (mang theo hành lý).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Thông tin địa điểm:</h4>
+                        <p><strong>Nhà hàng khu Tràng An:</strong> Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 4: Thư giãn chiều -->
+            <li class="timeline-item" data-start-time="2025-11-16T13:15:00" data-end-time="2025-11-16T16:15:00">
+                <div class="timeline-icon bg-cyan-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118L2.98 9.1c-.783-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">13:15 – 16:15 (3 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Thư giãn (Tùy chọn)">Thư giãn (Tùy chọn)</h3>
+                    <p class="text-sm font-normal text-gray-500">Hoàn toàn tự do. (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để tắm rửa.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút).</p>
+                        <h4>Thông tin địa điểm:</h4>
+                        <ul>
+                            <li><strong>Quán cà phê TTTP:</strong> Nhiều lựa chọn.</li>
+                            <li><strong>Nhà nghỉ theo giờ (TTTP):</strong> Có nhiều nhà nghỉ cung cấp dịch vụ này.</li>
+                        </ul>
+                        <h4>Lý do chọn:</h4>
+                        <p>Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 5: Chuẩn bị về -->
+            <li class="timeline-item" data-start-time="2025-11-16T16:15:00" data-end-time="2025-11-16T16:45:00">
+                <div class="timeline-icon bg-gray-400">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">16:15 – 16:45 (30 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Chuẩn bị về">Chuẩn bị về</h3>
+                    <p class="text-sm font-normal text-gray-500">Đổ xăng, kiểm tra xe, sắp xếp hành lý.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Lý do chọn:</h4>
+                        <p>Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15).</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 6: Về Vân Đình -->
+            <li class="timeline-item" data-start-time="2025-11-16T16:45:00" data-end-time="2025-11-16T18:15:00">
+                <div class="timeline-icon bg-gray-400">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">16:45 – 18:15 (1 giờ 30 phút)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Lái xe về Vân Đình">Lái xe về Vân Đình</h3>
+                    <p class="text-sm font-normal text-gray-500">Di chuyển từ Ninh Bình đến Vân Đình, Ứng Hòa (theo QL1A).</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy).</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15).</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 7: Ăn tối Vân Đình -->
+            <li class="timeline-item" data-start-time="2025-11-16T18:15:00" data-end-time="2025-11-16T19:15:00">
+                <div class="timeline-icon bg-yellow-500">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18M10 3v1.9l-2.35 6.1a1 1 0 00.8 1.5h11.1a1 1 0 00.8-1.5L14 4.9V3m-4 7v6m4-6v6m-4-6h4"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">18:15 – 19:15 (1 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Ăn tối Vịt cỏ Vân Đình">Ăn tối Vịt cỏ Vân Đình</h3>
+                    <p class="text-sm font-normal text-gray-500">Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình.</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Thông tin địa điểm:</h4>
+                        <p><strong>Vân Đình (Ứng Hòa):</strong> Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý.</p>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Mục 8: Về Hà Nội -->
+            <li class="timeline-item" data-start-time="2025-11-16T19:15:00" data-end-time="2025-11-16T20:15:00">
+                <div class="timeline-icon bg-gray-400">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <div class="timeline-card bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                    <time class="mb-1 text-sm font-semibold text-blue-600">19:15 – 20:15 (1 giờ)</time>
+                    <h3 class="text-lg font-semibold text-gray-900" data-title="Về đến Hà Nội">Về đến Hà Nội</h3>
+                    <p class="text-sm font-normal text-gray-500">Lái xe chặng cuối về Hà Nội. Kết thúc chuyến đi!</p>
+                    <button class="details-toggle">
+                        Xem chi tiết
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="details-content">
+                        <h4>Chi tiết di chuyển (ước tính):</h4>
+                        <p>Vân Đình -> Trung tâm Hà Nội: ~30-40km (Khoảng 1 tiếng xe máy).</p>
+                        <h4>Lý do chọn:</h4>
+                        <p>Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau.</p>
+                    </div>
+                </div>
+            </li>
+
+        </ol>
+    </div>
+</div>
+
+<script>
+    function updateClockAndTimeline() {
+        // Lấy thời gian hiện tại
+        const now = new Date();
+
+        // Cập nhật đồng hồ
+        const clockElement = document.getElementById('clock');
+        const dateElement = document.getElementById('date');
+        if (clockElement && dateElement) {
+            clockElement.textContent = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            dateElement.textContent = now.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        // Cập nhật trạng thái timeline
+        const items = document.querySelectorAll('.timeline-item');
+        const currentActivityElement = document.getElementById('current-activity');
+        const trackingStatusElement = document.getElementById('tracking-status');
+
+        let currentItemFound = false;
+        let currentTitle = "Đang ngoài giờ lịch trình";
+        let statusText = "Chúc bạn một ngày tốt lành!";
+
+        items.forEach(item => {
+            const startTime = new Date(item.dataset.startTime);
+            const endTime = new Date(item.dataset.endTime);
+            const titleElement = item.querySelector('h3[data-title]');
+            const title = titleElement ? titleElement.dataset.title : "Hoạt động không tên";
+
+
+            // Xóa các lớp trạng thái cũ
+            item.classList.remove('status-completed', 'status-current');
+            const iconElement = item.querySelector('.timeline-icon');
+            if (iconElement) {
+                iconElement.style.backgroundColor = ''; // Reset màu icon
+            }
+
+
+            if (now > endTime) {
+                // Đã hoàn thành
+                item.classList.add('status-completed');
+                if (iconElement) {
+                    iconElement.style.backgroundColor = '#94a3b8'; // Màu xám
+                }
+            } else if (now >= startTime && now <= endTime) {
+                // Đang diễn ra
+                item.classList.add('status-current');
+                currentItemFound = true;
+                currentTitle = title;
+                statusText = "Lịch trình hiện tại của bạn:";
+            } else {
+                // Sắp diễn ra
+            }
+        });
+
+        if (currentActivityElement) {
+            currentActivityElement.textContent = currentTitle;
+        }
+        if (trackingStatusElement) {
+            trackingStatusElement.textContent = statusText;
+            if (currentItemFound) {
+                trackingStatusElement.classList.add('animate-pulse');
+            } else {
+                trackingStatusElement.classList.remove('animate-pulse');
+            }
+        }
+    }
+
+    function setupDetailsToggle() {
+        const timelineContainer = document.getElementById('timeline-container');
+        if (!timelineContainer) {
+            console.error("Không tìm thấy phần tử #timeline-container");
+            return;
+        }
+
+        timelineContainer.addEventListener('click', function(event) {
+            const toggleButton = event.target.closest('.details-toggle');
+
+            if (toggleButton) {
+                const content = toggleButton.nextElementSibling;
+                if (content && content.classList.contains('details-content')) {
+                    toggleButton.classList.toggle('open');
+                    content.classList.toggle('open');
+                }
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateClockAndTimeline();
+        setupDetailsToggle();
+        setInterval(updateClockAndTimeline, 1000);
+    });
+</script>
+
+</body>
+</html>
+
