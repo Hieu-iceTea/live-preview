@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch trình Ninh Bình 2N1Đ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Sử dụng font Inter mượt mà hơn */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f6; /* Một màu nền nhẹ nhàng hơn */
+        }
+
+        /* CSS cho đường timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 3rem; /* 48px */
+            padding-bottom: 2rem; /* 32px */
+        }
+
+        /* Đường kẻ dọc */
+        .timeline-line {
+            position: absolute;
+            left: 20px; /* Căn giữa icon */
+            top: 1.25rem; /* 20px */
+            bottom: -0.5rem; /* -8px */
+            width: 2px;
+            background-color: #cbd5e1; /* gray-300 */
+        }
+
+        /* Icon container */
+        .icon-container {
+            position: absolute;
+            left: 0;
+            top: 0.5rem; /* 8px */
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; /* rounded-full */
+            border-width: 2px;
+            background-color: white;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        /* Lớp cho trạng thái "Đã qua" */
+        .status-past {
+            opacity: 0.6;
+        }
+
+        .status-past .timeline-line {
+            background-color: #16a34a; /* green-600 */
+        }
+
+        .status-past .icon-container {
+            border-color: #16a34a; /* green-600 */
+            background-color: #f0fdf4; /* green-50 */
+        }
+
+        /* Lớp cho trạng thái "Đang diễn ra" */
+        .status-current .timeline-content {
+            transform: scale(1.02); /* Phóng to nhẹ */
+            border: 2px solid #2563eb; /* blue-600 */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .status-current .icon-container {
+            border-color: #2563eb; /* blue-600 */
+            background-color: #dbeafe; /* blue-100 */
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        .status-current .timeline-line {
+            background: linear-gradient(#16a34a, #16a34a 50%, #2563eb 50%, #2563eb);
+            background-size: 100% 10px;
+        }
+
+        /* Lớp cho trạng thái "Sắp tới" */
+        .status-future .icon-container {
+            border-color: #94a3b8; /* slate-400 */
+        }
+
+        /* Ẩn chi tiết */
+        .details-content {
+            /* display: none; */ /* Đã thay đổi */
+            max-height: 0; /* Đã thay đổi */
+            overflow: hidden;
+            transition: max-height 0.25s ease-out; /* Đã thay đổi - nhanh hơn */
+        }
+
+        .details-content.expanded {
+            /* display: block; */ /* Đã thay đổi */
+            /* max-height: 1000px; */ /* ĐÃ XÓA - JS sẽ xử lý */
+        }
+
+        /* Animation nhấp nháy cho icon */
+        @keyframes pulse-blue {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+        }
+
+        /* Chi tiết bên trong phần mở rộng */
+        .details-content h4 {
+            font-weight: 600;
+            color: #1e3a8a; /* blue-900 */
+            margin-top: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .details-content ul {
+            list-style-type: disc;
+            padding-left: 1.25rem;
+            color: #374151; /* gray-700 */
+        }
+
+        .details-content p {
+            color: #374151; /* gray-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<!-- HEADER CỐ ĐỊNH -->
+<header id="header" class="sticky top-0 left-0 w-full bg-white shadow-lg z-50 p-4 border-b-4 border-blue-600">
+    <div class="container mx-auto max-w-3xl">
+        <!-- Tiêu đề chính -->
+        <div class="flex justify-between items-center mb-3">
+            <div>
+                <h1 id="main-title" class="text-2xl font-bold text-blue-800"></h1>
+                <p id="main-subtitle" class="text-sm text-gray-600"></p>
+            </div>
+            <!-- Đồng hồ thời gian thực -->
+            <div id="real-time-clock" class="text-right">
+                <div class="font-mono font-bold text-xl text-gray-800">...</div>
+                <div class="text-xs text-gray-500">...</div>
+            </div>
+        </div>
+
+        <!-- Hoạt động hiện tại -->
+        <div id="current-activity-container" class="hidden">
+            <div class="bg-blue-100 border border-blue-300 text-blue-800 p-3 rounded-lg text-center">
+                <span class="font-medium">Đang diễn ra:</span>
+                <span id="current-activity-display" class="font-bold"></span>
+            </div>
+        </div>
+
+        <!-- Bộ điều khiển giả lập thời gian (Dành cho kiểm thử) -->
+        <div class="mt-4 p-2 bg-yellow-50 border border-yellow-300 rounded-lg">
+            <button id="toggle-test-panel" class="font-medium text-sm text-yellow-800 hover:underline">Công cụ Giả lập
+                thời gian (Nhấn để Ẩn/Hiện)
+            </button>
+            <div id="test-panel-content" class="details-content"> <!-- Sử dụng lại class .details-content -->
+
+                <!-- (MỚI) Layout flex cho các input -->
+                <div class="mt-4 border-t border-yellow-200 pt-4 flex flex-wrap gap-4 items-end">
+
+                    <div class="flex-1 min-w-[140px]">
+                        <label for="time-override-date" class="block text-xs font-medium text-yellow-800 mb-1">Giả lập
+                            ngày:</label>
+                        <input type="date" id="time-override-date" class="w-full p-1 border rounded text-sm h-[34px]">
+                    </div>
+
+                    <div class="flex-1 min-w-[140px]">
+                        <label for="time-override-time" class="block text-xs font-medium text-yellow-800 mb-1">Giả lập
+                            giờ (có giây):</label>
+                        <input type="time" id="time-override-time" class="w-full p-1 border rounded text-sm h-[34px]"
+                               step="1">
+                    </div>
+
+                    <button id="reset-time"
+                            class="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 h-[34px] flex-shrink-0">
+                        Hiện tại
+                    </button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- NỘI DUNG LỊCH TRÌNH -->
+<main class="container mx-auto max-w-3xl p-4 relative">
+    <!-- Nơi JS sẽ chèn nội dung timeline -->
+    <div id="timeline-container"></div>
+</main>
+
+<script>
+    // --- DỮ LIỆU LỊCH TRÌNH (Tải từ JSON) ---
+    const scheduleData = {
+        "tripInfo": {
+            "title": "Lộ Trình Chuyến Đi Ninh Bình",
+            "subtitle": "2 Ngày 1 Đêm (Phiên bản Tối ưu)",
+            "dates": "15-16/11/2025"
+        },
+        "schedule": [
+            {
+                "dayInfo": {
+                    "day": 1,
+                    "date": "2025-11-15",
+                    "title": "Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)"
+                },
+                "timelineItems": [
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T05:30:00",
+                            "endTime": "2025-11-15T07:15:00",
+                            "durationText": "1 giờ 45 phút"
+                        },
+                        "title": "Xuất phát từ Hà Nội",
+                        "summary": "Lái xe máy, di chuyển đến Trung tâm TP. Ninh Bình.",
+                        "iconType": "time",
+                        "details": {
+                            "chiTietDiChuyen": "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h.",
+                            "lyDoChon": "Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T07:15:00",
+                            "endTime": "2025-11-15T08:15:00",
+                            "durationText": "1 giờ"
+                        },
+                        "title": "Gửi đồ & Ăn sáng",
+                        "summary": "Tới nhà nghỉ (TTTP) gửi hành lý miễn phí. Ăn sáng (Gợi ý: Miến Lươn).",
+                        "iconType": "logistics",
+                        "details": {
+                            "thongTinDiaDiem": [
+                                "Nhà nghỉ (TTTP): Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm.",
+                                "Quán Miến Lươn: Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn)."
+                            ],
+                            "lyDoChon": "Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T08:15:00",
+                            "endTime": "2025-11-15T11:30:00",
+                            "durationText": "3 giờ 15 phút"
+                        },
+                        "title": "Tham quan Cụm Tam Cốc",
+                        "summary": "Lái xe ra Tam Cốc (30p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).",
+                        "iconType": "boat",
+                        "details": {
+                            "chiTietDiChuyen": [
+                                "TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).",
+                                "Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy)."
+                            ],
+                            "thongTinDiaDiem": [
+                                "Bến thuyền Tam Cốc: Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.",
+                                "Chùa Bích Động: \"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
+                            ],
+                            "lyDoChon": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T11:30:00",
+                            "endTime": "2025-11-15T13:30:00",
+                            "durationText": "2 giờ"
+                        },
+                        "title": "Ăn trưa & Nghỉ ngơi tại Tam Cốc",
+                        "summary": "Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng tại quán cà phê.",
+                        "iconType": "food",
+                        "details": {
+                            "thongTinDiaDiem": [
+                                "Nhà hàng Tam Cốc: Rất nhiều lựa chọn từ bình dân đến cao cấp dọc khu vực bến thuyền.",
+                                "Quán cà phê Tam Cốc: Nhiều quán có view đẹp ra đồng lúa/núi non."
+                            ],
+                            "lyDoChon": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T13:30:00",
+                            "endTime": "2025-11-15T16:45:00",
+                            "durationText": "3 giờ 15 phút"
+                        },
+                        "title": "Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc",
+                        "summary": "Lái xe ra Hoa Lư (30p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
+                        "iconType": "explore",
+                        "details": {
+                            "chiTietDiChuyen": [
+                                "Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).",
+                                "Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút)."
+                            ],
+                            "thongTinDiaDiem": [
+                                "Cố đô Hoa Lư: Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm.",
+                                "Tuyệt Tình Cốc (Động Am Tiên): Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp \"sống ảo\". Có chùa nhỏ trong động phía trên."
+                            ],
+                            "lyDoChon": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T16:45:00",
+                            "endTime": "2025-11-15T18:15:00",
+                            "durationText": "1 giờ 30 phút"
+                        },
+                        "title": "Về Nhà nghỉ & Tắm rửa",
+                        "summary": "Lái xe về TTTP (20p). Nhận phòng (lấy lại đồ), tắm rửa và nghỉ ngơi (1h 10p).",
+                        "iconType": "hotel",
+                        "details": {
+                            "chiTietDiChuyen": "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy).",
+                            "lyDoChon": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T18:15:00",
+                            "endTime": "2025-11-15T19:15:00",
+                            "durationText": "1 giờ"
+                        },
+                        "title": "Ăn tối tại Phố 8",
+                        "summary": "Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8).",
+                        "iconType": "food",
+                        "details": {
+                            "thongTinDiaDiem": "Phố 8 (Cù Chính Lan): Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
+                            "lyDoChon": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T19:15:00",
+                            "endTime": "2025-11-15T23:00:00",
+                            "durationText": "3 giờ 45 phút"
+                        },
+                        "title": "Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)",
+                        "summary": "Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu).",
+                        "iconType": "nightlife",
+                        "details": {
+                            "chiTietDiChuyen": "Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút).",
+                            "thongTinDiaDiem": [
+                                "Phố đi bộ (Phố 8): Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần.",
+                                "Phố cổ Hoa Lư: Khu phố tái hiện, lung linh đèn lồng về đêm. Có các gian hàng, hoạt động văn nghệ.",
+                                "Tháp Tứ Ân & Đền Mẫu (Chùa Bạc): Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối."
+                            ],
+                            "lyDoChon": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T23:00:00",
+                            "endTime": "2025-11-16T07:30:00",
+                            "durationText": ""
+                        },
+                        "title": "Về nhà nghỉ",
+                        "summary": "Kết thúc Ngày 1, nghỉ ngơi.",
+                        "iconType": "hotel",
+                        "details": {
+                            "lyDoChon": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn."
+                        }
+                    }
+                ]
+            },
+            {
+                "dayInfo": {
+                    "day": 2,
+                    "date": "2025-11-16",
+                    "title": "Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)"
+                },
+                "timelineItems": [
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T07:30:00",
+                            "endTime": "2025-11-16T08:15:00",
+                            "durationText": "45 phút"
+                        },
+                        "title": "Ăn sáng & Trả phòng",
+                        "summary": "Ăn sáng tại TTTP. Quay về nhà nghỉ, làm thủ tục Check-out. (Hành lý mang theo).",
+                        "iconType": "food",
+                        "details": {
+                            "thongTinDiaDiem": [
+                                "Quán ăn sáng TTTP: Nhiều lựa chọn.",
+                                "Nhà nghỉ (TTTP): Nơi bạn đã ở đêm qua."
+                            ],
+                            "lyDoChon": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T08:15:00",
+                            "endTime": "2025-11-16T12:15:00",
+                            "durationText": "4 giờ"
+                        },
+                        "title": "Tham quan Cụm Tràng An",
+                        "summary": "Lái xe ra Tràng An (30p). Gửi hành lý tại quầy (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).",
+                        "iconType": "boat",
+                        "details": {
+                            "chiTietDiChuyen": "TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy).",
+                            "thongTinDiaDiem": [
+                                "Bến thuyền Tràng An: Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ.",
+                                "Dịch vụ gửi đồ: Có tại khu vực nhà điều hành/bán vé."
+                            ],
+                            "lyDoChon": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T12:15:00",
+                            "endTime": "2025-11-16T13:15:00",
+                            "durationText": "1 giờ"
+                        },
+                        "title": "Ăn trưa Dê núi Cơm cháy",
+                        "summary": "Ăn trưa Dê núi Cơm cháy tại nhà hàng khu Tràng An (mang theo hành lý).",
+                        "iconType": "food",
+                        "details": {
+                            "thongTinDiaDiem": "Nhà hàng khu Tràng An: Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).",
+                            "lyDoChon": "Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T13:15:00",
+                            "endTime": "2025-11-16T16:15:00",
+                            "durationText": "3 giờ"
+                        },
+                        "title": "Thư giãn (Tùy chọn)",
+                        "summary": "Hoàn toàn tự do. (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để tắm rửa.",
+                        "iconType": "relax",
+                        "details": {
+                            "chiTietDiChuyen": "Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút).",
+                            "thongTinDiaDiem": [
+                                "Quán cà phê TTTP: Nhiều lựa chọn.",
+                                "Nhà nghỉ theo giờ (TTTP): Có nhiều nhà nghỉ cung cấp dịch vụ này."
+                            ],
+                            "lyDoChon": "Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T16:15:00",
+                            "endTime": "2025-11-16T16:45:00",
+                            "durationText": "30 phút"
+                        },
+                        "title": "Chuẩn bị về",
+                        "summary": "Đổ xăng, kiểm tra xe, sắp xếp hành lý.",
+                        "iconType": "time",
+                        "details": {
+                            "lyDoChon": "Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T16:45:00",
+                            "endTime": "2025-11-16T18:15:00",
+                            "durationText": "1 giờ 30 phút"
+                        },
+                        "title": "Lái xe về Vân Đình",
+                        "summary": "Di chuyển từ Ninh Bình đến Vân Đình, Ứng Hòa (theo QL1A).",
+                        "iconType": "time",
+                        "details": {
+                            "chiTietDiChuyen": "Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy).",
+                            "lyDoChon": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T18:15:00",
+                            "endTime": "2025-11-16T19:15:00",
+                            "durationText": "1 giờ"
+                        },
+                        "title": "Ăn tối Vịt cỏ Vân Đình",
+                        "summary": "Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình.",
+                        "iconType": "food",
+                        "details": {
+                            "thongTinDiaDiem": "Vân Đình (Ứng Hòa): Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
+                            "lyDoChon": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T19:15:00",
+                            "endTime": "2025-11-16T20:15:00",
+                            "durationText": "1 giờ"
+                        },
+                        "title": "Về đến Hà Nội",
+                        "summary": "Lái xe chặng cuối về Hà Nội. Kết thúc chuyến đi!",
+                        "iconType": "time",
+                        "details": {
+                            "chiTietDiChuyen": "Vân Đình -> Trung tâm Hà Nội: ~30-40km (Khoảng 1 tiếng xe máy).",
+                            "lyDoChon": "Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau."
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+
+    // --- ICON SVG (Sử dụng inline SVG để không phụ thuộc vào thư viện ngoài) ---
+    const icons = {
+        time: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+        logistics: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-baggage-claim"><path d="M22 18H6a2 2 0 0 1-2-2V7a2 2 0 0 0-2-2"/><path d="M17 14V4a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v10"/><rect width="13" height="8" x="8" y="6" rx="1"/><circle cx="18" cy="20" r="2"/><circle cx="9" cy="20" r="2"/></svg>`,
+        boat: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ship"><path d="M2 21c.6.5 1.2 1 2.5 1 1.6 0 2.2-1.8 3.5-1.8 1.4 0 2.2 1.8 3.5 1.8 1.3 0 2-.5 3.5-1.8 1.4 0 2.2 1.8 3.5 1.8 1.3 0 1.9-.5 2.5-1H2z"/><path d="M19.3 19.3c-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4"/><path d="M22 10.5c0-.9-.5-1.8-1.4-2.3-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4C2.5 8.7 2 9.6 2 10.5V16h20v-5.5z"/><path d="M16 6.2C14.5 5.2 13 5 11.5 5c-1.5 0-3 .2-4.5.8"/><path d="M12 12v4"/></svg>`,
+        food: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils-crossed"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 2.1 6.4 6.4"/></svg>`,
+        explore: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+        hotel: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bed-double"><path d="M2 17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v4Z"/><path d="M4 11V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/><path d="M12 11V6"/><path d="M6 11V6"/><path d="M18 11V6"/></svg>`,
+        nightlife: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-star"><path d="M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/><path d="m19 11 1.5 1.5"/><path d="M22 12.5h-3"/></svg>`,
+        relax: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coffee"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2Z"/><path d="M6 2v2"/><path d="M18 15v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2c0 1.1.9 2 2 2h8a4 4 0 0 0 4-4Z"/><path d="M20 15h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v6Z"/></svg>`,
+        default: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>`
+    };
+
+    function getIcon(iconType) {
+        return icons[iconType] || icons.default;
+    }
+
+    // --- HÀM ĐỊNH DẠNG CHI TIẾT ---
+    function formatDetails(details) {
+        let html = '';
+
+        // Hàm trợ giúp để render một mảng hoặc một chuỗi
+        const renderDetail = (data) => {
+            if (Array.isArray(data)) {
+                return `<ul>${data.map(item => `<li>${item}</li>`).join('')}</ul>`;
+            }
+            return `<p>${data}</p>`;
+        };
+
+        if (details.chiTietDiChuyen) {
+            html += `<h4>Chi tiết Di chuyển</h4>${renderDetail(details.chiTietDiChuyen)}`;
+        }
+        if (details.thongTinDiaDiem) {
+            html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.thongTinDiaDiem)}`;
+        }
+        if (details.lyDoChon) {
+            html += `<h4>Lý do Lựa chọn</h4><p>${details.lyDoChon}</p>`;
+        }
+
+        return html;
+    }
+
+    // --- HÀM RENDER LỊCH TRÌNH ---
+    function renderTimeline(data) {
+        const container = document.getElementById('timeline-container');
+        container.innerHTML = ''; // Xóa nội dung cũ
+
+        // Cập nhật tiêu đề chính
+        document.getElementById('main-title').innerText = data.tripInfo.title;
+        document.getElementById('main-subtitle').innerText = `${data.tripInfo.subtitle} (${data.tripInfo.dates})`;
+
+        data.schedule.forEach(day => {
+            // Thêm tiêu đề ngày
+            const dayHeader = document.createElement('h2');
+            dayHeader.className = "text-2xl font-bold text-gray-800 my-6 pb-2 border-b-2 border-gray-300";
+            dayHeader.innerText = day.dayInfo.title;
+            container.appendChild(dayHeader);
+
+            // Thêm các mục timeline
+            day.timelineItems.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'timeline-item status-future'; // Mặc định là 'sắp tới'
+                // Lưu trữ thời gian trực tiếp trên element để JS dễ dàng truy cập
+                itemEl.dataset.startTime = item.timeInfo.startTime;
+                itemEl.dataset.endTime = item.timeInfo.endTime;
+                itemEl.id = `item-${item.timeInfo.startTime}`; // ID duy nhất
+
+                const startTime = new Date(item.timeInfo.startTime);
+                const endTime = new Date(item.timeInfo.endTime);
+
+                const timeString = `${startTime.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })} - ${endTime.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
+
+                itemEl.innerHTML = `
+                        <!-- Đường kẻ dọc -->
+                        <div class="timeline-line"></div>
+
+                        <!-- Icon -->
+                        <div class="icon-container">
+                            ${getIcon(item.iconType)}
+                        </div>
+
+                        <!-- Box nội dung -->
+                        <div class="timeline-content bg-white rounded-lg shadow-md p-4 transition-all duration-300">
+                            <!-- Hàng tiêu đề -->
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="item-title font-bold text-lg text-gray-900">${item.title}</span>
+                                ${item.timeInfo.durationText ? `<span class="text-sm font-medium bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full whitespace-nowrap">${item.timeInfo.durationText}</span>` : ''}
+                            </div>
+
+                            <!-- Thời gian -->
+                            <p class="text-sm text-gray-500 font-mono mb-3">${timeString}</p>
+
+                            <!-- Tóm tắt -->
+                            <p class="text-gray-700 mb-4">${item.summary}</p>
+
+                            <!-- Thời gian còn lại (MỚI) -->
+                            <p class="time-remaining text-sm font-medium text-red-600 mb-4 hidden"></p>
+
+                            <!-- Nút Xem chi tiết -->
+                            <button class="toggle-details text-blue-600 font-medium text-sm hover:underline">Xem chi tiết</button>
+
+                            <!-- Nội dung chi tiết (ẩn) -->
+                            <div class="details-content">
+                                <div class="mt-4 border-t border-gray-200 pt-4">
+                                    ${formatDetails(item.details)}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                // Thêm sự kiện click cho nút "Xem chi tiết"
+                const toggleButton = itemEl.querySelector('.toggle-details');
+                const detailsContent = itemEl.querySelector('.details-content');
+
+                toggleButton.addEventListener('click', () => {
+                    const isExpanded = detailsContent.classList.toggle('expanded');
+
+                    if (isExpanded) {
+                        // Mở ra
+                        detailsContent.style.maxHeight = detailsContent.scrollHeight + 'px';
+                        toggleButton.innerText = 'Thu gọn';
+                        itemEl.dataset.userExpanded = 'true'; // Người dùng MỞ
+                        delete itemEl.dataset.userCollapsed; // Xóa cờ THU GỌN
+                    } else {
+                        // Thu gọn
+                        detailsContent.style.maxHeight = '0px';
+                        toggleButton.innerText = 'Xem chi tiết';
+                        itemEl.dataset.userCollapsed = 'true'; // Người dùng THU GỌN
+                        delete itemEl.dataset.userExpanded; // Xóa cờ MỞ
+                    }
+                });
+
+                container.appendChild(itemEl);
+            });
+        });
+    }
+
+    // --- LOGIC THỜI GIAN THỰC ---
+
+    const timeOverrideDateInput = document.getElementById('time-override-date');
+    const timeOverrideTimeInput = document.getElementById('time-override-time');
+    const resetTimeButton = document.getElementById('reset-time');
+    const clockDisplay = document.getElementById('real-time-clock');
+    const currentActivityContainer = document.getElementById('current-activity-container');
+    const currentActivityDisplay = document.getElementById('current-activity-display');
+    const header = document.getElementById('header');
+
+    let lastScrolledItemId = null; // Biến để tránh cuộn trang liên tục
+
+    // Lấy thời gian hiện tại (hoặc thời gian giả lập)
+    function getCurrentTime() {
+        const dateValue = timeOverrideDateInput.value;
+        const timeValue = timeOverrideTimeInput.value;
+
+        if (dateValue && timeValue) {
+            // Cả ngày và giờ đều được chọn
+            return new Date(`${dateValue}T${timeValue}`);
+        } else if (dateValue) {
+            // Chỉ chọn ngày -> lấy giờ hiện tại
+            const now = new Date();
+            const simulatedDate = new Date(dateValue);
+            simulatedDate.setHours(now.getHours());
+            simulatedDate.setMinutes(now.getMinutes());
+            simulatedDate.setSeconds(now.getSeconds());
+            return simulatedDate;
+        }
+
+        // Không chọn gì -> lấy thời gian thực
+        return new Date();
+    }
+
+    // (MỚI) Hàm cập nhật URL param
+    function updateUrlParams() {
+        const dateValue = timeOverrideDateInput.value;
+        const timeValue = timeOverrideTimeInput.value;
+        const url = new URL(window.location);
+
+        if (dateValue) {
+            if (timeValue) {
+                url.searchParams.set('time', `${dateValue}T${timeValue}`);
+            } else {
+                url.searchParams.set('time', dateValue);
+            }
+        } else {
+            url.searchParams.delete('time');
+        }
+
+        // Cập nhật URL mà không tải lại trang
+        window.history.pushState({}, '', url);
+    }
+
+    // Định dạng số (thêm số 0)
+    const pad = (num) => String(num).padStart(2, '0');
+
+    // (MỚI) Hàm định dạng thời gian còn lại
+    function formatRemainingTime(milliseconds) {
+        let totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+
+        let hours = Math.floor(totalSeconds / 3600);
+        totalSeconds %= 3600;
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+
+        if (totalSeconds <= 0) return "Sắp kết thúc...";
+
+        let str = "Còn lại: ";
+        // (MỚI) Luôn hiển thị HH:MM:SS
+        str += `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+
+        return str;
+    }
+
+    // Hàm cập nhật chính, chạy mỗi giây
+    function updateTimeline() {
+        const now = getCurrentTime();
+
+        // 1. Cập nhật đồng hồ
+        const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const dateStr = now.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        clockDisplay.innerHTML = `
+                <div class="font-mono font-bold text-xl text-gray-800">${timeStr}</div>
+                <div class="text-xs text-gray-500">${dateStr}</div>
+            `;
+
+        let currentItem = null;
+        const allItems = document.querySelectorAll('.timeline-item');
+
+        allItems.forEach(itemEl => {
+            const startTime = new Date(itemEl.dataset.startTime);
+            const endTime = new Date(itemEl.dataset.endTime);
+            const detailsContent = itemEl.querySelector('.details-content');
+            const toggleButton = itemEl.querySelector('.toggle-details');
+            const remEl = itemEl.querySelector('.time-remaining'); // (MỚI) Lấy thẻ thời gian còn lại
+
+            // 2. Phân loại trạng thái (Quá khứ, Hiện tại, Tương lai)
+            if (now >= endTime) {
+                // Đã qua
+                itemEl.className = 'timeline-item status-past';
+                // Tự động đóng (nếu đang mở VÀ không phải do người dùng tự mở)
+                if (detailsContent.classList.contains('expanded') && !itemEl.dataset.userExpanded) {
+                    detailsContent.classList.remove('expanded');
+                    detailsContent.style.maxHeight = '0px';
+                    toggleButton.innerText = 'Xem chi tiết';
+                }
+                // Reset cờ 'userCollapsed' khi nó đã qua
+                if (itemEl.dataset.userCollapsed) {
+                    delete itemEl.dataset.userCollapsed;
+                }
+                remEl.classList.add('hidden'); // Ẩn thời gian còn lại
+            } else if (now >= startTime && now < endTime) {
+                // Đang diễn ra
+                itemEl.className = 'timeline-item status-current';
+                currentItem = itemEl;
+
+                // Tự động mở (nếu đang đóng VÀ người dùng CHƯA TỰ THU GỌN NÓ)
+                if (!detailsContent.classList.contains('expanded') && !itemEl.dataset.userCollapsed) {
+                    detailsContent.classList.add('expanded');
+                    detailsContent.style.maxHeight = detailsContent.scrollHeight + 'px';
+                    toggleButton.innerText = 'Thu gọn';
+                    // Không set cờ userExpanded, để nó tự đóng khi chuyển mục
+                }
+
+                // (MỚI) Cập nhật thời gian còn lại
+                const remainingMs = endTime.getTime() - now.getTime();
+                remEl.innerText = formatRemainingTime(remainingMs);
+                remEl.classList.remove('hidden');
+
+            } else {
+                // Sắp tới
+                itemEl.className = 'timeline-item status-future';
+                // Tự động đóng (nếu đang mở VÀ không phải do người dùng tự mở)
+                if (detailsContent.classList.contains('expanded') && !itemEl.dataset.userExpanded) {
+                    detailsContent.classList.remove('expanded');
+                    detailsContent.style.maxHeight = '0px';
+                    toggleButton.innerText = 'Xem chi tiết';
+                }
+                // Reset cờ 'userCollapsed'
+                if (itemEl.dataset.userCollapsed) {
+                    delete itemEl.dataset.userCollapsed;
+                }
+                remEl.classList.add('hidden'); // Ẩn thời gian còn lại
+            }
+        });
+
+        // 3. Cập nhật thanh Hoạt động hiện tại
+        if (currentItem) {
+            currentActivityDisplay.innerText = currentItem.querySelector('.item-title').innerText;
+            currentActivityContainer.classList.remove('hidden');
+
+            // 4. Tự động cuộn trang (chỉ cuộn 1 lần khi mục thay đổi)
+            if (currentItem.id !== lastScrolledItemId) {
+                const newTargetId = currentItem.id; // Lưu ID mới
+                lastScrolledItemId = newTargetId; // Cập nhật lastScrolledItemId ngay lập tức để tránh gọi lại
+
+                // (MỚI) Chờ 300ms (lâu hơn 0.25s của transition) để item cũ thu gọn
+                setTimeout(() => {
+                    // Kiểm tra xem item mục tiêu có còn là item hiện tại không (phòng trường hợp thay đổi nhanh)
+                    const currentTargetEl = document.getElementById(newTargetId);
+                    if (currentTargetEl && currentTargetEl.classList.contains('status-current')) {
+                        const headerHeight = header.offsetHeight;
+                        const itemTop = currentTargetEl.getBoundingClientRect().top + window.scrollY;
+
+                        window.scrollTo({
+                            top: itemTop - headerHeight - 20, // 20px lề
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 300); // Đợi 300ms
+            }
+        } else {
+            currentActivityContainer.classList.add('hidden');
+            lastScrolledItemId = null; // Reset khi không có mục nào
+        }
+    }
+
+    // --- KHỞI CHẠY ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Render lịch trình lần đầu
+        renderTimeline(scheduleData);
+
+        // (MỚI) Thêm sự kiện cho nút Ẩn/Hiện Test Panel
+        const toggleTestPanelButton = document.getElementById('toggle-test-panel');
+        const testPanelContent = document.getElementById('test-panel-content');
+
+        toggleTestPanelButton.addEventListener('click', () => {
+            const isExpanded = testPanelContent.classList.toggle('expanded');
+            if (isExpanded) {
+                testPanelContent.style.maxHeight = testPanelContent.scrollHeight + 'px';
+            } else {
+                testPanelContent.style.maxHeight = '0px';
+            }
+        });
+
+
+        // (MỚI) Hàm xử lý khi thời gian giả lập thay đổi
+        function handleSimulatedTimeChange() {
+            updateTimeline();
+            updateUrlParams(); // Cập nhật URL
+        }
+
+        // Cập nhật sự kiện cho nút reset
+        resetTimeButton.addEventListener('click', () => {
+            timeOverrideDateInput.value = '';
+            timeOverrideTimeInput.value = '';
+            handleSimulatedTimeChange(); // Cập nhật ngay
+        });
+
+        // Cập nhật khi thay đổi thời gian giả lập
+        timeOverrideDateInput.addEventListener('change', handleSimulatedTimeChange);
+        timeOverrideTimeInput.addEventListener('change', handleSimulatedTimeChange);
+
+        // --- (MỚI) XỬ LÝ PARAM TỪ URL ---
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const timeParam = urlParams.get('time'); // Ví dụ: ?time=2025-11-15T09:30:00 hoặc ?time=2025-11-15
+
+            if (timeParam) {
+                const simulatedDate = new Date(timeParam);
+
+                if (!isNaN(simulatedDate.getTime())) {
+                    // 1. Điền ngày
+                    const dateValue = `${simulatedDate.getFullYear()}-${pad(simulatedDate.getMonth() + 1)}-${pad(simulatedDate.getDate())}`;
+                    timeOverrideDateInput.value = dateValue;
+
+                    // 2. Kiểm tra xem param có bao gồm thời gian không (chứa 'T', ':', hoặc ' ')
+                    const hasTime = /T|:| /.test(timeParam);
+
+                    if (hasTime) {
+                        // 2a. Điền giờ
+                        const timeValue = `${pad(simulatedDate.getHours())}:${pad(simulatedDate.getMinutes())}:${pad(simulatedDate.getSeconds())}`;
+                        timeOverrideTimeInput.value = timeValue;
+                    }
+                    // 2b. Nếu không có giờ, ô input time sẽ trống, và hàm getCurrentTime() sẽ tự lấy giờ hiện tại (đúng yêu cầu)
+
+                    // 3. Tự động mở panel
+                    if (!testPanelContent.classList.contains('expanded')) {
+                        testPanelContent.classList.add('expanded');
+                        testPanelContent.style.maxHeight = testPanelContent.scrollHeight + 'px';
+                    }
+                } else {
+                    console.warn("Giá trị 'time' trên URL không hợp lệ:", timeParam);
+                }
+            }
+        } catch (e) {
+            console.error("Lỗi khi xử lý URL param 'time':", e);
+        }
+        // --- KẾT THÚC XỬ LÝ PARAM ---
+
+        // Bắt đầu vòng lặp cập nhật thời gian thực
+        setInterval(updateTimeline, 1000); // 1 giây một lần
+
+        // Chạy lần đầu tiên
+        updateTimeline();
+    });
+</script>
+</body>
+</html>
