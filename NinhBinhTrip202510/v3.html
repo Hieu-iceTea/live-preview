@@ -22,6 +22,13 @@
             background-color: #f4f7f6;
         }
 
+        /* (MỚI) Thay thế border-bottom của header bằng shadow xanh nhẹ nhàng */
+        #header {
+            /* 0 5px 15px -3px là bóng tương đương shadow-lg của tailwind */
+            /* rgba(37, 99, 235, 0.1) là màu xanh (blue-600) với 10% độ mờ */
+            box-shadow: 0 5px 15px -3px rgba(37, 99, 235, 0.1);
+        }
+
         /* CSS CHO TIMELINE (Style của index.html)
         */
         .timeline-item {
@@ -171,7 +178,13 @@
 
         .pulse-urgent {
             animation: pulse-red 1s infinite;
-            font-weight: 700; /* bold */
+            /* (ĐÃ SỬA) Xóa font-weight: 700; ra khỏi đây */
+            /* JS sẽ thêm class 'time-warning-30min' riêng */
+        }
+
+        .time-warning-30min {
+            font-weight: 700 !important; /* bold */
+            font-size: 15px !important;
         }
 
 
@@ -207,7 +220,9 @@
   - Lấy style tiêu đề, layout đồng hồ, box "Hoạt động hiện tại" của index.html
   - Giữ lại "Công cụ Giả lập thời gian" của v2.html
 -->
-<header id="header" class="sticky top-0 left-0 w-full bg-white shadow-lg z-50 p-4 border-b-4 border-blue-600">
+<!-- (ĐÃ SỬA) Xóa class 'shadow-lg', 'border-b-4', 'border-blue-600' -->
+<!-- CSS trong <style> (ở trên) sẽ thêm shadow màu xanh nhạt. -->
+<header id="header" class="sticky top-0 left-0 w-full bg-white z-50 p-4">
     <!--
       Sử dụng max-w-4xl giống index.html
     -->
@@ -868,6 +883,8 @@
                     delete itemEl.dataset.userCollapsed;
                 }
                 remEl.classList.add('hidden');
+                // (MỚI) Đảm bảo xóa cả 2 class khi mục đã trôi qua
+                remEl.classList.remove('time-warning-30min', 'pulse-urgent');
             } else if (now >= startTime && now < endTime) {
                 // Đang diễn ra
                 itemEl.className = 'timeline-item status-current';
@@ -887,11 +904,20 @@
                 remEl.innerText = formatRemainingTime(remainingMs);
                 remEl.classList.remove('hidden');
 
-                // (MỚI) Thêm class 'pulse-urgent' nếu còn dưới 15 phút (900 giây)
-                if (remainingSeconds < 900 && remainingSeconds > 0) {
-                    remEl.classList.add('pulse-urgent');
+                // (ĐÃ SỬA) Logic 2 tầng cho 30 phút và 15 phút
+
+                // 1. Dưới 30 phút (1800s)
+                if (remainingSeconds < 1800 && remainingSeconds > 0) {
+                    remEl.classList.add('time-warning-30min'); // Thêm class 'time-warning-30min' của Tailwind
                 } else {
-                    remEl.classList.remove('pulse-urgent');
+                    remEl.classList.remove('time-warning-30min'); // Xóa nếu trên 30 phút
+                }
+
+                // 2. Dưới 15 phút (900s)
+                if (remainingSeconds < 900 && remainingSeconds > 0) {
+                    remEl.classList.add('pulse-urgent'); // Thêm pulse
+                } else {
+                    remEl.classList.remove('pulse-urgent'); // Xóa nếu trên 15 phút
                 }
 
             } else {
@@ -908,7 +934,9 @@
                     delete itemEl.dataset.userCollapsed;
                 }
                 remEl.classList.add('hidden');
-                remEl.classList.remove('pulse-urgent'); // (MỚI) Xóa pulse nếu là mục sắp tới
+                remEl.classList.remove('pulse-urgent');
+                // (MỚI) Đảm bảo xóa cả time-warning-30min
+                remEl.classList.remove('time-warning-30min');
             }
         });
 
