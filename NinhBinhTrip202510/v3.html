@@ -2,12 +2,14 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <!--
       Tiêu đề tôi lấy từ file index.html của bạn
     -->
-    <title>Hiếu & Chi - Ninh Bình Trip 2025</title>
+    <title>Your Trip</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="route.png" type="image/x-icon">
     <style>
         /* Sử dụng font Inter mượt mà hơn */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -93,7 +95,7 @@
 
         .status-past .icon-container {
             /* Dùng background-color thay vì border */
-            background-color: #94a3b8; /* gray-400 */
+            background-color: #16A34ADB; /* gray-400 */
         }
 
         /* Lớp cho trạng thái "Đang diễn ra" */
@@ -127,7 +129,10 @@
         .details-content {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.35s ease-out; /* Nhanh hơn 0.5s của index.html */
+            transition: all 0.35s ease-out; /* Nhanh hơn 0.5s của index.html */
+            margin-top: 0; /* mt-3 */
+            padding-top: 0; /* pt-3 */
+            border-top: 0 solid transparent;
         }
 
         /* (MỚI) Thêm style cho .details-content khi được mở rộng */
@@ -187,6 +192,10 @@
             font-size: 15px !important;
         }
 
+        /* Optimize animation cho time-remaining */
+        .time-remaining {
+            will-change: transform; /* GPU acceleration cho animation mượt mà */
+        }
 
         /* Chi tiết bên trong phần mở rộng (Lấy từ index.html) */
         .details-content h4 {
@@ -209,6 +218,58 @@
             font-size: 0.875rem;
             color: #6b7280;
             margin-bottom: 8px;
+        }
+
+        /* Icon Google Maps inline cho địa điểm */
+        .place-map-icon {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 2px;
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            vertical-align: middle;
+        }
+
+        .place-map-icon:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.15);
+        }
+
+        .place-map-icon svg {
+            display: block;
+            width: 16px; /* To icon lên để dễ nhìn hơn */
+            height: 16px;
+            margin-top: -4px; /* Nâng icon lên 1px để căn giữa với text */
+        }
+
+        /* Icon Google Maps cho day header (tổng quan cả ngày) */
+        .day-map-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px; /* Khoảng cách giữa icon và text */
+            padding: 4px; /* Tăng hit area để dễ click */
+            color: #3b82f6; /* blue-500 */
+            font-size: 0.875rem; /* 14px - nhỏ hơn tiêu đề */
+            transition: color 0.2s ease, transform 0.2s ease;
+            text-decoration: none; /* Bỏ gạch chân mặc định */
+        }
+
+        .day-map-link:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.05); /* Giảm scale để phù hợp với text */
+            text-decoration: underline; /* Gạch chân khi hover */
+        }
+
+        .day-map-link svg {
+            display: block;
+            flex-shrink: 0; /* Không cho icon bị co lại */
+        }
+
+        .day-map-link span {
+            font-weight: 500; /* Medium weight cho text */
+            white-space: nowrap; /* Không cho text xuống dòng */
         }
     </style>
 </head>
@@ -302,168 +363,222 @@
     // --- DỮ LIỆU LỊCH TRÌNH (Lấy 100% từ v2.html) ---
     // Dữ liệu này được tách biệt hoàn toàn khỏi HTML,
     // giúp bạn dễ dàng chỉnh sửa lịch trình mà không cần động vào code.
+    //
+    // LƯU Ý: Trường "durationText" trong timeInfo được TỰ ĐỘNG TÍNH TOÁN
+    // từ startTime và endTime, nên KHÔNG CẦN điền thủ công.
+    // Ví dụ: startTime: "2025-11-15T05:30:00", endTime: "2025-11-15T07:15:00"
+    //        => Tự động hiển thị: "1 giờ 45 phút"
     const scheduleData = {
         "tripInfo": {
-            "title": "Hiếu & Chi - Ninh Bình Trip", // Đổi tiêu đề
-            "subtitle": "2 Ngày 1 Đêm (Phiên bản v3)",
-            "dates": "15-16/11/2025"
+            "title": "Ninh Bình trip 2025", // Đổi tiêu đề
+            "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
+            "dates": "15-16/11/2025",
+            "defaultRegion": "Ninh Bình" // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
         },
         "schedule": [
             {
                 "dayInfo": {
                     "day": 1,
                     "date": "2025-11-15",
-                    "title": "Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)"
+                    "title": "Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)",
+                    "mapUrl": "https://google.com/maps"
                 },
                 "timelineItems": [
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T05:30:00",
-                            "endTime": "2025-11-15T07:15:00",
-                            "durationText": "1 giờ 45 phút"
+                            "endTime": "2025-11-15T07:15:00"
                         },
                         "title": "Xuất phát từ Hà Nội",
                         "summary": "Lái xe máy, di chuyển đến Trung tâm TP. Ninh Bình.",
                         "iconType": "time", // 'time' sẽ gọi icon đồng hồ
                         "details": {
-                            "chiTietDiChuyen": "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h.",
-                            "lyDoChon": "Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP."
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/aqbqJeMUASt33Quj6",
+                                // "mapUrl": "https://maps.app.goo.gl/nNN4n58kspyqrgpn9",
+                                "steps": [
+                                    "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h."
+                                ]
+                            },
+                            "reason": "Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T07:15:00",
-                            "endTime": "2025-11-15T08:15:00",
-                            "durationText": "1 giờ"
+                            "endTime": "2025-11-15T08:15:00"
                         },
                         "title": "Gửi đồ & Ăn sáng",
                         "summary": "Tới nhà nghỉ (TTTP) gửi hành lý miễn phí. Ăn sáng (Gợi ý: Miến Lươn).",
                         "iconType": "logistics", // 'logistics' sẽ gọi icon túi đồ
                         "details": {
-                            "thongTinDiaDiem": [
-                                "Nhà nghỉ (TTTP): Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm.",
-                                "Quán Miến Lươn: Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn)."
+                            "places": [
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm."
+                                },
+                                {
+                                    "name": "Quán Miến Lươn",
+                                    "description": "Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn)."
+                                }
                             ],
-                            "lyDoChon": "Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch."
+                            "reason": "Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T08:15:00",
-                            "endTime": "2025-11-15T11:30:00",
-                            "durationText": "3 giờ 15 phút"
+                            "endTime": "2025-11-15T11:30:00"
                         },
                         "title": "Tham quan Cụm Tam Cốc",
                         "summary": "Lái xe ra Tam Cốc (30p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).",
                         "iconType": "boat", // 'boat' sẽ gọi icon thuyền
                         "details": {
-                            "chiTietDiChuyen": [
-                                "TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).",
-                                "Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy)."
+                            "directions": {
+                                "steps": [
+                                    "TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).",
+                                    "Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Bến thuyền Tam Cốc",
+                                    "description": "Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.",
+                                    "mapUrl": "https://maps.app.goo.gl/9dJCr52N1C5QVopC8"
+                                },
+                                {
+                                    "name": "Chùa Bích Động",
+                                    "description": "\"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
+                                }
                             ],
-                            "thongTinDiaDiem": [
-                                "Bến thuyền Tam Cốc: Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.",
-                                "Chùa Bích Động: \"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
-                            ],
-                            "lyDoChon": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
+                            "reason": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T11:30:00",
-                            "endTime": "2025-11-15T13:30:00",
-                            "durationText": "2 giờ"
+                            "endTime": "2025-11-15T13:30:00"
                         },
                         "title": "Ăn trưa & Nghỉ ngơi tại Tam Cốc",
                         "summary": "Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng tại quán cà phê.",
                         "iconType": "food", // 'food' sẽ gọi icon đồ ăn
                         "details": {
-                            "thongTinDiaDiem": [
-                                "Nhà hàng Tam Cốc: Rất nhiều lựa chọn từ bình dân đến cao cấp dọc khu vực bến thuyền.",
-                                "Quán cà phê Tam Cốc: Nhiều quán có view đẹp ra đồng lúa/núi non."
+                            "directions": {
+                                // "mapUrl": "",
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà hàng Tam Cốc",
+                                    "description": "Rất nhiều lựa chọn từ bình dân đến cao cấp dọc khu vực bến thuyền."
+                                },
+                                {
+                                    "name": "Quán cà phê Tam Cốc",
+                                    "description": "Nhiều quán có view đẹp ra đồng lúa/núi non."
+                                }
                             ],
-                            "lyDoChon": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
+                            "reason": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T13:30:00",
-                            "endTime": "2025-11-15T16:45:00",
-                            "durationText": "3 giờ 15 phút"
+                            "endTime": "2025-11-15T16:45:00"
                         },
                         "title": "Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc",
                         "summary": "Lái xe ra Hoa Lư (30p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
                         "iconType": "explore", // 'explore' sẽ gọi icon map
                         "details": {
-                            "chiTietDiChuyen": [
-                                "Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).",
-                                "Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút)."
+                            "directions": {
+                                "steps": [
+                                    "Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).",
+                                    "Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Cố đô Hoa Lư",
+                                    "description": "Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm."
+                                },
+                                {
+                                    "name": "Tuyệt Tình Cốc (Động Am Tiên)",
+                                    "description": "Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp \"sống ảo\". Có chùa nhỏ trong động phía trên."
+                                }
                             ],
-                            "thongTinDiaDiem": [
-                                "Cố đô Hoa Lư: Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm.",
-                                "Tuyệt Tình Cốc (Động Am Tiên): Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp \"sống ảo\". Có chùa nhỏ trong động phía trên."
-                            ],
-                            "lyDoChon": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh."
+                            "reason": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T16:45:00",
-                            "endTime": "2025-11-15T18:15:00",
-                            "durationText": "1 giờ 30 phút"
+                            "endTime": "2025-11-15T18:15:00"
                         },
                         "title": "Về Nhà nghỉ & Tắm rửa",
                         "summary": "Lái xe về TTTP (20p). Nhận phòng (lấy lại đồ), tắm rửa và nghỉ ngơi (1h 10p).",
                         "iconType": "hotel", // 'hotel' sẽ gọi icon khách sạn/giường
                         "details": {
-                            "chiTietDiChuyen": "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy).",
-                            "lyDoChon": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/8ZeLiTqWv1sEv1Te6",
+                                "steps": [
+                                    "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy)."
+                                ]
+                            },
+                            "reason": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T18:15:00",
-                            "endTime": "2025-11-15T19:15:00",
-                            "durationText": "1 giờ"
+                            "endTime": "2025-11-15T19:15:00"
                         },
                         "title": "Ăn tối tại Phố 8",
                         "summary": "Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8).",
                         "iconType": "food",
                         "details": {
-                            "thongTinDiaDiem": "Phố 8 (Cù Chính Lan): Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
-                            "lyDoChon": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương."
+                            "places": "Phố 8 (Cù Chính Lan): Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
+                            "reason": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T19:15:00",
-                            "endTime": "2025-11-15T23:00:00",
-                            "durationText": "3 giờ 45 phút"
+                            "endTime": "2025-11-15T23:00:00"
                         },
                         "title": "Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)",
                         "summary": "Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu).",
                         "iconType": "nightlife", // 'nightlife' sẽ gọi icon trăng sao
                         "details": {
-                            "chiTietDiChuyen": "Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút).",
-                            "thongTinDiaDiem": [
-                                "Phố đi bộ (Phố 8): Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần.",
-                                "Phố cổ Hoa Lư: Khu phố tái hiện, lung linh đèn lồng về đêm. Có các gian hàng, hoạt động văn nghệ.",
-                                "Tháp Tứ Ân & Đền Mẫu (Chùa Bạc): Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối."
+                            "directions": {
+                                "steps": [
+                                    "Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Phố đi bộ (Phố 8)",
+                                    "description": "Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần."
+                                },
+                                {
+                                    "name": "Phố cổ Hoa Lư",
+                                    "description": "Khu phố tái hiện, lung linh đèn lồng về đêm. Có các gian hàng, hoạt động văn nghệ."
+                                },
+                                {
+                                    "name": "Tháp Tứ Ân & Đền Mẫu (Chùa Bạc)",
+                                    "description": "Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối."
+                                }
                             ],
-                            "lyDoChon": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
+                            "reason": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-15T23:00:00",
-                            "endTime": "2025-11-16T07:30:00",
-                            "durationText": ""
+                            "endTime": "2025-11-16T07:30:00"
                         },
                         "title": "Về nhà nghỉ",
                         "summary": "Kết thúc Ngày 1, nghỉ ngơi.",
                         "iconType": "hotel",
                         "details": {
-                            "lyDoChon": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn."
+                            "reason": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn."
                         }
                     }
                 ]
@@ -472,129 +587,156 @@
                 "dayInfo": {
                     "day": 2,
                     "date": "2025-11-16",
-                    "title": "Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)"
+                    "title": "Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)",
+                    "mapUrl": ""  // Thêm URL khi có
                 },
                 "timelineItems": [
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T07:30:00",
-                            "endTime": "2025-11-16T08:15:00",
-                            "durationText": "45 phút"
+                            "endTime": "2025-11-16T08:15:00"
                         },
                         "title": "Ăn sáng & Trả phòng",
                         "summary": "Ăn sáng tại TTTP. Quay về nhà nghỉ, làm thủ tục Check-out. (Hành lý mang theo).",
                         "iconType": "food",
                         "details": {
-                            "thongTinDiaDiem": [
-                                "Quán ăn sáng TTTP: Nhiều lựa chọn.",
-                                "Nhà nghỉ (TTTP): Nơi bạn đã ở đêm qua."
+                            "places": [
+                                {
+                                    "name": "Quán ăn sáng TTTP",
+                                    "description": "Nhiều lựa chọn."
+                                },
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Nơi bạn đã ở đêm qua."
+                                }
                             ],
-                            "lyDoChon": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người."
+                            "reason": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T08:15:00",
-                            "endTime": "2025-11-16T12:15:00",
-                            "durationText": "4 giờ"
+                            "endTime": "2025-11-16T12:15:00"
                         },
                         "title": "Tham quan Cụm Tràng An",
                         "summary": "Lái xe ra Tràng An (30p). Gửi hành lý tại quầy (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).",
                         "iconType": "boat",
                         "details": {
-                            "chiTietDiChuyen": "TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy).",
-                            "thongTinDiaDiem": [
-                                "Bến thuyền Tràng An: Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ.",
-                                "Dịch vụ gửi đồ: Có tại khu vực nhà điều hành/bán vé."
+                            "directions": {
+                                "steps": [
+                                    "TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Bến thuyền Tràng An",
+                                    "description": "Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ."
+                                },
+                                {
+                                    "name": "Dịch vụ gửi đồ",
+                                    "description": "Có tại khu vực nhà điều hành/bán vé."
+                                }
                             ],
-                            "lyDoChon": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
+                            "reason": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T12:15:00",
-                            "endTime": "2025-11-16T13:15:00",
-                            "durationText": "1 giờ"
+                            "endTime": "2025-11-16T13:15:00"
                         },
                         "title": "Ăn trưa Dê núi Cơm cháy",
                         "summary": "Ăn trưa Dê núi Cơm cháy tại nhà hàng khu Tràng An (mang theo hành lý).",
                         "iconType": "food",
                         "details": {
-                            "thongTinDiaDiem": "Nhà hàng khu Tràng An: Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).",
-                            "lyDoChon": "Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
+                            "places": "Nhà hàng khu Tràng An: Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).",
+                            "reason": "Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T13:15:00",
-                            "endTime": "2025-11-16T16:15:00",
-                            "durationText": "3 giờ"
+                            "endTime": "2025-11-16T16:15:00"
                         },
                         "title": "Thư giãn (Tùy chọn)",
                         "summary": "Hoàn toàn tự do. (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để tắm rửa.",
                         "iconType": "relax", // 'relax' sẽ gọi icon cafe
                         "details": {
-                            "chiTietDiChuyen": "Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút).",
-                            "thongTinDiaDiem": [
-                                "Quán cà phê TTTP: Nhiều lựa chọn.",
-                                "Nhà nghỉ theo giờ (TTTP): Có nhiều nhà nghỉ cung cấp dịch vụ này."
+                            "directions": {
+                                "steps": [
+                                    "Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Quán cà phê TTTP",
+                                    "description": "Nhiều lựa chọn."
+                                },
+                                {
+                                    "name": "Nhà nghỉ theo giờ (TTTP)",
+                                    "description": "Có nhiều nhà nghỉ cung cấp dịch vụ này."
+                                }
                             ],
-                            "lyDoChon": "Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
+                            "reason": "Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T16:15:00",
-                            "endTime": "2025-11-16T16:45:00",
-                            "durationText": "30 phút"
+                            "endTime": "2025-11-16T16:45:00"
                         },
                         "title": "Chuẩn bị về",
                         "summary": "Đổ xăng, kiểm tra xe, sắp xếp hành lý.",
                         "iconType": "time",
                         "details": {
-                            "lyDoChon": "Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
+                            "reason": "Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T16:45:00",
-                            "endTime": "2025-11-16T18:15:00",
-                            "durationText": "1 giờ 30 phút"
+                            "endTime": "2025-11-16T18:15:00"
                         },
                         "title": "Lái xe về Vân Đình",
                         "summary": "Di chuyển từ Ninh Bình đến Vân Đình, Ứng Hòa (theo QL1A).",
                         "iconType": "time",
                         "details": {
-                            "chiTietDiChuyen": "Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy).",
-                            "lyDoChon": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
+                            "directions": {
+                                "steps": [
+                                    "Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy)."
+                                ]
+                            },
+                            "reason": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T18:15:00",
-                            "endTime": "2025-11-16T19:15:00",
-                            "durationText": "1 giờ"
+                            "endTime": "2025-11-16T19:15:00"
                         },
                         "title": "Ăn tối Vịt cỏ Vân Đình",
                         "summary": "Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình.",
                         "iconType": "food",
                         "details": {
-                            "thongTinDiaDiem": "Vân Đình (Ứng Hòa): Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
-                            "lyDoChon": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý."
+                            "places": "Vân Đình (Ứng Hòa): Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
+                            "reason": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T19:15:00",
-                            "endTime": "2025-11-16T20:15:00",
-                            "durationText": "1 giờ"
+                            "endTime": "2025-11-16T20:15:00"
                         },
                         "title": "Về đến Hà Nội",
                         "summary": "Lái xe chặng cuối về Hà Nội. Kết thúc chuyến đi!",
                         "iconType": "time",
                         "details": {
-                            "chiTietDiChuyen": "Vân Đình -> Trung tâm Hà Nội: ~30-40km (Khoảng 1 tiếng xe máy).",
-                            "lyDoChon": "Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau."
+                            "directions": {
+                                "steps": [
+                                    "Vân Đình -> Trung tâm Hà Nội: ~30-40km (Khoảng 1 tiếng xe máy)."
+                                ]
+                            },
+                            "reason": "Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau."
                         }
                     }
                 ]
@@ -621,6 +763,183 @@
         return icons[iconType] || icons.default;
     }
 
+    // --- HÀM TÍNH TOÁN THỜI GIAN TỰ ĐỘNG ---
+    /**
+     * Tính toán và format thời gian khoảng cách giữa startTime và endTime
+     * @param {string|Date} startTime - Thời gian bắt đầu (ISO string hoặc Date object)
+     * @param {string|Date} endTime - Thời gian kết thúc (ISO string hoặc Date object)
+     * @returns {string} - Chuỗi thời gian đã format (vd: "1 giờ 45 phút", "30 phút", "2 giờ")
+     */
+    function calculateDuration(startTime, endTime) {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+
+        // Tính khoảng cách tính bằng milliseconds
+        const durationMs = end.getTime() - start.getTime();
+
+        // Chuyển đổi sang phút và giờ
+        const totalMinutes = Math.floor(durationMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        // Format chuỗi kết quả
+        if (hours > 0 && minutes > 0) {
+            return `${hours} giờ ${minutes} phút`;
+        } else if (hours > 0) {
+            return `${hours} giờ`;
+        } else if (minutes > 0) {
+            return `${minutes} phút`;
+        } else {
+            return ""; // Trường hợp đặc biệt: thời gian = 0
+        }
+    }
+
+    // --- HÀM TỰ ĐỘNG TẠO GOOGLE MAPS DIRECTIONS URL ---
+    /**
+     * Tự động tạo Google Maps Directions URL từ danh sách địa điểm (2+ địa điểm)
+     * @param {Array} places - Mảng các địa điểm (có thể là object hoặc string)
+     * @param {string|null} region - Vùng/tỉnh (optional, tự động lấy từ scheduleData.tripInfo.defaultRegion nếu không truyền)
+     * @returns {string|null} - Google Maps directions URL hoặc null nếu không hợp lệ
+     */
+    function generateDirectionsMapUrl(places, region = null) {
+        if (!places || !Array.isArray(places) || places.length === 0) {
+            return null;
+        }
+
+        // Lấy tên địa điểm (hỗ trợ cả object và string)
+        const locationNames = places.map(place => {
+            if (typeof place === 'object' && place.name) {
+                return place.name;
+            }
+            return place;
+        }).filter(Boolean);
+
+        if (locationNames.length === 0) {
+            return null;
+        }
+
+        // Tự động lấy region từ scheduleData.tripInfo.defaultRegion nếu không truyền vào
+        if (!region && scheduleData && scheduleData.tripInfo && scheduleData.tripInfo.defaultRegion) {
+            region = scheduleData.tripInfo.defaultRegion;
+        }
+
+        // Encode và tạo URL
+        const encodedLocations = locationNames
+            .map(name => encodeURIComponent(
+                region
+                    ? `${name.trim()}, ${region}`
+                    : name.trim()
+            ))
+            .join('/');
+
+        return `https://www.google.com/maps/dir/${encodedLocations}`;
+    }
+
+    // --- HÀM TỰ ĐỘNG TẠO GOOGLE MAPS SEARCH URL CHO 1 ĐỊA ĐIỂM ---
+    /**
+     * Tự động tạo Google Maps Search URL cho 1 địa điểm
+     * @param {string} placeName - Tên địa điểm
+     * @param {string|null} region - Vùng/tỉnh (optional, tự động lấy từ scheduleData.tripInfo.defaultRegion nếu không truyền)
+     * @returns {string|null} - Google Maps search URL hoặc null nếu không hợp lệ
+     */
+    function generatePlaceSearchUrl(placeName, region = null) {
+        if (!placeName || typeof placeName !== 'string') {
+            return null;
+        }
+
+        // Tự động lấy region từ scheduleData.tripInfo.defaultRegion nếu không truyền vào
+        if (!region && scheduleData && scheduleData.tripInfo && scheduleData.tripInfo.defaultRegion) {
+            region = scheduleData.tripInfo.defaultRegion;
+        }
+
+        // Tạo search query (có hoặc không có region)
+        const searchQuery = region
+            ? `${placeName.trim()}, ${region}`
+            : placeName.trim();
+
+        const encoded = encodeURIComponent(searchQuery);
+        return `https://www.google.com/maps/search/${encoded}`;
+    }
+
+    // --- HÀM RENDER NÚT GOOGLE MAPS DIRECTIONS ---
+    /**
+     * Render nút link Google Maps Directions (chỉ đường) với mapUrl
+     * @param {string|null} mapUrl - URL Google Maps directions (null/empty = auto-generate từ places)
+     * @param {Array} places - Mảng các địa điểm (dùng để tự động tạo directions URL nếu mapUrl rỗng)
+     * @returns {string} - HTML string cho nút Google Maps Directions hoặc empty string
+     */
+    function renderDirectionsMapUrlButton(mapUrl, places) {
+        let isAutoGenerated = false;
+
+        // Tự động tạo mapUrl nếu chưa có và có places >= 2
+        if (!mapUrl && places && Array.isArray(places) && places.length >= 2) {
+            mapUrl = generateDirectionsMapUrl(places);
+            isAutoGenerated = true;
+        }
+
+        // Không có mapUrl thì không hiển thị gì
+        if (!mapUrl) {
+            return '';
+        }
+
+        // Label cho mapUrl tự động (nested span với style riêng)
+        const autoLabel = isAutoGenerated
+            ? ' <span class="text-xs text-gray-500 italic">(Tự động tạo)</span>'
+            : '';
+
+        // Return HTML
+        // Wrap text + autoLabel vào <span> để chúng luôn dính liền nhau (1 flex item)
+        // Wrap SVG trong <span class="shrink-0"> để icon không bị co lại khi mobile
+        return `
+            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline mb-2 text-sm font-medium">
+                <span class="shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </span>
+                <span>Xem toàn bộ hành trình trên Google Maps${autoLabel}</span>
+            </a>
+        `;
+    }
+
+    // --- HÀM RENDER ICON GOOGLE MAPS CHO 1 ĐỊA ĐIỂM ---
+    /**
+     * Render icon Google Maps inline cho 1 địa điểm
+     * @param {string} placeName - Tên địa điểm (dùng để tạo URL và tooltip)
+     * @param {string} mapUrl - URL Google Maps (empty string = auto-generate)
+     * @returns {string} - HTML string cho icon inline hoặc empty string
+     */
+    function renderPlaceMapIcon(placeName, mapUrl) {
+        // Nếu không có tên địa điểm thì không render
+        if (!placeName) {
+            return '';
+        }
+
+        let finalUrl = mapUrl;
+        let isAutoGenerated = false;
+
+        // Tự động tạo URL nếu mapUrl là empty string
+        if (!mapUrl || mapUrl === '') {
+            finalUrl = generatePlaceSearchUrl(placeName);
+            isAutoGenerated = true;
+        }
+
+        // Nếu không có URL (cả manual và auto) thì không render
+        if (!finalUrl) {
+            return '';
+        }
+
+        // Tạo tooltip text
+        const tooltipText = isAutoGenerated
+            ? 'Xem trên Google Maps (Tự động tạo)'
+            : 'Xem trên Google Maps';
+
+        // Return icon HTML inline
+        return `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="place-map-icon" title="${tooltipText}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></a>`;
+    }
+
     // --- HÀM ĐỊNH DẠNG CHI TIẾT (Lấy từ v2.html) ---
     // Hàm này sẽ tự động tạo HTML cho mục 'details' trong JSON
     function formatDetails(details) {
@@ -629,22 +948,74 @@
         // Hàm trợ giúp để render một mảng (list) hoặc một chuỗi (p)
         const renderDetail = (data) => {
             if (Array.isArray(data)) {
-                return `<ul>${data.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                return `<ul>${data.map(item => {
+                    // Kiểm tra nếu item là object (có name và description)
+                    if (typeof item === 'object' && item !== null) {
+                        // Render map icon inline (tự động tạo URL nếu mapUrl là empty string)
+                        const mapIcon = renderPlaceMapIcon(item.name, item.mapUrl || '');
+                        return `<li><strong>${item.name}${mapIcon}:</strong> ${item.description}</li>`;
+                    }
+                    // Backward compatibility: Nếu vẫn là string
+                    return `<li>${item}</li>`;
+                }).join('')}</ul>`;
             }
             return `<p>${data}</p>`;
         };
 
-        if (details.chiTietDiChuyen) {
-            html += `<h4>Chi tiết Di chuyển</h4>${renderDetail(details.chiTietDiChuyen)}`;
+        // Điều kiện hiển thị khối "Chi tiết Di chuyển":
+        // 1. Có directions (bất kỳ), HOẶC
+        // 2. Có places >= 2 (có thể tạo URL hành trình tự động)
+        const hasDirections = details.directions;
+        const canGenerateRoute = details.places && Array.isArray(details.places) && details.places.length >= 2;
+
+        if (hasDirections || canGenerateRoute) {
+            html += `<h4>Chi tiết Di chuyển</h4>`;
+
+            // Render nút Google Maps Directions (nếu có đủ điều kiện: places >= 2)
+            html += renderDirectionsMapUrlButton(
+                details.directions?.mapUrl || null,
+                details.places
+            );
+
+            // Render steps (chỉ khi có directions và steps)
+            // Note: directions luôn có cấu trúc: { steps: string[], mapUrl?: string }
+            if (hasDirections && details.directions.steps) {
+                html += renderDetail(details.directions.steps);
+            }
         }
-        if (details.thongTinDiaDiem) {
-            html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.thongTinDiaDiem)}`;
+        if (details.places) {
+            html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.places)}`;
         }
-        if (details.lyDoChon) {
-            html += `<h4>Lý do Lựa chọn</h4><p>${details.lyDoChon}</p>`;
+        if (details.reason) {
+            html += `<h4>Lý do Lựa chọn</h4><p>${details.reason}</p>`;
         }
 
         return html;
+    }
+
+    // --- HÀM RENDER ICON MAP CHO DAY HEADER ---
+    /**
+     * Render HTML cho icon map của day header (tổng quan hành trình cả ngày)
+     * @param {string} mapUrl - URL Google Maps cho tổng quan cả ngày
+     * @returns {string} - HTML string hoặc empty string nếu không có URL
+     */
+    function renderDayMapLink(mapUrl) {
+        if (!mapUrl) {
+            return '';
+        }
+
+        return `
+            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
+               class="day-map-link"
+               title="Xem tổng quan hành trình cả ngày trên Google Maps">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>Xem bản đồ</span>
+            </a>
+        `;
     }
 
     // --- HÀM RENDER LỊCH TRÌNH (Lấy từ v2.html, chỉnh sửa HTML output) ---
@@ -656,18 +1027,36 @@
         document.getElementById('main-title').innerText = data.tripInfo.title;
         document.getElementById('main-subtitle').innerText = `${data.tripInfo.subtitle} (${data.tripInfo.dates})`;
 
+        // Cập nhật tiêu đề của tab trình duyệt
+        document.title = `${data.tripInfo.title} | Hiếu iceTea`;
+
         data.schedule.forEach((day, dayIndex) => {
-            // Thêm tiêu đề ngày (Style của index.html)
-            const dayHeader = document.createElement('h2');
-            dayHeader.className = "text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-200";
+            // ================================================================
+            // === TẠO WRAPPER CONTAINER CHO MỖI NGÀY ===
+            // ================================================================
+            const dayContainer = document.createElement('div');
+            dayContainer.className = 'timeline-day';
+
             // Thêm lề trên cho ngày thứ 2 trở đi
             if (dayIndex > 0) {
-                dayHeader.classList.add("mt-8");
+                dayContainer.classList.add("mt-12");
             }
-            dayHeader.innerText = day.dayInfo.title;
-            container.appendChild(dayHeader);
 
-            // Thêm các mục timeline
+            // ================================================================
+            // === THÊM TIÊU ĐỀ NGÀY VÀO CONTAINER ===
+            // ================================================================
+            const dayHeader = document.createElement('h2');
+            dayHeader.className = "text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-200";
+            // Set nội dung: title + icon map
+            const dayMapIconHTML = renderDayMapLink(day.dayInfo.mapUrl);
+            dayHeader.innerHTML = `${day.dayInfo.title}${dayMapIconHTML}`;
+
+            // Append header vào dayContainer (thay vì container chính)
+            dayContainer.appendChild(dayHeader);
+
+            // ================================================================
+            // === THÊM CÁC MỤC TIMELINE VÀO CONTAINER ===
+            // ================================================================
             day.timelineItems.forEach(item => {
                 const itemEl = document.createElement('div');
                 itemEl.className = 'timeline-item status-future'; // Mặc định là 'sắp tới'
@@ -682,6 +1071,9 @@
                     hour: '2-digit',
                     minute: '2-digit'
                 })} – ${endTime.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
+
+                // Tự động tính toán durationText (nếu không có trong JSON)
+                const durationText = item.timeInfo.durationText || calculateDuration(item.timeInfo.startTime, item.timeInfo.endTime);
 
                 //
                 // HTML OUTPUT ĐÃ ĐƯỢC CHỈNH SỬA
@@ -699,15 +1091,17 @@
                         </div>
 
                         <!-- Box nội dung (Thêm class 'timeline-card' từ index.html) -->
-                        <!-- (ĐÃ SỬA) Thêm class 'relative' để định vị thời gian còn lại -->
-                        <div class="timeline-card relative bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-300">
+                        <div class="timeline-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-300">
 
-                            <!-- Thời gian còn lại (Giữ từ v2) -->
-                            <!-- (ĐÃ SỬA) Di chuyển lên đây và thêm class định vị (absolute top-4 right-4) -->
-                            <p class="time-remaining absolute top-4 right-4 text-sm font-medium text-red-600 hidden"></p>
+                            <!-- Wrapper flexbox cho 2 thời gian (1 hàng ngang, không xuống dòng) -->
+                            <div class="flex justify-between items-start mb-1">
+                                <!-- Thời gian chính -->
+                                <time class="text-sm font-semibold text-blue-600">${timeString} ${durationText ? `(${durationText})` : ''}</time>
 
-                            <!-- Thời gian (Style của index.html) -->
-                            <time class="mb-1 text-sm font-semibold text-blue-600">${timeString} ${item.timeInfo.durationText ? `(${item.timeInfo.durationText})` : ''}</time>
+                                <!-- Thời gian còn lại -->
+                                <!-- shrink-0: không co lại khi flex container bị thu hẹp -->
+                                <p class="time-remaining text-sm font-medium text-red-600 hidden shrink-0 text-right">còn lại: --:--:--</p>
+                            </div>
 
                             <!-- Tiêu đề (Style của index.html) -->
                             <h3 class="item-title text-lg font-semibold text-gray-900">${item.title}</h3>
@@ -745,22 +1139,28 @@
                     toggleButton.classList.toggle('expanded'); // Để xoay icon
 
                     if (isExpanded) {
-                        // Mở ra
-                        detailsContent.style.maxHeight = detailsContent.scrollHeight + 'px';
+                        // Mở ra - Gọi helper function
+                        expandTimelineItemDetails(detailsContent);
                         buttonText.innerText = 'Thu gọn';
                         itemEl.dataset.userExpanded = 'true'; // Đánh dấu người dùng MỞ
                         delete itemEl.dataset.userCollapsed;
                     } else {
-                        // Thu gọn
-                        detailsContent.style.maxHeight = '0px';
+                        // Thu gọn - Gọi helper function
+                        collapseTimelineItemDetails(detailsContent);
                         buttonText.innerText = 'Xem chi tiết';
                         itemEl.dataset.userCollapsed = 'true'; // Đánh dấu người dùng THU GỌN
                         delete itemEl.dataset.userExpanded;
                     }
                 });
 
-                container.appendChild(itemEl);
+                // Append timeline item vào dayContainer (thay vì container chính)
+                dayContainer.appendChild(itemEl);
             });
+
+            // ================================================================
+            // === APPEND DAY CONTAINER VÀO MAIN TIMELINE CONTAINER ===
+            // ================================================================
+            container.appendChild(dayContainer);
         });
     }
 
@@ -840,6 +1240,60 @@
         return `còn lại: ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 
+    // ================================================================
+    // === HELPER FUNCTIONS - Expand/Collapse Timeline Item Details ===
+    // ================================================================
+
+    /**
+     * Mở rộng nội dung chi tiết của mục timeline
+     * Sử dụng transitionend event và unique ID để an toàn với rapid clicks
+     * @param {HTMLElement} contentEl - Element .details-content
+     */
+    function expandTimelineItemDetails(contentEl) {
+        // Tạo unique ID cho lần expand này (timestamp + random)
+        const expandId = Date.now() + Math.random();
+        contentEl._currentExpandId = expandId;
+
+        // Set scrollHeight để animation chạy mượt
+        contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+
+        // Lắng nghe transition end để set về 'none' (tự động co dãn)
+        // NOTE: Không dùng { once: true } vì CSS dùng "transition: all" → nhiều properties → nhiều events
+        // Phải check propertyName và manual remove listener
+        function handleTransitionEnd(e) {
+            // Check 4 điều kiện:
+            // 1. Property là max-height (không phải margin-top, padding-top, border, etc.)
+            // 2. Event từ đúng element (không phải từ children)
+            // 3. Vẫn đang expanded
+            // 4. Expand ID match (không bị override bởi expand khác - an toàn với rapid clicks)
+            if (e.propertyName === 'max-height' && e.target === contentEl && contentEl.classList.contains('expanded') && contentEl._currentExpandId === expandId) {
+                contentEl.style.maxHeight = 'none'; // Tự động co dãn khi resize
+                contentEl._currentExpandId = null; // Cleanup ID
+                contentEl.removeEventListener('transitionend', handleTransitionEnd); // Cleanup listener
+            }
+        }
+
+        contentEl.addEventListener('transitionend', handleTransitionEnd);
+    }
+
+    /**
+     * Thu gọn nội dung chi tiết của mục timeline
+     * @param {HTMLElement} contentEl - Element .details-content
+     */
+    function collapseTimelineItemDetails(contentEl) {
+        // Clear expand ID (cancel pending expand nếu có)
+        contentEl._currentExpandId = null;
+
+        // Nếu đang là 'none', chuyển về scrollHeight trước
+        if (contentEl.style.maxHeight === 'none') {
+            contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+            contentEl.offsetHeight; // Force reflow để browser nhận giá trị mới
+        }
+
+        // Set về 0 để animation chạy
+        contentEl.style.maxHeight = '0px';
+    }
+
     // Hàm cập nhật chính, chạy mỗi giây
     function updateTimeline() {
         const now = getCurrentTime();
@@ -894,7 +1348,7 @@
                 if (!detailsContent.classList.contains('expanded') && !itemEl.dataset.userCollapsed) {
                     detailsContent.classList.add('expanded');
                     toggleButton.classList.add('expanded');
-                    detailsContent.style.maxHeight = detailsContent.scrollHeight + 'px';
+                    expandTimelineItemDetails(detailsContent); // Gọi helper function
                     buttonText.innerText = 'Thu gọn';
                 }
 
