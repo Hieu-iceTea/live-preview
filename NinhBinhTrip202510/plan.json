@@ -1,0 +1,299 @@
+{
+  "tripInfo": {
+    "title": "Lộ Trình Chuyến Đi Ninh Bình",
+    "subtitle": "2 Ngày 1 Đêm (Phiên bản Tối ưu)",
+    "dates": "15-16/11/2025"
+  },
+  "schedule": [
+    {
+      "dayInfo": {
+        "day": 1,
+        "date": "2025-11-15",
+        "title": "Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)"
+      },
+      "timelineItems": [
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T05:30:00",
+            "endTime": "2025-11-15T07:15:00",
+            "durationText": "1 giờ 45 phút"
+          },
+          "title": "Xuất phát từ Hà Nội",
+          "summary": "Lái xe máy, di chuyển đến Trung tâm TP. Ninh Bình.",
+          "iconType": "time",
+          "details": {
+            "chiTietDiChuyen": "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h.",
+            "lyDoChon": "Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T07:15:00",
+            "endTime": "2025-11-15T08:15:00",
+            "durationText": "1 giờ"
+          },
+          "title": "Gửi đồ & Ăn sáng",
+          "summary": "Tới nhà nghỉ (TTTP) gửi hành lý miễn phí. Ăn sáng (Gợi ý: Miến Lươn).",
+          "iconType": "logistics",
+          "details": {
+            "thongTinDiaDiem": [
+              "Nhà nghỉ (TTTP): Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm.",
+              "Quán Miến Lươn: Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn)."
+            ],
+            "lyDoChon": "Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T08:15:00",
+            "endTime": "2025-11-15T11:30:00",
+            "durationText": "3 giờ 15 phút"
+          },
+          "title": "Tham quan Cụm Tam Cốc",
+          "summary": "Lái xe ra Tam Cốc (30p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).",
+          "iconType": "boat",
+          "details": {
+            "chiTietDiChuyen": [
+              "TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).",
+              "Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy)."
+            ],
+            "thongTinDiaDiem": [
+              "Bến thuyền Tam Cốc: Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.",
+              "Chùa Bích Động: \"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
+            ],
+            "lyDoChon": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T11:30:00",
+            "endTime": "2025-11-15T13:30:00",
+            "durationText": "2 giờ"
+          },
+          "title": "Ăn trưa & Nghỉ ngơi tại Tam Cốc",
+          "summary": "Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng tại quán cà phê.",
+          "iconType": "food",
+          "details": {
+            "thongTinDiaDiem": [
+              "Nhà hàng Tam Cốc: Rất nhiều lựa chọn từ bình dân đến cao cấp dọc khu vực bến thuyền.",
+              "Quán cà phê Tam Cốc: Nhiều quán có view đẹp ra đồng lúa/núi non."
+            ],
+            "lyDoChon": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T13:30:00",
+            "endTime": "2025-11-15T16:45:00",
+            "durationText": "3 giờ 15 phút"
+          },
+          "title": "Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc",
+          "summary": "Lái xe ra Hoa Lư (30p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
+          "iconType": "explore",
+          "details": {
+            "chiTietDiChuyen": [
+              "Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).",
+              "Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút)."
+            ],
+            "thongTinDiaDiem": [
+              "Cố đô Hoa Lư: Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm.",
+              "Tuyệt Tình Cốc (Động Am Tiên): Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp \"sống ảo\". Có chùa nhỏ trong động phía trên."
+            ],
+            "lyDoChon": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T16:45:00",
+            "endTime": "2025-11-15T18:15:00",
+            "durationText": "1 giờ 30 phút"
+          },
+          "title": "Về Nhà nghỉ & Tắm rửa",
+          "summary": "Lái xe về TTTP (20p). Nhận phòng (lấy lại đồ), tắm rửa và nghỉ ngơi (1h 10p).",
+          "iconType": "hotel",
+          "details": {
+            "chiTietDiChuyen": "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy).",
+            "lyDoChon": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T18:15:00",
+            "endTime": "2025-11-15T19:15:00",
+            "durationText": "1 giờ"
+          },
+          "title": "Ăn tối tại Phố 8",
+          "summary": "Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8).",
+          "iconType": "food",
+          "details": {
+            "thongTinDiaDiem": "Phố 8 (Cù Chính Lan): Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
+            "lyDoChon": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T19:15:00",
+            "endTime": "2025-11-15T23:00:00",
+            "durationText": "3 giờ 45 phút"
+          },
+          "title": "Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)",
+          "summary": "Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu).",
+          "iconType": "nightlife",
+          "details": {
+            "chiTietDiChuyen": "Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút).",
+            "thongTinDiaDiem": [
+              "Phố đi bộ (Phố 8): Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần.",
+              "Phố cổ Hoa Lư: Khu phố tái hiện, lung linh đèn lồng về đêm. Có các gian hàng, hoạt động văn nghệ.",
+              "Tháp Tứ Ân & Đền Mẫu (Chùa Bạc): Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối."
+            ],
+            "lyDoChon": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-15T23:00:00",
+            "endTime": "2025-11-16T07:30:00",
+            "durationText": ""
+          },
+          "title": "Về nhà nghỉ",
+          "summary": "Kết thúc Ngày 1, nghỉ ngơi.",
+          "iconType": "hotel",
+          "details": {
+            "lyDoChon": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn."
+          }
+        }
+      ]
+    },
+    {
+      "dayInfo": {
+        "day": 2,
+        "date": "2025-11-16",
+        "title": "Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)"
+      },
+      "timelineItems": [
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T07:30:00",
+            "endTime": "2025-11-16T08:15:00",
+            "durationText": "45 phút"
+          },
+          "title": "Ăn sáng & Trả phòng",
+          "summary": "Ăn sáng tại TTTP. Quay về nhà nghỉ, làm thủ tục Check-out. (Hành lý mang theo).",
+          "iconType": "food",
+          "details": {
+            "thongTinDiaDiem": [
+              "Quán ăn sáng TTTP: Nhiều lựa chọn.",
+              "Nhà nghỉ (TTTP): Nơi bạn đã ở đêm qua."
+            ],
+            "lyDoChon": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T08:15:00",
+            "endTime": "2025-11-16T12:15:00",
+            "durationText": "4 giờ"
+          },
+          "title": "Tham quan Cụm Tràng An",
+          "summary": "Lái xe ra Tràng An (30p). Gửi hành lý tại quầy (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).",
+          "iconType": "boat",
+          "details": {
+            "chiTietDiChuyen": "TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy).",
+            "thongTinDiaDiem": [
+              "Bến thuyền Tràng An: Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ.",
+              "Dịch vụ gửi đồ: Có tại khu vực nhà điều hành/bán vé."
+            ],
+            "lyDoChon": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T12:15:00",
+            "endTime": "2025-11-16T13:15:00",
+            "durationText": "1 giờ"
+          },
+          "title": "Ăn trưa Dê núi Cơm cháy",
+          "summary": "Ăn trưa Dê núi Cơm cháy tại nhà hàng khu Tràng An (mang theo hành lý).",
+          "iconType": "food",
+          "details": {
+            "thongTinDiaDiem": "Nhà hàng khu Tràng An: Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).",
+            "lyDoChon": "Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T13:15:00",
+            "endTime": "2025-11-16T16:15:00",
+            "durationText": "3 giờ"
+          },
+          "title": "Thư giãn (Tùy chọn)",
+          "summary": "Hoàn toàn tự do. (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để tắm rửa.",
+          "iconType": "relax",
+          "details": {
+            "chiTietDiChuyen": "Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút).",
+            "thongTinDiaDiem": [
+              "Quán cà phê TTTP: Nhiều lựa chọn.",
+              "Nhà nghỉ theo giờ (TTTP): Có nhiều nhà nghỉ cung cấp dịch vụ này."
+            ],
+            "lyDoChon": "Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T16:15:00",
+            "endTime": "2025-11-16T16:45:00",
+            "durationText": "30 phút"
+          },
+          "title": "Chuẩn bị về",
+          "summary": "Đổ xăng, kiểm tra xe, sắp xếp hành lý.",
+          "iconType": "time",
+          "details": {
+            "lyDoChon": "Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T16:45:00",
+            "endTime": "2025-11-16T18:15:00",
+            "durationText": "1 giờ 30 phút"
+          },
+          "title": "Lái xe về Vân Đình",
+          "summary": "Di chuyển từ Ninh Bình đến Vân Đình, Ứng Hòa (theo QL1A).",
+          "iconType": "time",
+          "details": {
+            "chiTietDiChuyen": "Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy).",
+            "lyDoChon": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T18:15:00",
+            "endTime": "2025-11-16T19:15:00",
+            "durationText": "1 giờ"
+          },
+          "title": "Ăn tối Vịt cỏ Vân Đình",
+          "summary": "Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình.",
+          "iconType": "food",
+          "details": {
+            "thongTinDiaDiem": "Vân Đình (Ứng Hòa): Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
+            "lyDoChon": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý."
+          }
+        },
+        {
+          "timeInfo": {
+            "startTime": "2025-11-16T19:15:00",
+            "endTime": "2025-11-16T20:15:00",
+            "durationText": "1 giờ"
+          },
+          "title": "Về đến Hà Nội",
+          "summary": "Lái xe chặng cuối về Hà Nội. Kết thúc chuyến đi!",
+          "iconType": "time",
+          "details": {
+            "chiTietDiChuyen": "Vân Đình -> Trung tâm Hà Nội: ~30-40km (Khoảng 1 tiếng xe máy).",
+            "lyDoChon": "Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau."
+          }
+        }
+      ]
+    }
+  ]
+}
