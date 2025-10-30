@@ -271,6 +271,29 @@
             font-weight: 500; /* Medium weight cho text */
             white-space: nowrap; /* Không cho text xuống dòng */
         }
+
+        /* Icon tài liệu chuyến đi (inline với tiêu đề chính) */
+        .trip-doc-link {
+            display: inline-flex;
+            align-items: center;
+            /*margin-left: 8px; !* Khoảng cách với tiêu đề *!*/
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            vertical-align: middle;
+            transform-origin: bottom left; /* Phóng to từ bên dưới lên */
+        }
+
+        .trip-doc-link:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.15);
+        }
+
+        .trip-doc-link svg {
+            display: block;
+            width: 18px; /* To hơn place-map-icon (16px) vì ở header */
+            height: 18px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -496,7 +519,8 @@
             "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
             "dates": "15-16/11/2025",
             "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
-            "totalBudget": 4015000 // Tính toán bằng tay và ghi tổng chi phí chuyến đi vào đây. (Tổng cho tất cả mọi người)
+            "totalBudget": 4015000, // Tính toán bằng tay và ghi tổng chi phí chuyến đi vào đây. (Tổng cho tất cả mọi người)
+            "documentUrl": "https://docs.google.com/spreadsheets/d/1N9SNB6n3YJ2kndi1_ZtQd0aFdE9Ib-UudKnR86DUdbQ"
         },
         "schedule": [
             // NGÀY 1
@@ -1562,6 +1586,32 @@
         return `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="place-map-icon" title="${tooltipText}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></a>`;
     }
 
+    // --- HÀM RENDER LINK TÀI LIỆU CHUYẾN ĐI ---
+    /**
+     * Render icon link tài liệu chuyến đi (inline với tiêu đề chính)
+     * @param {string} documentUrl - URL tài liệu chuyến đi
+     * @returns {string} - HTML string cho icon link hoặc empty string
+     */
+    function renderTripDocumentLink(documentUrl) {
+        // Nếu không có documentUrl thì không render
+        if (!documentUrl) {
+            return '';
+        }
+
+        // Return icon HTML inline (File Text icon - Lucide)
+        return `
+            <a href="${documentUrl}" target="_blank" rel="noopener noreferrer" class="trip-doc-link" title="Xem tài liệu chuyến đi">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+            </a>
+        `;
+    }
+
     // --- HÀM ĐỊNH DẠNG CHI TIẾT (Lấy từ v2.html) ---
     // Hàm này sẽ tự động tạo HTML cho mục 'details' trong JSON
     function formatDetails(details) {
@@ -1648,8 +1698,9 @@
         const container = document.getElementById('timeline-container');
         container.innerHTML = ''; // Xóa nội dung cũ
 
-        // Cập nhật tiêu đề chính
-        document.getElementById('main-title').innerText = data.tripInfo.title;
+        // Cập nhật tiêu đề chính (với icon link tài liệu nếu có)
+        const docLinkHTML = renderTripDocumentLink(data.tripInfo.documentUrl);
+        document.getElementById('main-title').innerHTML = `${data.tripInfo.title}${docLinkHTML}`;
 
         // Cập nhật subtitle với totalBudget
         let totalBudgetText = ''
