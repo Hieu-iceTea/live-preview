@@ -360,17 +360,125 @@
 </main>
 
 <script>
-    // --- DỮ LIỆU LỊCH TRÌNH (Lấy 100% từ v2.html) ---
-    // Dữ liệu này được tách biệt hoàn toàn khỏi HTML,
-    // giúp bạn dễ dàng chỉnh sửa lịch trình mà không cần động vào code.
+    // ========================================================================
+    // === DỮ LIỆU LỊCH TRÌNH (scheduleData) ===
+    // ========================================================================
     //
-    // LƯU Ý: Trường "durationText" trong timeInfo được TỰ ĐỘNG TÍNH TOÁN
-    // từ startTime và endTime, nên KHÔNG CẦN điền thủ công.
-    // Ví dụ: startTime: "2025-11-15T05:30:00", endTime: "2025-11-15T07:15:00"
-    //        => Tự động hiển thị: "1 giờ 45 phút"
+    // Đây là biến chứa TOÀN BỘ dữ liệu cho chuyến đi của bạn.
+    // Dữ liệu này được tách biệt hoàn toàn khỏi HTML và logic code,
+    // giúp bạn dễ dàng chỉnh sửa lịch trình hoặc TẠO CHUYẾN ĐI MỚI
+    // chỉ bằng cách thay đổi nội dung JSON này.
     //
-    // CHI PHÍ (details.budgets):
-    // - category (optional): hotel | food | drink | transport | ticket | shopping | relax | other
+    // ------------------------------------------------------------------------
+    // 📋 CẤU TRÚC DỮ LIỆU
+    // ------------------------------------------------------------------------
+    //
+    // {
+    //   "tripInfo": {                          // === THÔNG TIN CHUYẾN ĐI ===
+    //     "title": string,                     // Tiêu đề chuyến đi (hiển thị ở header và tab title)
+    //     "subtitle": string,                  // Phụ đề (ai đi, bao nhiêu ngày)
+    //     "dates": string,                     // Ngày tháng (dạng text tự do: "15-16/11/2025")
+    //     "defaultRegion": string,             // Vùng/tỉnh mặc định (dùng để tự động tạo Google Maps URL)
+    //     "totalBudget": number                // Tổng chi phí dự kiến (VNĐ, hiển thị ở subtitle)
+    //   },
+    //
+    //   "schedule": [                          // === DANH SÁCH CÁC NGÀY ===
+    //     {
+    //       "dayInfo": {                       // --- Thông tin ngày ---
+    //         "day": number,                   // Số thứ tự ngày (1, 2, 3, ...)
+    //         "date": string,                  // Ngày (format: "YYYY-MM-DD", vd: "2025-11-15")
+    //         "title": string,                 // Tiêu đề ngày (vd: "Ngày 1: Thứ 7, 15/11/2025")
+    //         "mapUrl": string                 // (Optional) Link Google Maps tổng quan cả ngày
+    //       },
+    //
+    //       "timelineItems": [                 // --- Danh sách hoạt động trong ngày ---
+    //         {
+    //           "timeInfo": {                  // • Thông tin thời gian
+    //             "startTime": string,         //   - Thời gian bắt đầu (ISO 8601: "YYYY-MM-DDTHH:MM:SS")
+    //             "endTime": string,           //   - Thời gian kết thúc (ISO 8601: "YYYY-MM-DDTHH:MM:SS")
+    //             "durationText": string       //   - (Optional, TỰ ĐỘNG TÍNH) Thời lượng (vd: "1 giờ 45 phút")
+    //           },
+    //
+    //           "title": string,               // • Tiêu đề hoạt động
+    //           "summary": string,             // • Tóm tắt ngắn gọn
+    //           "iconType": string,            // • Loại icon: time | logistics | boat | food | explore | hotel | nightlife | relax | default
+    //
+    //           "details": {                   // • Chi tiết (hiển thị khi mở rộng)
+    //             "directions": {              //   ◦ Thông tin di chuyển (optional)
+    //               "mapUrl": string,          //     - Link Google Maps Directions (nếu rỗng → tự động tạo từ places)
+    //               "steps": string[]          //     - Các bước di chuyển (mảng chuỗi)
+    //             },
+    //
+    //             "places": string | [        //   ◦ Địa điểm (có thể là string hoặc mảng object)
+    //               {
+    //                 "name": string,          //     - Tên địa điểm
+    //                 "description": string,   //     - Mô tả
+    //                 "mapUrl": string         //     - (Optional) Link Google Maps (nếu rỗng → tự động tạo)
+    //               }
+    //             ],
+    //
+    //             "budgets": [                 //   ◦ Chi phí (optional)
+    //               {
+    //                 "name": string,          //     - Tên khoản chi
+    //                 "amount": number,        //     - Số tiền (VNĐ)
+    //                 "category": string,      //     - (Optional) Loại: hotel | food | drink | transport | ticket | shopping | relax | other
+    //                 "note": string           //     - (Optional) Ghi chú
+    //               }
+    //             ],
+    //
+    //             "reason": string             //   ◦ Lý do lựa chọn (optional)
+    //           }
+    //         }
+    //       ]
+    //     }
+    //   ]
+    // }
+    //
+    // ------------------------------------------------------------------------
+    // 🔄 CÁCH SỬ DỤNG & TÁI SỬ DỤNG
+    // ------------------------------------------------------------------------
+    //
+    // 1. TẠO CHUYẾN ĐI MỚI:
+    //    - Copy toàn bộ biến scheduleData này sang file HTML mới
+    //    - Thay đổi tripInfo (title, subtitle, dates, defaultRegion, totalBudget)
+    //    - Thay đổi schedule (các ngày và hoạt động)
+    //    - Save file → Mở trình duyệt → Hoàn thành!
+    //
+    // 2. CHỈNH SỬA LỊCH TRÌNH HIỆN TẠI:
+    //    - Tìm đến phần schedule → tìm ngày cần sửa → tìm item cần sửa
+    //    - Thay đổi các trường: title, summary, timeInfo, details, ...
+    //    - Refresh trình duyệt để xem kết quả
+    //
+    // 3. LƯU Ý QUAN TRỌNG:
+    //    ✓ Thời gian (startTime, endTime): Phải dùng định dạng ISO 8601
+    //      Ví dụ: "2025-11-15T08:30:00" (năm-tháng-ngày T giờ:phút:giây)
+    //
+    //    ✓ durationText: KHÔNG CẦN điền thủ công, hệ thống sẽ tự động tính
+    //      từ startTime và endTime. Ví dụ: 05:30 → 07:15 = "1 giờ 45 phút"
+    //
+    //    ✓ mapUrl: Có thể bỏ trống (empty string "") → hệ thống sẽ TỰ ĐỘNG tạo
+    //      Google Maps URL dựa trên tên địa điểm + defaultRegion
+    //
+    //    ✓ iconType: Chọn 1 trong các giá trị sau:
+    //      - time: đồng hồ (xuất phát, về, chuẩn bị)
+    //      - logistics: túi đồ (gửi đồ, check-in/out)
+    //      - boat: thuyền (đi thuyền, tour sông)
+    //      - food: đồ ăn (ăn sáng, trưa, tối)
+    //      - explore: bản đồ (tham quan, khám phá)
+    //      - hotel: giường (nhà nghỉ, khách sạn)
+    //      - nightlife: trăng sao (chơi đêm, phố đêm)
+    //      - relax: cafe (nghỉ ngơi, thư giãn)
+    //      - default: lịch (các hoạt động khác)
+    //
+    //    ✓ budgets.category: Chọn 1 trong các giá trị sau (để hiển thị emoji phù hợp):
+    //      hotel 🏠 | food 🍜 | drink ☕ | transport 🚕 | ticket 🎫 | shopping 🛍️ | relax 💆 | other 💰
+    //
+    // 4. TÍ MẸO:
+    //    - Dùng "Công cụ Giả lập thời gian" (ở header) để test lịch trình
+    //    - Chia sẻ link với tham số ?time=2025-11-15T09:30:00 để xem tại thời điểm cụ thể
+    //    - Nếu muốn ẩn 1 hoạt động tạm thời: Comment toàn bộ object {...} của item đó
+    //
+    // ========================================================================
     const scheduleData = {
         "tripInfo": {
             "title": "Ninh Bình trip 2025", // Đổi tiêu đề
