@@ -582,28 +582,28 @@
                             ],
                             "budgets": [
                                 {
-                                    "name": "Nhà nghỉ (Ngủ qua đêm trước chuyến đi)",
+                                    "name": "Phòng nghỉ",
                                     "amount": 350000,
                                     "category": "hotel", // Phân loại. Các giá trị: hotel | food | drink | transport | ticket | shopping | relax | other
-                                    "note": "Nghỉ đêm trước khi đi"
+                                    "note": "Ngủ qua đêm trước chuyến đi. Lựa chọn chỗ gần điểm đến hơn và tránh cụm tắc đường đi đến bến xe Nước Ngầm cuối tuần."
                                 },
                                 {
-                                    "name": "Xăng xe lượt đi (ước tính)",
+                                    "name": "Xăng xe lượt đi",
                                     "amount": 60000,
                                     "category": "transport",
                                     "note": "Đầy bình xăng xe máy Khoảng 3 lít"
                                 },
                                 {
-                                    "name": "Cafe, trà (Dừng nghỉ)",
+                                    "name": "Cafe, trà",
                                     "amount": 80000,
                                     "category": "drink",
                                     "note": "Dừng nghỉ ngơi giữa đường"
                                 },
                                 {
-                                    "name": "Ăn sáng (Tự chuẩn bị)",
+                                    "name": "Ăn sáng",
                                     "amount": 60000,
                                     "category": "food",
-                                    "note": "Chi phí bánh mỳ/đồ ăn sáng mang theo"
+                                    "note": "Chi phí bánh mỳ/đồ ăn sáng mang theo chuẩn bị trước"
                                 }
                             ],
                             "reason": "Xuất phát sớm để tránh tắc đường, tận dụng thời gian ban ngày, nghỉ ngơi giữa đường và ăn sáng tự túc để tiết kiệm thời gian. Đến TTTP checkin trước khi di chuyển tiếp."
@@ -615,7 +615,7 @@
                             "endTime": "2025-11-15T08:00:00"
                         },
                         "title": "Đến Ninh Bình checkin & Chuẩn bị",
-                        "summary": "Gửi hành lý tại nhà nghỉ, ăn nhanh, chụp ảnh check-in.",
+                        "summary": "Chụp ảnh check-in, gửi hành lý tại nhà nghỉ, ăn nhanh.",
                         "iconType": "ticket",
                         "details": {
                             "directions": {
@@ -623,16 +623,21 @@
                             },
                             "places": [
                                 {
+                                    "name": "Cổng chào Ninh Bình",
+                                    "description": "Có thể checkin chụp ảnh ở đây (~10p)."
+                                },
+                                {
+                                    "name": "Phố đi bộ Ninh Bình",
+                                    "description": "Chụp ảnh check-in nhanh (~15p). Ăn nhanh bánh mỳ (nếu mang theo mà chưa ăn) (~10p)."
+                                },
+                                {
                                     "name": "Nhà nghỉ (TTTP)",
                                     "description": "Đến nhà nghỉ (đã liên hệ trước) để gửi đồ (~10p)."
                                 },
                                 {
                                     "name": "Quán ăn sáng TTTP (tùy chọn)",
-                                    "description": "Nếu chưa ăn sáng. Gợi ý Miến Lươn Bà Phấn hoặc quán khác gần đó."
-                                },
-                                {
-                                    "name": "Phố đi bộ Ninh Bình",
-                                    "description": "Chụp ảnh check-in nhanh (~15p). Ăn nhanh bánh mỳ (nếu chưa ăn) (~10p)."
+                                    "description": "Nếu chưa ăn sáng. Gợi ý Miến Lươn Bà Phấn hoặc quán khác gần đó. (~30p)",
+                                    "mapUrl": "https://www.google.com/maps/search/Ăn+sáng,+Ninh+Bình"
                                 }
                             ],
                             "budgets": [], // Bỏ 80k ăn sáng (đã chuyển lên mục trước)
@@ -649,6 +654,7 @@
                         "iconType": "boat",
                         "details": {
                             "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/w2HQMmjK7JRuwam87",
                                 "steps": [
                                     "Di chuyển TTTP -> Bến thuyền Tam Cốc (~7-8km, ~20 phút).",
                                     "Đi thuyền Tam Cốc (08:30 - 10:30).",
@@ -671,7 +677,7 @@
                                 {
                                     "name": "Đền Thái Vi (Option)",
                                     "description": "Nằm gần Tam Cốc, đền cổ, không gian rất yên tĩnh và đẹp, ít khách du lịch hơn. Miễn phí tham quan. (Nếu đi nhanh 2 điểm trên, có thể ghé qua).",
-                                    "mapUrl": ""
+                                    "mapUrl": "https://www.google.com/maps/search/Đền+Thái+Vi,+Ninh+Bình"
                                 }
                             ],
                             "budgets": [
@@ -721,12 +727,12 @@
                                 {
                                     "name": "Nhà hàng Tam Cốc (Du lịch, Gần)",
                                     "description": "Gợi ý: Nhà hàng Chính Thư (cũng có ở Tam Cốc, nổi tiếng).",
-                                    "mapUrl": ""
+                                    "mapUrl": "https://maps.app.goo.gl/f4d722wj9TXrpM5T6"
                                 },
                                 {
                                     "name": "Nhà hàng (Địa phương, Gần)",
                                     "description": "Gợi ý: Anh Dũng Restaurant (Gà đồi, Cá sông), Minh Tâm Restaurant (Cơm bình dân, rẻ).",
-                                    "mapUrl": ""
+                                    "mapUrl": "https://maps.app.goo.gl/fYqAWtppdzPrfXwA9"
                                 },
                                 {
                                     "name": "Option 1: Quán cà phê Tam Cốc",
@@ -770,26 +776,30 @@
                         "iconType": "explore",
                         "details": {
                             "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/ctgRVUdjpRcFn1Xv5",
                                 "steps": [
                                     "Di chuyển Tam Cốc -> Cố đô Hoa Lư (~10-12km, ~25 phút xe máy).",
                                     "Tham quan Cố đô (14:00 - 15:30).",
                                     "(Option) Ghé Chùa Nhất Trụ (ngay cạnh).",
                                     "Di chuyển Cố đô -> Tuyệt Tình Cốc (~400m, ~2 phút).",
-                                    "Tham quan Tuyệt Tình Cốc (15:30 - 16:45)."
+                                    "Tham quan Tuyệt Tình Cốc (Động Am Tiên) (15:30 - 16:45)."
                                 ]
                             },
                             "places": [
                                 {
                                     "name": "Cố đô Hoa Lư",
-                                    "description": "Kinh đô xưa. Thăm đền Vua Đinh Tiên Hoàng, Vua Lê Đại Hành. Không khí cổ kính. Nên thuê hướng dẫn viên (~100k-200k) hoặc đọc trước lịch sử."
+                                    "description": "Kinh đô xưa. Thăm đền Vua Đinh Tiên Hoàng, Vua Lê Đại Hành. Không khí cổ kính. Nên thuê hướng dẫn viên (~100k-200k) hoặc đọc trước lịch sử.",
+                                    "mapUrl": "https://maps.app.goo.gl/GwmWXKjFid2ztRat5"
                                 },
                                 {
                                     "name": "Chùa Nhất Trụ (Option)",
-                                    "description": "Ngay cạnh Cố đô. Chùa cổ, nổi tiếng với Cột kinh Phật bằng đá độc đáo. Miễn phí."
+                                    "description": "Ngay cạnh Cố đô. Chùa cổ, nổi tiếng với Cột kinh Phật bằng đá độc đáo. Miễn phí.",
+                                    "mapUrl": "https://www.google.com/maps/search/Chùa+Nhất+Trụ,+Ninh+Bình"
                                 },
                                 {
                                     "name": "Tuyệt Tình Cốc (Động Am Tiên)",
-                                    "description": "Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Chùa nhỏ trong động phía trên. Cảnh đẹp \"sống ảo\"."
+                                    "description": "Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Chùa nhỏ trong động phía trên. Cảnh đẹp \"sống ảo\".",
+                                    "mapUrl": "https://maps.app.goo.gl/FBxPaybsXtsCE5Xq9"
                                 }
                             ],
                             "budgets": [
@@ -1057,6 +1067,7 @@
                         "iconType": "boat",
                         "details": {
                             "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/KdAKf5us5wmeGTEUA",
                                 "steps": [
                                     "Di chuyển TTTP -> Bến thuyền Tràng An (~7-8km, ~20 phút).",
                                     "Gửi hành lý (08:50 - 09:00).",
@@ -1067,13 +1078,27 @@
                             },
                             "places": [
                                 {
-                                    "name": "Bến thuyền Tràng An",
+                                    "name": "Khu du lịch sinh thái Tràng An",
                                     "description": "Di sản UNESCO. Có 3 tuyến, thuyền đi 4-6 người. Gợi ý: Tuyến 2 (Phim trường, 3 đền) hoặc Tuyến 3 (nhiều hang động dài). Tour kéo dài ~3 tiếng qua hang động, hồ nước, núi đá vôi, thăm đền chùa cổ.",
-                                    "mapUrl": ""
+                                    "mapUrl": "https://maps.app.goo.gl/R7y4EViUgpEW1Gg29"
                                 },
                                 {
-                                    "name": "Dịch vụ gửi đồ Tràng An",
-                                    "description": "Xác nhận: Có quầy trông giữ hành lý (miễn phí hoặc phí nhỏ) rất an toàn cho khách đi thuyền. Gửi tại khu vực nhà điều hành/bán vé."
+                                    "name": "Phòng vé Bến thuyền Tràng An",
+                                    "description": "Dịch vụ gửi đồ Tràng An. Xác nhận: Có quầy trông giữ hành lý (miễn phí hoặc phí nhỏ) rất an toàn cho khách đi thuyền. Gửi tại khu vực nhà điều hành/bán vé."
+                                },
+                                {
+                                    "name": "Đền Trình",
+                                    "description": "Địa điểm sẽ đi qua khi đi thuyền."
+                                },
+                                {
+                                    "name": "Phim Trường Kong Skull Island Ninh Bình (Option)",
+                                    "description": "Địa điểm quay phim King Kong",
+                                    "mapUrl": "https://maps.app.goo.gl/zaA4Nnoc42kHoHut9"
+                                },
+                                {
+                                    "name": "Thung Tối (Hang Tối) (Option)",
+                                    "description": "Cách Tràng An khoảng 2Km. Hang tối dài khoản 1 km có nhiều thạch nhũ trong hang rất đẹp.",
+                                    "mapUrl": "https://maps.app.goo.gl/iHQ5oJ8JEW6Zjjs78"
                                 },
                                 {
                                     "name": "Khu Cơm Cháy (Option)",
