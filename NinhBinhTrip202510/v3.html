@@ -370,6 +370,17 @@
     // chỉ bằng cách thay đổi nội dung JSON này.
     //
     // ------------------------------------------------------------------------
+    // 📋 CẤU TRÚC DỮ LIỆU (Phiên bản rút gọn để xem tổng quan)
+    // ------------------------------------------------------------------------
+    // tripInfo: Thông tin chung
+    // schedule: Mảng các ngày
+    //   dayInfo: Thông tin ngày
+    //   timelineItems: Mảng các hoạt động
+    //     timeInfo: startTime (ISO), endTime (ISO)
+    //     title, summary, iconType
+    //     details: directions?, places?, budgets?, reason?
+    //
+    // ------------------------------------------------------------------------
     // 📋 CẤU TRÚC DỮ LIỆU
     // ------------------------------------------------------------------------
     //
@@ -485,14 +496,14 @@
             "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
             "dates": "15-16/11/2025",
             "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
-            "totalBudget": 1200000 // Tổng chi phí dự kiến cho toàn bộ chuyến đi (tất cả mọi người)
+            "totalBudget": 3300000 // Tổng chi phí dự kiến cho toàn bộ chuyến đi (tất cả mọi người)
         },
         "schedule": [
             {
                 "dayInfo": {
                     "day": 1,
                     "date": "2025-11-15",
-                    "title": "Ngày 1: Thứ 7, 15/11/2025 (Di sản & Phố đêm)",
+                    "title": "Ngày 1: Thứ 7, 15/11 (Tam Cốc, Hoa Lư & Phố đêm)",
                     "mapUrl": "https://google.com/maps"
                 },
                 "timelineItems": [
@@ -520,9 +531,10 @@
                                     "note": "Nghỉ đêm trước khi đi"
                                 },
                                 {
-                                    "name": "Đổ xăng lần đầu",
-                                    "amount": 50000,
-                                    "category": "transport"
+                                    "name": "Xăng xe lượt đi (ước tính)",
+                                    "amount": 70000,
+                                    "category": "transport",
+                                    "note": "Khoảng 3 lít"
                                 },
                                 {
                                     "name": "Cafe, trà",
@@ -539,21 +551,29 @@
                             "startTime": "2025-11-15T07:15:00",
                             "endTime": "2025-11-15T08:15:00"
                         },
-                        "title": "Gửi đồ & Ăn sáng",
+                        "title": "Đến Ninh Bình & Chuẩn bị",
                         "summary": "Tới nhà nghỉ (TTTP) gửi hành lý miễn phí. Ăn sáng (Gợi ý: Miến Lươn).",
-                        "iconType": "logistics", // 'logistics' sẽ gọi icon túi đồ
+                        "iconType": "logistics",
                         "details": {
                             "places": [
                                 {
                                     "name": "Nhà nghỉ (TTTP)",
-                                    "description": "Chọn nhà nghỉ đã đặt trước ở khu vực trung tâm."
+                                    "description": "Đến nhà nghỉ đã đặt trước để gửi đồ."
                                 },
                                 {
-                                    "name": "Quán Miến Lươn",
-                                    "description": "Có nhiều quán nổi tiếng ở TTTP (vd: Miến lươn Bà Phấn)."
+                                    "name": "Quán ăn sáng TTTP",
+                                    "description": "Gợi ý Miến Lươn Bà Phấn hoặc quán khác gần đó."
                                 }
                             ],
-                            "reason": "Giải quyết vấn đề hành lý (gửi miễn phí). Ăn sáng đặc sản (nhẹ, nhanh) ngay tại TTTP cho tiện trước khi di chuyển ra khu du lịch."
+                            "budgets": [
+                                {
+                                    "name": "Ăn sáng (2 người)",
+                                    "amount": 80000,
+                                    "category": "food",
+                                    "note": "~40k/người"
+                                }
+                            ],
+                            "reason": "Giải quyết hành lý, nạp năng lượng nhanh gọn trước khi bắt đầu tham quan."
                         }
                     },
                     {
@@ -562,19 +582,21 @@
                             "endTime": "2025-11-15T11:30:00"
                         },
                         "title": "Tham quan Cụm Tam Cốc",
-                        "summary": "Lái xe ra Tam Cốc (30p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).",
-                        "iconType": "boat", // 'boat' sẽ gọi icon thuyền
+                        "summary": "Lái xe ra Tam Cốc (20p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p).",
+                        "iconType": "boat",
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "TTTP -> Bến thuyền Tam Cốc: ~7-8km (15-20 phút xe máy).",
-                                    "Bến thuyền Tam Cốc -> Chùa Bích Động: ~2-3km (5-7 phút xe máy)."
+                                    "Di chuyển TTTP -> Bến thuyền Tam Cốc (~7-8km, ~20 phút xe máy).",
+                                    "Đi thuyền Tam Cốc (08:45 - 10:45).",
+                                    "Di chuyển Bến thuyền Tam Cốc -> Chùa Bích Động (~2-3km, ~7 phút xe máy).",
+                                    "Tham quan Chùa Bích Động (10:45 - 11:30)."
                                 ]
                             },
                             "places": [
                                 {
                                     "name": "Bến thuyền Tam Cốc",
-                                    "description": "Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang. Cảnh quan núi non, sông nước.",
+                                    "description": "Xuất phát đi thuyền trên sông Ngô Đồng, xuyên 3 hang (Cả, Hai, Ba). Ngắm cảnh núi non, sông nước.",
                                     "mapUrl": "https://maps.app.goo.gl/9dJCr52N1C5QVopC8"
                                 },
                                 {
@@ -584,13 +606,19 @@
                             ],
                             "budgets": [
                                 {
-                                    "name": "Vé tham quan Tam Cốc",
-                                    "amount": 500000,
+                                    "name": "Vé thắng cảnh Tam Cốc",
+                                    "amount": 240000,
                                     "category": "ticket",
-                                    "note": "250k/người lớn. Đã bao gồm vé vào cửa khu thắng cảnh và vé đi thuyền"
+                                    "note": "120k/người x 2"
                                 },
                                 {
-                                    "name": "Gửi xe vào Tam Cốc",
+                                    "name": "Vé đi thuyền Tam Cốc",
+                                    "amount": 150000,
+                                    "category": "ticket",
+                                    "note": "150k/thuyền (có thể ghép hoặc bao thuyền)"
+                                },
+                                {
+                                    "name": "Gửi xe máy",
                                     "amount": 10000,
                                     "category": "transport"
                                 }
@@ -605,7 +633,7 @@
                         },
                         "title": "Ăn trưa & Nghỉ ngơi tại Tam Cốc",
                         "summary": "Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng tại quán cà phê.",
-                        "iconType": "food", // 'food' sẽ gọi icon đồ ăn
+                        "iconType": "food",
                         "details": {
                             "directions": {
                                 // "mapUrl": "",
@@ -623,14 +651,15 @@
                             "budgets": [
                                 {
                                     "name": "Ăn trưa tại nhà hàng",
-                                    "amount": 200000,
+                                    "amount": 250000,
                                     "category": "food",
                                     "note": "2 người"
                                 },
                                 {
-                                    "name": "Cafe nghỉ ngơi",
+                                    "name": "Cà phê/Đồ uống",
                                     "amount": 80000,
-                                    "category": "drink"
+                                    "category": "drink",
+                                    "note": "Nghỉ ngơi giờ trưa"
                                 }
                             ],
                             "reason": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
@@ -642,23 +671,45 @@
                             "endTime": "2025-11-15T16:45:00"
                         },
                         "title": "Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc",
-                        "summary": "Lái xe ra Hoa Lư (30p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
-                        "iconType": "explore", // 'explore' sẽ gọi icon map
+                        "summary": "Lái xe ra Hoa Lư (25p). Tham quan Cố đô Hoa Lư (1.5 tiếng). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
+                        "iconType": "explore",
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "Tam Cốc -> Cố đô Hoa Lư: ~10-12km (20-25 phút xe máy).",
-                                    "Cố đô Hoa Lư -> Tuyệt Tình Cốc: ~400m (Đi bộ hoặc xe máy 2 phút)."
+                                    "Di chuyển Tam Cốc -> Cố đô Hoa Lư (~10-12km, ~25 phút xe máy).",
+                                    "Tham quan Cố đô (14:00 - 15:30).",
+                                    "Di chuyển Cố đô -> Tuyệt Tình Cốc (~400m, ~2 phút).",
+                                    "Tham quan Tuyệt Tình Cốc (15:30 - 16:45)."
                                 ]
                             },
                             "places": [
                                 {
                                     "name": "Cố đô Hoa Lư",
-                                    "description": "Kinh đô xưa, thăm đền Vua Đinh Tiên Hoàng và Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm."
+                                    "description": "Kinh đô xưa. Thăm đền Vua Đinh Tiên Hoàng, Vua Lê Đại Hành. Không khí cổ kính, trang nghiêm."
                                 },
                                 {
                                     "name": "Tuyệt Tình Cốc (Động Am Tiên)",
                                     "description": "Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Cảnh đẹp \"sống ảo\". Có chùa nhỏ trong động phía trên."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé Cố đô Hoa Lư",
+                                    "amount": 40000,
+                                    "category": "ticket",
+                                    "note": "20k/người x 2"
+                                },
+                                {
+                                    "name": "Vé Tuyệt Tình Cốc",
+                                    "amount": 40000,
+                                    "category": "ticket",
+                                    "note": "20k/người x 2"
+                                },
+                                {
+                                    "name": "Gửi xe (2 điểm)",
+                                    "amount": 20000,
+                                    "category": "transport",
+                                    "note": "~10k/điểm"
                                 }
                             ],
                             "reason": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh."
@@ -669,22 +720,29 @@
                             "startTime": "2025-11-15T16:45:00",
                             "endTime": "2025-11-15T18:15:00"
                         },
-                        "title": "Về Nhà nghỉ & Tắm rửa",
+                        "title": "Về Nhà nghỉ ngơi, tắm rửa & Chuẩn bị tối",
                         "summary": "Lái xe về TTTP (20p). Nhận phòng (lấy lại đồ), tắm rửa và nghỉ ngơi (1h 10p).",
-                        "iconType": "hotel", // 'hotel' sẽ gọi icon khách sạn/giường
+                        "iconType": "hotel",
                         "details": {
                             "directions": {
                                 "mapUrl": "https://maps.app.goo.gl/8ZeLiTqWv1sEv1Te6",
                                 "steps": [
-                                    "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy)."
+                                    "Di chuyển Tuyệt Tình Cốc -> Nhà nghỉ TTTP (~10km, ~20 phút)."
                                 ]
                             },
+                            "places": [
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Nhận phòng, tắm rửa, nghỉ ngơi chuẩn bị đi chơi tối.",
+                                    "mapUrl": ""
+                                }
+                            ],
                             "budgets": [
                                 {
                                     "name": "Phòng nghỉ 1 đêm",
                                     "amount": 350000,
                                     "category": "hotel",
-                                    "note": "Trung tâm TP, Cần đặt trước phòng chủ động"
+                                    "note": "Ước tính cho phòng 2 người, mức trung bình. Phòng ở trung tâm TP, Cần đặt trước phòng chủ động"
                                 }
                             ],
                             "reason": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
@@ -699,7 +757,26 @@
                         "summary": "Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8).",
                         "iconType": "food",
                         "details": {
-                            "places": "Phố 8 (Cù Chính Lan): Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ nhà nghỉ ra Phố 8 (~1-2km, ~5-10p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Phố 8 (Cù Chính Lan)",
+                                    "description": "Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn tối (Lẩu/Nướng)",
+                                    "amount": 350000,
+                                    "category": "food",
+                                    "note": "Ước tính cho 2 người"
+                                }
+                            ],
                             "reason": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương."
                         }
                     },
@@ -710,11 +787,12 @@
                         },
                         "title": "Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)",
                         "summary": "Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu).",
-                        "iconType": "nightlife", // 'nightlife' sẽ gọi icon trăng sao
+                        "iconType": "nightlife",
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "Phố 8 -> Phố cổ Hoa Lư: ~1-2km (Đi bộ hoặc xe máy 3-5 phút)."
+                                    "Di chuyển/Đi bộ Phố 8 -> Phố cổ Hoa Lư (~1-2km, ~5 phút xe máy).",
+                                    "Đi bộ, Dạo chơi trong khu vực."
                                 ]
                             },
                             "places": [
@@ -731,6 +809,18 @@
                                     "description": "Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Có thể lên tham quan buổi tối."
                                 }
                             ],
+                            "budgets": [
+                                {
+                                    "name": "Gửi xe",
+                                    "amount": 10000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Đồ uống/Ăn vặt (Nếu có)",
+                                    "amount": 50000,
+                                    "category": "drink"
+                                }
+                            ],
                             "reason": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
                         }
                     },
@@ -743,6 +833,18 @@
                         "summary": "Kết thúc Ngày 1, nghỉ ngơi.",
                         "iconType": "hotel",
                         "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ Phố cổ về nhà nghỉ (~1-2km, ~5p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Nghỉ ngơi qua đêm.",
+                                    "mapUrl": ""
+                                }
+                            ],
                             "reason": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn."
                         }
                     }
@@ -752,8 +854,8 @@
                 "dayInfo": {
                     "day": 2,
                     "date": "2025-11-16",
-                    "title": "Ngày 2: Chủ Nhật, 16/11/2025 (Di sản & Trở về)",
-                    "mapUrl": ""  // Thêm URL khi có
+                    "title": "Ngày 2: Chủ Nhật, 16/11 (Tràng An, Bái Đính & Trở về)",
+                    "mapUrl": ""
                 },
                 "timelineItems": [
                     {
@@ -762,17 +864,26 @@
                             "endTime": "2025-11-16T08:15:00"
                         },
                         "title": "Ăn sáng & Trả phòng",
-                        "summary": "Ăn sáng tại TTTP. Quay về nhà nghỉ, làm thủ tục Check-out. (Hành lý mang theo).",
+                        "summary": "Ăn sáng tại TTTP (~30p). Quay về nhà nghỉ, làm thủ tục Check-out (~15p). Hành lý mang theo xe.",
                         "iconType": "food",
                         "details": {
                             "places": [
                                 {
                                     "name": "Quán ăn sáng TTTP",
-                                    "description": "Nhiều lựa chọn."
+                                    "description": "Nhiều lựa chọn.",
+                                    "mapUrl": ""
                                 },
                                 {
                                     "name": "Nhà nghỉ (TTTP)",
                                     "description": "Nơi bạn đã ở đêm qua."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn sáng (2 người)",
+                                    "amount": 80000,
+                                    "category": "food",
+                                    "note": "~40k/người"
                                 }
                             ],
                             "reason": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người."
@@ -784,22 +895,44 @@
                             "endTime": "2025-11-16T12:15:00"
                         },
                         "title": "Tham quan Cụm Tràng An",
-                        "summary": "Lái xe ra Tràng An (30p). Gửi hành lý tại quầy (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).",
+                        "summary": "Lái xe ra Tràng An (30p). Gửi hành lý (15p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (15p).",
                         "iconType": "boat",
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "TTTP -> Bến thuyền Tràng An: ~7-8km (15-20 phút xe máy)."
+                                    "Di chuyển TTTP -> Bến thuyền Tràng An (~7-8km, ~20 phút).",
+                                    "Gửi hành lý (08:45 - 09:00).",
+                                    "Đi thuyền Tràng An (09:00 - 12:00).",
+                                    "Lấy lại hành lý (12:00 - 12:15)."
                                 ]
                             },
                             "places": [
                                 {
                                     "name": "Bến thuyền Tràng An",
-                                    "description": "Di sản UNESCO. Tour thuyền ~3 tiếng qua các hang động, hồ nước, núi đá vôi, dừng chân thăm các đền chùa cổ."
+                                    "description": "Di sản UNESCO. Tour thuyền ~3 tiếng qua hang động, hồ nước, núi đá vôi, thăm đền chùa cổ.",
+                                    "mapUrl": ""
                                 },
                                 {
-                                    "name": "Dịch vụ gửi đồ",
-                                    "description": "Có tại khu vực nhà điều hành/bán vé."
+                                    "name": "Dịch vụ gửi đồ Tràng An",
+                                    "description": "Tại khu vực nhà điều hành/bán vé."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé đi thuyền Tràng An",
+                                    "amount": 500000,
+                                    "category": "ticket",
+                                    "note": "250k/người x 2 (Bao gồm vé thắng cảnh)"
+                                },
+                                {
+                                    "name": "Gửi hành lý (ước tính)",
+                                    "amount": 10000,
+                                    "category": "ticket"
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 15000,
+                                    "category": "transport"
                                 }
                             ],
                             "reason": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
@@ -814,47 +947,109 @@
                         "summary": "Ăn trưa Dê núi Cơm cháy tại nhà hàng khu Tràng An (mang theo hành lý).",
                         "iconType": "food",
                         "details": {
-                            "places": "Nhà hàng khu Tràng An: Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy ngay gần bến thuyền (vd: Chính Thư, Thăng Long...).",
+                            "places": [
+                                {
+                                    "name": "Nhà hàng khu Tràng An",
+                                    "description": "Nhiều nhà hàng lớn chuyên đặc sản Dê núi, Cơm cháy gần bến thuyền (VD: Chính Thư, Thăng Long...).",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn trưa Dê núi (2 người)",
+                                    "amount": 400000,
+                                    "category": "food",
+                                    "note": "Ước tính cho bữa đặc sản"
+                                }
+                            ],
                             "reason": "Ăn trưa đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
                         }
                     },
                     {
                         "timeInfo": {
                             "startTime": "2025-11-16T13:15:00",
-                            "endTime": "2025-11-16T16:15:00"
+                            "endTime": "2025-11-16T16:00:00" // Rút ngắn để chuẩn bị về
                         },
-                        "title": "Thư giãn (Tùy chọn)",
-                        "summary": "Hoàn toàn tự do. (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để tắm rửa.",
-                        "iconType": "relax", // 'relax' sẽ gọi icon cafe
+                        "title": "Tham quan Chùa Bái Đính",
+                        "summary": "Di chuyển (30p). Gửi đồ (15p). Tham quan nhanh (1h 45m). Lấy đồ (15p). Nếu không đi chùa Bái Đính thì chọn một trong hai phương án: (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để nghỉ ngơi tắm rửa giữ sức chuẩn bị về Hà Nội.",
+                        "iconType": "explore",
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "Nếu chọn nghỉ tại TTTP: Tràng An -> TTTP: ~7-8km (15-20 phút)."
+                                    "Di chuyển Tràng An -> Chùa Bái Đính (~15-17km, ~30 phút).",
+                                    "Gửi hành lý tại cổng (13:45 - 14:00).",
+                                    "Đi xe điện vào, tham quan nhanh 1-2 điểm chính (Điện Tam Thế, Bảo Tháp), đi xe điện ra (14:00 - 15:45).",
+                                    "Lấy lại hành lý (15:45 - 16:00)."
                                 ]
                             },
                             "places": [
                                 {
-                                    "name": "Quán cà phê TTTP",
-                                    "description": "Nhiều lựa chọn."
+                                    "name": "Chùa Bái Đính",
+                                    "description": "Quần thể chùa lớn nhất VN. Đi xe điện vào. Có thể tham quan Điện Tam Thế, Bảo Tháp.",
+                                    "mapUrl": ""
                                 },
                                 {
-                                    "name": "Nhà nghỉ theo giờ (TTTP)",
-                                    "description": "Có nhiều nhà nghỉ cung cấp dịch vụ này."
+                                    "name": "Dịch vụ gửi đồ Bái Đính",
+                                    "description": "Tại khu vực cổng."
                                 }
                             ],
-                            "reason": "Thời gian đệm để bạn hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
+                            "budgets": [
+                                {
+                                    "name": "Vé xe điện Bái Đính (khứ hồi)",
+                                    "amount": 120000,
+                                    "category": "transport",
+                                    "note": "60k/người x 2"
+                                },
+                                {
+                                    "name": "Vé Bảo Tháp (Tùy chọn)",
+                                    "amount": 100000,
+                                    "category": "ticket",
+                                    "note": "50k/người x 2 (Nếu muốn lên)"
+                                },
+                                {
+                                    "name": "Gửi hành lý (ước tính)",
+                                    "amount": 15000,
+                                    "category": "logistics"
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 15000,
+                                    "category": "transport"
+                                }
+                            ],
+                            "reason": "Bạn muốn thêm Bái Đính. Lịch trình này cố gắng đi nhanh để kịp giờ về, nhưng sẽ khá mệt và gấp. Hoặc bạn có thể bỏ lịch đi chùa này, chuyển sang lịch cafe nghỉ ngơi để hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
                         }
                     },
                     {
                         "timeInfo": {
-                            "startTime": "2025-11-16T16:15:00",
+                            "startTime": "2025-11-16T16:00:00",
                             "endTime": "2025-11-16T16:45:00"
                         },
                         "title": "Chuẩn bị về",
-                        "summary": "Đổ xăng, kiểm tra xe, sắp xếp hành lý.",
+                        "summary": "Di chuyển ra hướng QL1A (30p). Đổ xăng, kiểm tra xe (15p).",
                         "iconType": "time",
                         "details": {
-                            "reason": "Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ Bái Đính ra cây xăng gần QL1A (~15-17km, ~30p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Cây xăng gần QL1A",
+                                    "description": "Đổ xăng, kiểm tra xe trước khi về.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Xăng xe lượt về (ước tính)",
+                                    "amount": 70000,
+                                    "category": "transport",
+                                    "note": "Khoảng 3 lít"
+                                }
+                            ],
+                            "reason": "Bước chuẩn bị cuối cùng để đảm bảo an toàn và đủ xăng cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
                         }
                     },
                     {
@@ -868,7 +1063,7 @@
                         "details": {
                             "directions": {
                                 "steps": [
-                                    "Ninh Bình -> Vân Đình: ~60-70km (Khoảng 1h30p xe máy)."
+                                    "Ninh Bình (TTTP, từ khu vực QL1A) -> Vân Đình: ~60-70km (Khoảng 1h 30p xe máy)."
                                 ]
                             },
                             "reason": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
@@ -883,7 +1078,21 @@
                         "summary": "Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình.",
                         "iconType": "food",
                         "details": {
-                            "places": "Vân Đình (Ứng Hòa): Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
+                            "places": [
+                                {
+                                    "name": "Quán Vịt cỏ Vân Đình (Ứng Hòa)",
+                                    "description": "Nổi tiếng với đặc sản vịt cỏ. Có nhiều quán dọc đường QL1A.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn tối Vịt (2 người)",
+                                    "amount": 250000,
+                                    "category": "food",
+                                    "note": "Ước tính"
+                                }
+                            ],
                             "reason": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về. Ăn 1 tiếng là hợp lý."
                         }
                     },
