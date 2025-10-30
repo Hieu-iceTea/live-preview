@@ -373,7 +373,8 @@
             "title": "Ninh Bình trip 2025", // Đổi tiêu đề
             "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
             "dates": "15-16/11/2025",
-            "defaultRegion": "Ninh Bình" // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
+            "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
+            "totalBudget": 1200000 // Tổng chi phí dự kiến cho toàn bộ chuyến đi (tất cả mọi người)
         },
         "schedule": [
             {
@@ -400,6 +401,25 @@
                                     "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h."
                                 ]
                             },
+                            "budget": [
+                                {
+                                    "name": "Nhà nghỉ",
+                                    "amount": 300000,
+                                    "category": "hotel",
+                                    "note": "Nghỉ đêm trước khi đi"
+                                },
+                                {
+                                    "name": "Đổ xăng lần đầu",
+                                    "amount": 50000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Cafe, trà",
+                                    "amount": 80000,
+                                    "category": "drink",
+                                    "note": "Dừng nghỉ ngơi giữa đường"
+                                }
+                            ],
                             "reason": "Xuất phát sớm (theo ý bạn) để tránh tắc đường, tận dụng thời gian ban ngày. Đến TTTP (gần hơn Tam Cốc) để tối ưu logistics theo kế hoạch ở TTTP."
                         }
                     },
@@ -451,6 +471,19 @@
                                     "description": "\"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
                                 }
                             ],
+                            "budget": [
+                                {
+                                    "name": "Vé tham quan Tam Cốc",
+                                    "amount": 500000,
+                                    "category": "ticket",
+                                    "note": "250k/người lớn. Đã bao gồm vé vào cửa khu thắng cảnh và vé đi thuyền"
+                                },
+                                {
+                                    "name": "Gửi xe vào Tam Cốc",
+                                    "amount": 10000,
+                                    "category": "transport"
+                                }
+                            ],
                             "reason": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
                         }
                     },
@@ -474,6 +507,19 @@
                                 {
                                     "name": "Quán cà phê Tam Cốc",
                                     "description": "Nhiều quán có view đẹp ra đồng lúa/núi non."
+                                }
+                            ],
+                            "budget": [
+                                {
+                                    "name": "Ăn trưa tại nhà hàng",
+                                    "amount": 200000,
+                                    "category": "food",
+                                    "note": "2 người"
+                                },
+                                {
+                                    "name": "Cafe nghỉ ngơi",
+                                    "amount": 80000,
+                                    "category": "drink"
                                 }
                             ],
                             "reason": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư."
@@ -522,6 +568,14 @@
                                     "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy)."
                                 ]
                             },
+                            "budget": [
+                                {
+                                    "name": "Phòng nghỉ 1 đêm",
+                                    "amount": 350000,
+                                    "category": "hotel",
+                                    "note": "Trung tâm TP, Cần đặt trước phòng chủ động"
+                                }
+                            ],
                             "reason": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:15)."
                         }
                     },
@@ -763,6 +817,65 @@
         return icons[iconType] || icons.default;
     }
 
+    // --- HÀM FORMAT TIỀN TỆ ---
+    /**
+     * Format số tiền thành chuỗi VND
+     * @param {number} amount - Số tiền
+     * @returns {string} - Chuỗi đã format (vd: "120.000đ")
+     */
+    function formatCurrency(amount) {
+        if (!amount || amount === 0) return '0đ';
+        return amount.toLocaleString('vi-VN') + 'đ';
+    }
+
+    // --- HÀM RENDER CHI PHÍ (BUDGET) ---
+    /**
+     * Render section "Chi phí" (từ details.budget)
+     * @param {Array} budget - Mảng budget items từ details.budget
+     * @returns {string} - HTML string hoặc empty string
+     */
+    function renderBudget(budget) {
+        // Kiểm tra budget có tồn tại và là array không rỗng
+        if (!budget || !Array.isArray(budget) || budget.length === 0) {
+            return '';
+        }
+
+        // Icon mapping cho categories
+        const categoryIcons = {
+            "hotel": "🏠",
+            "food": "🍜",
+            "drink": "☕",
+            "transport": "🚕",
+            "ticket": "🎫",
+            "shopping": "🛍️",
+            "relax": "💆",
+            "other": "💰"
+        };
+
+        // Heading:
+        let html = '<h4>Chi phí</h4>';
+        html += '<ul class="budget-list">';
+
+        budget.forEach(item => {
+            const icon = item.category ? categoryIcons[item.category] || "💰" : "💰";
+            const amount = formatCurrency(item.amount || 0);
+
+            // Format: 🎫 Vé tham quan: 120.000đ
+            let itemText = `${icon} ${item.name}: ${amount}`;
+
+            // Thêm note nếu có (trong ngoặc đơn)
+            if (item.note) {
+                itemText += ` (${item.note})`;
+            }
+
+            html += `<li>${itemText}</li>`;
+        });
+
+        html += '</ul>';
+
+        return html;
+    }
+
     // --- HÀM TÍNH TOÁN THỜI GIAN TỰ ĐỘNG ---
     /**
      * Tính toán và format thời gian khoảng cách giữa startTime và endTime
@@ -986,6 +1099,9 @@
         if (details.places) {
             html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.places)}`;
         }
+        if (details.budget) {
+            html += renderBudget(details.budget);
+        }
         if (details.reason) {
             html += `<h4>Lý do Lựa chọn</h4><p>${details.reason}</p>`;
         }
@@ -1025,7 +1141,13 @@
 
         // Cập nhật tiêu đề chính
         document.getElementById('main-title').innerText = data.tripInfo.title;
-        document.getElementById('main-subtitle').innerText = `${data.tripInfo.subtitle} (${data.tripInfo.dates})`;
+
+        // Cập nhật subtitle với totalBudget
+        let totalBudgetText = ''
+        if (data.tripInfo.totalBudget) {
+            totalBudgetText += ` | Chi phí: ${formatCurrency(data.tripInfo.totalBudget)}`;
+        }
+        document.getElementById('main-subtitle').innerText = `${data.tripInfo.subtitle} (${data.tripInfo.dates})${totalBudgetText}`;
 
         // Cập nhật tiêu đề của tab trình duyệt
         document.title = `${data.tripInfo.title} | Hiếu iceTea`;
