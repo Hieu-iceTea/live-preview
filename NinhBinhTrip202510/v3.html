@@ -368,6 +368,9 @@
     // từ startTime và endTime, nên KHÔNG CẦN điền thủ công.
     // Ví dụ: startTime: "2025-11-15T05:30:00", endTime: "2025-11-15T07:15:00"
     //        => Tự động hiển thị: "1 giờ 45 phút"
+    //
+    // CHI PHÍ (details.budgets):
+    // - category (optional): hotel | food | drink | transport | ticket | shopping | relax | other
     const scheduleData = {
         "tripInfo": {
             "title": "Ninh Bình trip 2025", // Đổi tiêu đề
@@ -401,11 +404,11 @@
                                     "Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h."
                                 ]
                             },
-                            "budget": [
+                            "budgets": [
                                 {
                                     "name": "Nhà nghỉ",
                                     "amount": 300000,
-                                    "category": "hotel",
+                                    "category": "hotel", // Phân loại. Các giá trị: hotel | food | drink | transport | ticket | shopping | relax | other
                                     "note": "Nghỉ đêm trước khi đi"
                                 },
                                 {
@@ -471,7 +474,7 @@
                                     "description": "\"Nam thiên đệ nhị động\", chùa cổ dựa lưng vào núi, gồm 3 chùa Hạ-Trung-Thượng. Cổng chùa là điểm check-in nổi tiếng."
                                 }
                             ],
-                            "budget": [
+                            "budgets": [
                                 {
                                     "name": "Vé tham quan Tam Cốc",
                                     "amount": 500000,
@@ -509,7 +512,7 @@
                                     "description": "Nhiều quán có view đẹp ra đồng lúa/núi non."
                                 }
                             ],
-                            "budget": [
+                            "budgets": [
                                 {
                                     "name": "Ăn trưa tại nhà hàng",
                                     "amount": 200000,
@@ -568,7 +571,7 @@
                                     "Tuyệt Tình Cốc -> TTTP Ninh Bình: ~10km (15-20 phút xe máy)."
                                 ]
                             },
-                            "budget": [
+                            "budgets": [
                                 {
                                     "name": "Phòng nghỉ 1 đêm",
                                     "amount": 350000,
@@ -830,13 +833,13 @@
 
     // --- HÀM RENDER CHI PHÍ (BUDGET) ---
     /**
-     * Render section "Chi phí" (từ details.budget)
-     * @param {Array} budget - Mảng budget items từ details.budget
+     * Render section "Chi phí" (từ details.budgets)
+     * @param {Array} budgets - Mảng budget items từ details.budgets
      * @returns {string} - HTML string hoặc empty string
      */
-    function renderBudget(budget) {
-        // Kiểm tra budget có tồn tại và là array không rỗng
-        if (!budget || !Array.isArray(budget) || budget.length === 0) {
+    function renderBudget(budgets) {
+        // Kiểm tra budgets có tồn tại và là array không rỗng
+        if (!budgets || !Array.isArray(budgets) || budgets.length === 0) {
             return '';
         }
 
@@ -856,7 +859,7 @@
         let html = '<h4>Chi phí</h4>';
         html += '<ul class="budget-list">';
 
-        budget.forEach(item => {
+        budgets.forEach(item => {
             const icon = item.category ? categoryIcons[item.category] || "💰" : "💰";
             const amount = formatCurrency(item.amount || 0);
 
@@ -1099,8 +1102,8 @@
         if (details.places) {
             html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.places)}`;
         }
-        if (details.budget) {
-            html += renderBudget(details.budget);
+        if (details.budgets) {
+            html += renderBudget(details.budgets);
         }
         if (details.reason) {
             html += `<h4>Lý do Lựa chọn</h4><p>${details.reason}</p>`;
