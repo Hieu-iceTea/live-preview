@@ -1,0 +1,4332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <!--
+      Tiêu đề tôi lấy từ file index.html của bạn
+    -->
+    <title>Your Trip</title>
+    <!-- tailwindcss 3.4.17 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="route.png" type="image/x-icon">
+    <!-- Tippy.js for tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away-subtle.css">
+    <style>
+        /* Sử dụng font Inter mượt mà hơn */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        html {
+            scroll-behavior: smooth; /* Cuộn mượt */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Lấy màu nền từ index.html */
+            background-color: #f4f7f6;
+        }
+
+        /* (MỚI) Thay thế border-bottom của header bằng shadow xanh nhẹ nhàng */
+        #header {
+            /* 0 5px 15px -3px là bóng tương đương shadow-lg của tailwind */
+            /* rgba(37, 99, 235, 0.1) là màu xanh (blue-600) với 10% độ mờ */
+            box-shadow: 0 5px 15px -3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* CSS CHO TIMELINE (Style của index.html)
+        */
+        .timeline-item {
+            position: relative;
+            /* Padding giống index.html */
+            padding-left: 2.5rem; /* 40px */
+            padding-bottom: 2.5rem; /* 40px */
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        /* Đường kẻ dọc (Logic của v2) */
+        .timeline-line {
+            position: absolute;
+            /* Căn giữa icon 24px (left: 11px) */
+            left: 11px;
+            /* Điều chỉnh top cho khớp icon */
+            top: 1.25rem;
+            bottom: -0.5rem; /* -8px */
+            width: 2px;
+            background-color: #cbd5e1; /* gray-300 */
+        }
+
+        .timeline-item:last-child .timeline-line {
+            display: none; /* Ẩn đường kẻ ở mục cuối */
+        }
+
+        /* Icon container (Style của index.html) */
+        .icon-container {
+            position: absolute;
+            left: 0;
+            top: 0.5rem; /* 8px */
+            /* Kích thước 24x24px giống index.html */
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; /* rounded-full */
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        /* CSS TRẠNG THÁI (Logic của v2, Style của index.html)
+        */
+
+        /* Lớp cho trạng thái "Đã qua" */
+        .status-past {
+            opacity: 0.7; /* Giảm độ mờ giống index.html */
+        }
+
+        .status-past .timeline-card {
+            background-color: #f8fafc; /* slate-50 */
+        }
+
+        .status-past .timeline-line {
+            background-color: #16a34a; /* green-600 */
+        }
+
+        .status-past .icon-container {
+            /* Dùng background-color thay vì border */
+            background-color: #16A34ADB; /* gray-400 */
+        }
+
+        /* Lớp cho trạng thái "Đang diễn ra" */
+        .status-current .timeline-card {
+            /* Style phóng to + border xanh giống cả 2 file */
+            transform: scale(1.02);
+            border: 2px solid #2563eb; /* blue-600 */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        .status-current .icon-container {
+            /* Dùng background-color */
+            background-color: #2563eb; /* blue-600 */
+            /* Giữ lại animation nhấp nháy xịn của v2 */
+            animation: pulse-blue 1.5s infinite;
+        }
+
+        .status-current .timeline-line {
+            /* Giữ lại logic đổi màu 2 nửa của v2 */
+            background: linear-gradient(#16a34a, #16a34a 50%, #2563eb 50%, #2563eb);
+            background-size: 100% 10px;
+        }
+
+        /* Lớp cho trạng thái "Sắp tới" */
+        .status-future .icon-container {
+            /* Dùng background-color */
+            background-color: #cbd5e1; /* slate-300 */
+        }
+
+        /* Ẩn chi tiết (Logic của v2) */
+        .details-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.35s ease-out; /* Nhanh hơn 0.5s của index.html */
+            margin-top: 0; /* mt-3 */
+            padding-top: 0; /* pt-3 */
+            border-top: 0 solid transparent;
+        }
+
+        /* (MỚI) Thêm style cho .details-content khi được mở rộng */
+        /* Các class mt-3, pt-3, border-t sẽ được áp dụng tại đây thay vì trong HTML */
+        .details-content.expanded {
+            margin-top: 0.75rem; /* mt-3 */
+            padding-top: 0.75rem; /* pt-3 */
+            border-top: 1px solid #e2e8f0; /* border-t border-gray-200 */
+        }
+
+        /* (MỚI) Ghi đè style cho panel giả lập */
+        #test-panel-content.expanded {
+            border-top: none; /* Bỏ đường gạch ngang màu xám */
+            padding-top: 0; /* Bỏ padding-top của .details-content */
+        }
+
+        /* Nút xem chi tiết (Style của index.html) */
+        .toggle-details svg {
+            transition: transform 0.3s ease;
+        }
+
+        /* JS sẽ thêm/xóa class 'expanded' trên nút này */
+        .toggle-details.expanded svg {
+            transform: rotate(180deg);
+        }
+
+        /* Animation nhấp nháy (Lấy từ v2) */
+        @keyframes pulse-blue {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+        }
+
+        /* (MỚI) Thêm animation cho thời gian còn lại khẩn cấp */
+        @keyframes pulse-red {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .pulse-urgent {
+            animation: pulse-red 1s infinite;
+            /* (ĐÃ SỬA) Xóa font-weight: 700; ra khỏi đây */
+            /* JS sẽ thêm class 'time-warning-30min' riêng */
+        }
+
+        .time-warning-30min {
+            font-weight: 700 !important; /* bold */
+            font-size: 15px !important;
+        }
+
+        /* Optimize animation cho time-remaining */
+        .time-remaining {
+            will-change: transform; /* GPU acceleration cho animation mượt mà */
+        }
+
+        /* Chi tiết bên trong phần mở rộng (Lấy từ index.html) */
+        .details-content h4 {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 4px;
+            margin-top: 8px;
+        }
+
+        .details-content p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .details-content ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        /* Icon Google Maps inline cho địa điểm */
+        .place-map-icon {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 2px;
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            vertical-align: middle;
+        }
+
+        .place-map-icon:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.15);
+        }
+
+        .place-map-icon svg {
+            display: block;
+            width: 16px; /* To icon lên để dễ nhìn hơn */
+            height: 16px;
+            margin-top: -4px; /* Nâng icon lên 1px để căn giữa với text */
+        }
+
+        /* Icon Google Maps cho day header (tổng quan cả ngày) */
+        .day-map-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px; /* Khoảng cách giữa icon và text */
+            padding: 4px; /* Tăng hit area để dễ click */
+            color: #3b82f6; /* blue-500 */
+            font-size: 0.875rem; /* 14px - nhỏ hơn tiêu đề */
+            transition: color 0.2s ease, transform 0.2s ease;
+            text-decoration: none; /* Bỏ gạch chân mặc định */
+        }
+
+        .day-map-link:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.05); /* Giảm scale để phù hợp với text */
+            text-decoration: underline; /* Gạch chân khi hover */
+        }
+
+        .day-map-link svg {
+            display: block;
+            flex-shrink: 0; /* Không cho icon bị co lại */
+        }
+
+        .day-map-link span {
+            font-weight: 500; /* Medium weight cho text */
+            white-space: nowrap; /* Không cho text xuống dòng */
+        }
+
+        /* Icon tài liệu chuyến đi (inline với tiêu đề chính) */
+        .trip-doc-link {
+            display: inline-flex;
+            align-items: center;
+            /*margin-left: 8px; !* Khoảng cách với tiêu đề *!*/
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            vertical-align: middle;
+            transform-origin: bottom left; /* Phóng to từ bên dưới lên */
+        }
+
+        .trip-doc-link:hover {
+            color: #2563eb; /* blue-600 */
+            transform: scale(1.15);
+        }
+
+        .trip-doc-link svg {
+            display: block;
+            width: 18px; /* To hơn place-map-icon (16px) vì ở header */
+            height: 18px;
+        }
+
+        /* Hiển thị chi phí với tooltip (dotted underline) */
+        .budget-display {
+            /* Dotted underline nhẹ nhàng */
+            border-bottom: 1px dashed rgba(59, 130, 246, 0.4); /* blue-500 với 40% opacity */
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .budget-display:hover {
+            border-bottom: 1px dotted rgba(59, 130, 246, 0.9); /* Đậm hơn khi hover */
+        }
+
+        /* ================================================================
+           MODAL STYLES
+           ================================================================ */
+
+        /* Backdrop (overlay) */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.hidden {
+            display: none;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+        }
+
+        /* Modal container */
+        .modal-container {
+            background: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            max-width: 95vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            width: 1200px; /* Desktop width */
+            transform: scale(0.95);
+            transition: transform 0.3s ease,
+            max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, width, height;
+        }
+
+        .modal-backdrop.show .modal-container {
+            transform: scale(1);
+        }
+
+        /* Modal header */
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb; /* gray-200 */
+        }
+
+        .modal-title {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            color: #1f2937; /* gray-800 */
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #6b7280; /* gray-500 */
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background-color: #f3f4f6; /* gray-100 */
+            color: #1f2937; /* gray-800 */
+        }
+
+        /* Modal header buttons container */
+        .modal-header-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Modal fullscreen button */
+        .modal-fullscreen-btn {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #6b7280; /* gray-500 */
+            cursor: pointer;
+            padding: 0.5rem;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .modal-fullscreen-btn:hover {
+            background-color: #f3f4f6; /* gray-100 */
+            color: #1f2937; /* gray-800 */
+        }
+
+        .modal-fullscreen-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Fullscreen mode */
+        .modal-container.fullscreen {
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            /* Transition inherited from .modal-container */
+        }
+
+        /* Remove backdrop padding in fullscreen mode */
+        .modal-backdrop:has(.modal-container.fullscreen) {
+            padding: 0 !important;
+        }
+
+        /* Modal body */
+        .modal-body {
+            padding: 1.5rem;
+            overflow: auto;
+            flex: 1;
+        }
+
+        /* Budget modal: Use flexbox for automatic height calculation */
+        #budget-modal .modal-body {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden; /* Prevent double scrollbar */
+        }
+
+        #budget-modal .modal-container {
+            height: 100%;
+            width: 1150px;
+        }
+
+        /* Budget modal fullscreen mode: remove all padding/margin */
+        #budget-modal .modal-container.fullscreen .modal-header {
+            padding: 1rem; /* Reduce padding in fullscreen */
+            border-bottom: none; /* Optional: remove border */
+        }
+
+        #budget-modal .modal-container.fullscreen .modal-body {
+            padding: 0;
+        }
+
+        #budget-modal .modal-container.fullscreen .budget-toolbar {
+            margin-bottom: 0;
+            border-radius: 0;
+            padding: 0.75rem; /* Reduce toolbar padding */
+        }
+
+        #budget-modal .modal-container.fullscreen .budget-table-wrapper {
+            border-radius: 0; /* Remove border-radius in fullscreen */
+        }
+
+        /* Budget table wrapper (for horizontal scroll) */
+        .budget-table-wrapper {
+            flex: 1; /* Take all remaining space after toolbar */
+            overflow-y: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+            border-bottom-right-radius: 0.75rem; /* 12px */
+            border-bottom-left-radius: 0.75rem; /* 12px */
+        }
+
+        /* Budget table */
+        .budget-table {
+            width: 100%;
+            min-width: 800px; /* Ensure table is wide enough to scroll on mobile */
+            border-collapse: collapse;
+            font-size: 0.875rem; /* 14px */
+        }
+
+        .budget-table thead {
+            background-color: #f9fafb; /* gray-50 */
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .budget-table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #374151; /* gray-700 */
+            border-bottom: 2px solid #e5e7eb; /* gray-200 */
+            white-space: nowrap;
+        }
+
+        .budget-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f3f4f6; /* gray-100 */
+            color: #1f2937; /* gray-800 */
+            vertical-align: top;
+        }
+
+        .budget-table tbody tr:hover {
+            background-color: #f9fafb; /* gray-50 */
+        }
+
+        /* Table footer (totals) - Sticky at bottom */
+        .budget-table tfoot {
+            position: sticky;
+            bottom: 0;
+            background-color: white;
+            box-shadow: 0 -1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .budget-table tfoot td {
+            border-top: none;
+            border-bottom: none;
+        }
+
+        .budget-table .grand-total-row td {
+            background-color: #dbeafe; /* blue-100 */
+            padding: 1rem;
+        }
+
+        /* Text alignment utilities */
+        .budget-table .text-right {
+            text-align: right;
+        }
+
+        .budget-table .text-center {
+            text-align: center;
+        }
+
+        /* ===== BUDGET MODAL TOOLBAR ===== */
+        .budget-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            /*margin-bottom: 1rem;*/
+            padding: 1rem;
+            background-color: #f9fafb; /* gray-50 */
+            border-radius: 0.5rem;
+            align-items: center;
+            flex-shrink: 0; /* Don't shrink - always show full toolbar */
+        }
+
+        .budget-toolbar-section {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .budget-toolbar-section.grow {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Search input */
+        .budget-search {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .budget-search:focus {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .budget-search::placeholder {
+            color: #9ca3af; /* gray-400 */
+        }
+
+        /* Filter select */
+        .budget-filter-select {
+            width: 100%;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            background-color: white;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .budget-filter-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Toggle checkbox */
+        .budget-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .budget-toggle-checkbox {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .budget-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .budget-btn-primary {
+            background-color: #3b82f6; /* blue-500 */
+            color: white;
+        }
+
+        .budget-btn-primary:hover {
+            background-color: #2563eb; /* blue-600 */
+        }
+
+        .budget-btn-secondary {
+            background-color: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+
+        .budget-btn-secondary:hover {
+            background-color: #f9fafb;
+        }
+
+        /* View switcher (tabs) */
+        .budget-view-switcher {
+            display: flex;
+            gap: 0.25rem;
+            background-color: white;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            padding: 0.25rem;
+        }
+
+        .budget-view-tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: transparent;
+            color: #6b7280; /* gray-500 */
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .budget-view-tab:hover {
+            color: #374151;
+            background-color: #f9fafb;
+        }
+
+        .budget-view-tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* Sortable column headers */
+        .budget-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 1.5rem;
+        }
+
+        .budget-table th.sortable:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+
+        .budget-table th.sortable::after {
+            content: '↕';
+            position: absolute;
+            right: 0.5rem;
+            color: #9ca3af;
+            font-size: 0.75rem;
+        }
+
+        .budget-table th.sortable.sort-asc::after {
+            content: '⬆';
+            color: #3b82f6;
+        }
+
+        .budget-table th.sortable.sort-desc::after {
+            content: '⬇';
+            color: #3b82f6;
+        }
+
+        /* Date group header */
+        .budget-table .date-group-header td {
+            background-color: #dbeafe; /* blue-100 */
+            font-weight: 700;
+            font-size: 0.9375rem;
+            padding: 0.875rem 1rem;
+            color: #1e40af; /* blue-800 */
+            border-top: 2px solid #3b82f6; /* blue-500 */
+        }
+
+        /* Category group header */
+        .budget-table .category-group-header td {
+            background-color: #e0e7ff; /* indigo-100 */
+            font-weight: 700;
+            font-size: 0.9375rem;
+            padding: 0.875rem 1rem;
+            color: #4338ca; /* indigo-700 */
+        }
+
+        /* Person split row */
+        .budget-table .person-split-row td {
+            background-color: #f0fdf4; /* green-50 */
+            font-weight: 600;
+            padding: 0.875rem 1rem;
+            color: #166534; /* green-800 */
+        }
+
+        /* Highlight current activity */
+        .budget-table tr.current-activity {
+            background-color: #fef9c3 !important; /* yellow-100 */
+            border-left: 3px solid #eab308; /* yellow-500 */
+        }
+
+        /* Empty state */
+        .budget-empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        .budget-empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .budget-empty-state-text {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            /* Normal mode on mobile: slightly smaller for smooth transition */
+            .modal-container:not(.fullscreen) {
+                max-width: 95vw;
+                max-height: 90vh;
+                width: 95vw;
+                height: 90vh;
+                border-radius: 0.5rem; /* Smaller radius for mobile */
+            }
+
+            /* Fullscreen mode on mobile: explicit 100% */
+            .modal-container.fullscreen {
+                max-width: 100vw !important;
+                max-height: 100vh !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+            }
+
+            .modal-header {
+                padding: 1rem;
+            }
+
+            .modal-title {
+                font-size: 1.25rem; /* 20px */
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .budget-table {
+                font-size: 0.8125rem; /* 13px */
+            }
+
+            .budget-table th,
+            .budget-table td {
+                padding: 0.5rem 0.75rem;
+            }
+
+            .budget-table-wrapper {
+                max-height: 100%;
+                /*border-bottom-right-radius: 0.75rem; !* 12px *!*/
+                /*border-bottom-left-radius: 0.75rem; !* 12px *!*/
+            }
+
+            /* Toolbar mobile adjustments */
+            .budget-toolbar {
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 0.75rem;
+            }
+
+            .budget-toolbar-section {
+                width: 100%;
+            }
+
+            .budget-toolbar-section.grow {
+                min-width: 100%;
+            }
+
+            .budget-view-switcher {
+                width: 100%;
+                justify-content: stretch;
+            }
+
+            .budget-view-tab {
+                flex: 1;
+                text-align: center;
+                padding: 0.625rem 0.5rem;
+                font-size: 0.8125rem;
+            }
+
+            .budget-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<!--
+  HEADER CỐ ĐỊNH
+  Layout kết hợp:
+  - Lấy style tiêu đề, layout đồng hồ, box "Hoạt động hiện tại" của index.html
+  - Giữ lại "Công cụ Giả lập thời gian" của v2.html
+-->
+<!-- (ĐÃ SỬA) Xóa class 'shadow-lg', 'border-b-4', 'border-blue-600' -->
+<!-- CSS trong <style> (ở trên) sẽ thêm shadow màu xanh nhạt. -->
+<header id="header" class="sticky top-0 left-0 w-full bg-white z-50 p-4">
+    <!--
+      Sử dụng max-w-4xl giống index.html
+    -->
+    <div class="container mx-auto max-w-4xl">
+        <!-- Tiêu đề chính (Style index.html) -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-3">
+            <div class="text-center sm:text-left">
+                <!--
+                  ID 'main-title' và 'main-subtitle' được giữ lại từ v2.html
+                  để JS tự động điền dữ liệu
+                -->
+                <h1 id="main-title" class="text-3xl font-bold text-blue-600"></h1>
+                <p id="main-subtitle" class="text-lg text-gray-600"></p>
+            </div>
+
+            <!-- Đồng hồ thời gian thực (Lấy ID 'real-time-clock' từ v2.html) -->
+            <div id="real-time-clock" class="text-center sm:text-right mt-2 sm:mt-0">
+                <div class="font-mono font-bold text-2xl text-gray-900">...</div>
+                <div class="text-sm text-gray-500">...</div>
+            </div>
+        </div>
+
+        <!-- Hoạt động hiện tại (Lấy layout từ index.html, ID từ v2.html) -->
+        <div id="current-activity-container"
+             class="hidden bg-blue-100 border border-blue-200 p-3 rounded-md text-center mb-3">
+            <p class="text-xs text-blue-700 font-medium">Lịch trình hiện tại của bạn:</p>
+            <p id="current-activity-display" class="text-lg font-semibold text-blue-800"></p>
+        </div>
+
+        <!-- Bộ điều khiển giả lập thời gian (Giữ nguyên của v2.html) -->
+        <div class="mt-2 p-2 bg-yellow-50 border border-yellow-300 rounded-lg">
+            <button id="toggle-test-panel" class="font-medium text-sm text-yellow-800 hover:underline w-full text-left">
+                Công cụ Giả lập thời gian (Nhấn để Ẩn/Hiện)
+            </button>
+            <!--
+              Tôi đã sửa lại CSS cho .details-content
+              Nên ở đây tôi thêm class 'details-content' để tái sử dụng
+            -->
+            <div id="test-panel-content" class="details-content">
+                <!-- (ĐÃ SỬA) Bỏ 'mt-4' để UI gọn gàng hơn,
+                     chỉ giữ lại 'border-t' (vàng) và 'pt-4' (padding)
+                -->
+                <div class="border-t border-yellow-200 pt-4 flex flex-wrap gap-4 items-end">
+                    <div class="flex-1 min-w-[140px]">
+                        <label for="time-override-date" class="block text-xs font-medium text-yellow-800 mb-1">Giả lập
+                            ngày:</label>
+                        <input type="date" id="time-override-date" class="w-full p-1 border rounded text-sm h-[34px]">
+                    </div>
+
+                    <div class="flex-1 min-w-[140px]">
+                        <label for="time-override-time" class="block text-xs font-medium text-yellow-800 mb-1">Giả lập
+                            giờ (có giây):</label>
+                        <input type="time" id="time-override-time" class="w-full p-1 border rounded text-sm h-[34px]"
+                               step="1">
+                    </div>
+
+                    <button id="reset-time"
+                            class="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700 h-[34px] flex-shrink-0">
+                        Hiện tại
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!--
+  NỘI DUNG LỊCH TRÌNH
+  Sử dụng max-w-4xl giống index.html
+-->
+<main class="container mx-auto max-w-4xl p-4 md:p-8 relative">
+    <!-- Nơi JS sẽ chèn nội dung timeline (Logic của v2) -->
+    <div id="timeline-container"></div>
+</main>
+
+<script>
+    // ========================================================================
+    // === CONSTANTS & CONFIGURATION ===
+    // ========================================================================
+
+    /**
+     * Category mapping for budget display
+     * Maps category codes to display names and icons
+     */
+    const CATEGORY_MAP = Object.freeze({
+        hotel: {icon: '🏠', name: 'Hotel'},
+        food: {icon: '🍜', name: 'Food'},
+        drink: {icon: '☕', name: 'Drink'},
+        transport: {icon: '🚕', name: 'Transport'},
+        ticket: {icon: '🎫', name: 'Ticket'},
+        shopping: {icon: '🛍️', name: 'Shopping'},
+        relax: {icon: '💆', name: 'Relax'},
+        other: {icon: '💰', name: 'Other'}
+    });
+
+    // ========================================================================
+    // === GLOBAL VARIABLES ===
+    // ========================================================================
+
+    let budgetModalElement = null; // Budget modal element (null = not initialized)
+
+    // Budget modal state management
+    const budgetState = {
+        view: 'timeline', // 'timeline', 'category', 'person'
+        searchQuery: '',
+        categoryFilter: 'all',
+        showOptional: true,
+        showGrouping: true, // Show subtotals/grouping (universal for all views)
+        sortColumn: null,
+        sortDirection: null, // 'asc', 'desc'
+        currentActivityTitle: null, // For highlighting
+        allRows: [], // Cache of all budget rows
+    };
+
+    // ========================================================================
+    // === DỮ LIỆU LỊCH TRÌNH (scheduleData) ===
+    // ========================================================================
+    //
+    // Đây là biến chứa TOÀN BỘ dữ liệu cho chuyến đi của bạn.
+    // Dữ liệu này được tách biệt hoàn toàn khỏi HTML và logic code,
+    // giúp bạn dễ dàng chỉnh sửa lịch trình hoặc TẠO CHUYẾN ĐI MỚI
+    // chỉ bằng cách thay đổi nội dung JSON này.
+    //
+    // ------------------------------------------------------------------------
+    // 📋 CẤU TRÚC DỮ LIỆU (Phiên bản rút gọn để xem tổng quan)
+    // ------------------------------------------------------------------------
+    // tripInfo: Thông tin chung
+    // schedule: Mảng các ngày
+    //   dayInfo: Thông tin ngày
+    //   timelineItems: Mảng các hoạt động
+    //     timeInfo: startTime (ISO), endTime (ISO)
+    //     title, summary, iconType
+    //     details: directions?, places?, budgets?, reason?
+    //
+    // ------------------------------------------------------------------------
+    // 📋 CẤU TRÚC DỮ LIỆU
+    // ------------------------------------------------------------------------
+    //
+    // {
+    //   "tripInfo": {                          // === THÔNG TIN CHUYẾN ĐI ===
+    //     "title": string,                     // Tiêu đề chuyến đi (hiển thị ở header và tab title)
+    //     "subtitle": string,                  // Phụ đề (ai đi, bao nhiêu ngày)
+    //     "dates": string,                     // Ngày tháng (dạng text tự do: "15-16/11/2025")
+    //     "defaultRegion": string,             // Vùng/tỉnh mặc định (dùng để tự động tạo Google Maps URL)
+    //     "totalBudget": number                // Tổng chi phí dự kiến (VNĐ, hiển thị ở subtitle)
+    //   },
+    //
+    //   "schedule": [                          // === DANH SÁCH CÁC NGÀY ===
+    //     {
+    //       "dayInfo": {                       // --- Thông tin ngày ---
+    //         "day": number,                   // Số thứ tự ngày (1, 2, 3, ...)
+    //         "date": string,                  // Ngày (format: "YYYY-MM-DD", vd: "2025-11-15")
+    //         "title": string,                 // Tiêu đề ngày (vd: "Ngày 1: Thứ 7, 15/11/2025")
+    //         "mapUrl": string                 // (Optional) Link Google Maps tổng quan cả ngày
+    //       },
+    //
+    //       "timelineItems": [                 // --- Danh sách hoạt động trong ngày ---
+    //         {
+    //           "timeInfo": {                  // • Thông tin thời gian
+    //             "startTime": string,         //   - Thời gian bắt đầu (ISO 8601: "YYYY-MM-DDTHH:MM:SS")
+    //             "endTime": string,           //   - Thời gian kết thúc (ISO 8601: "YYYY-MM-DDTHH:MM:SS")
+    //             "durationText": string       //   - (Optional, TỰ ĐỘNG TÍNH) Thời lượng (vd: "1 giờ 45 phút")
+    //           },
+    //
+    //           "title": string,               // • Tiêu đề hoạt động
+    //           "summary": string,             // • Tóm tắt ngắn gọn
+    //           "iconType": string,            // • Loại icon: time | logistics | boat | food | explore | hotel | nightlife | relax | default
+    //
+    //           "details": {                   // • Chi tiết (hiển thị khi mở rộng)
+    //             "directions": {              //   ◦ Thông tin di chuyển (optional)
+    //               "mapUrl": string,          //     - Link Google Maps Directions (nếu rỗng → tự động tạo từ places)
+    //               "steps": string[]          //     - Các bước di chuyển (mảng chuỗi)
+    //             },
+    //
+    //             "places": string | [        //   ◦ Địa điểm (có thể là string hoặc mảng object)
+    //               {
+    //                 "name": string,          //     - Tên địa điểm
+    //                 "description": string,   //     - Mô tả
+    //                 "mapUrl": string         //     - (Optional) Link Google Maps (nếu rỗng → tự động tạo)
+    //               }
+    //             ],
+    //
+    //             "budgets": [                 //   ◦ Chi phí (optional)
+    //               {
+    //                 "name": string,          //     - Tên khoản chi
+    //                 "amount": number,        //     - Số tiền (VNĐ)
+    //                 "category": string,      //     - (Optional) Loại: hotel | food | drink | transport | ticket | shopping | relax | other
+    //                 "note": string,          //     - (Optional) Ghi chú
+    //                 "isOptional": boolean    //     - (Optional) true = chi phí TÙY CHỌN (không tính vào tổng), false/undefined = tính vào tổng
+    //               }
+    //             ],
+    //
+    //             "reason": string             //   ◦ Lý do lựa chọn (optional)
+    //           }
+    //         }
+    //       ]
+    //     }
+    //   ]
+    // }
+    //
+    // ------------------------------------------------------------------------
+    // 🔄 CÁCH SỬ DỤNG & TÁI SỬ DỤNG
+    // ------------------------------------------------------------------------
+    //
+    // 1. TẠO CHUYẾN ĐI MỚI:
+    //    - Copy toàn bộ biến scheduleData này sang file HTML mới
+    //    - Thay đổi tripInfo (title, subtitle, dates, defaultRegion, totalBudget)
+    //    - Thay đổi schedule (các ngày và hoạt động)
+    //    - Save file → Mở trình duyệt → Hoàn thành!
+    //
+    // 2. CHỈNH SỬA LỊCH TRÌNH HIỆN TẠI:
+    //    - Tìm đến phần schedule → tìm ngày cần sửa → tìm item cần sửa
+    //    - Thay đổi các trường: title, summary, timeInfo, details, ...
+    //    - Refresh trình duyệt để xem kết quả
+    //
+    // 3. LƯU Ý QUAN TRỌNG:
+    //    ✓ Thời gian (startTime, endTime): Phải dùng định dạng ISO 8601
+    //      Ví dụ: "2025-11-15T08:30:00" (năm-tháng-ngày T giờ:phút:giây)
+    //
+    //    ✓ durationText: KHÔNG CẦN điền thủ công, hệ thống sẽ tự động tính
+    //      từ startTime và endTime. Ví dụ: 05:30 → 07:15 = "1 giờ 45 phút"
+    //
+    //    ✓ mapUrl: Có thể bỏ trống (empty string "") → hệ thống sẽ TỰ ĐỘNG tạo
+    //      Google Maps URL dựa trên tên địa điểm + defaultRegion
+    //
+    //    ✓ iconType: Chọn 1 trong các giá trị sau:
+    //      - time: đồng hồ (xuất phát, về, chuẩn bị)
+    //      - logistics: túi đồ (gửi đồ, check-in/out)
+    //      - boat: thuyền (đi thuyền, tour sông)
+    //      - food: đồ ăn (ăn sáng, trưa, tối)
+    //      - explore: bản đồ (tham quan, khám phá)
+    //      - hotel: giường (nhà nghỉ, khách sạn)
+    //      - nightlife: trăng sao (chơi đêm, phố đêm)
+    //      - relax: cafe (nghỉ ngơi, thư giãn)
+    //      - default: lịch (các hoạt động khác)
+    //
+    //    ✓ budgets.category: Chọn 1 trong các giá trị sau (để hiển thị emoji phù hợp):
+    //      hotel 🏠 | food 🍜 | drink ☕ | transport 🚕 | ticket 🎫 | shopping 🛍️ | relax 💆 | other 💰
+    //
+    //    ✓ budgets.isOptional:
+    //      - true: Chi phí TÙY CHỌN (không tính vào tổng tự động)
+    //        Ví dụ: "Nhà nghỉ theo giờ (Nếu chọn Option 2)" - có thể có hoặc không
+    //      - false hoặc undefined: Chi phí CƠ BẢN (tính vào tổng tự động)
+    //        Ví dụ: "Vé tham quan", "Ăn trưa" - chắc chắn phát sinh
+    //      - Sử dụng khi có nhiều lựa chọn cho cùng 1 mục, user có thể chọn hoặc không
+    //
+    // 4. TÍ MẸO:
+    //    - Dùng "Công cụ Giả lập thời gian" (ở header) để test lịch trình
+    //    - Chia sẻ link với tham số ?time=2025-11-15T09:30:00 để xem tại thời điểm cụ thể
+    //    - Nếu muốn ẩn 1 hoạt động tạm thời: Comment toàn bộ object {...} của item đó
+    //
+    // ========================================================================
+    const scheduleData = {
+        "tripInfo": {
+            "title": "Ninh Bình trip 2025", // Đổi tiêu đề
+            "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
+            "dates": "15-16/11/2025",
+            "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
+            "totalBudget": undefined, // Tổng chi phí chuyến đi. (Tổng cho tất cả mọi người). Không điền để tính tự động. Điền để hiển thị số liệu tính toán bằng tay.
+            "documentUrl": "https://docs.google.com/spreadsheets/d/1N9SNB6n3YJ2kndi1_ZtQd0aFdE9Ib-UudKnR86DUdbQ"
+        },
+        "schedule": [
+            // NGÀY 1
+            {
+                "dayInfo": {
+                    "day": 1,
+                    "date": "2025-11-15",
+                    "title": "Ngày 1: Thứ 7, 15/11 (Tam Cốc, Hoa Lư & Phố đêm)",
+                    "mapUrl": "https://google.com/maps"
+                },
+                "timelineItems": [
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T05:30:00",
+                            "endTime": "2025-11-15T07:15:00"
+                        },
+                        "title": "Xuất phát từ Hà Nội & Nghỉ chân/Ăn sáng",
+                        "summary": "Lái xe máy, di chuyển đến Trung tâm TP. Ninh Bình. Quãng đường ~90km, đi theo QL1A cũ. Thời gian di chuyển khoảng 1h45p - 2h. Có dừng nghỉ ngơi & ăn sáng.",
+                        "iconType": "time", // 'time' sẽ gọi icon đồng hồ
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/2JXeXZgzNhsD1BXt9",
+                                // "mapUrl": "https://maps.app.goo.gl/aqbqJeMUASt33Quj6",
+                                // "mapUrl": "https://maps.app.goo.gl/nNN4n58kspyqrgpn9",
+                                "steps": [
+                                    "Di chuyển từ Nhà nghỉ (Hà Nội) -> Trạm nghỉ (VD: Trà Sen Cụ Trưởng An) (~1h 15p).",
+                                    "Đến Trạm nghỉ, nghỉ ngơi, uống nước, ăn sáng tự túc (bánh mỳ), vệ sinh cá nhân (~30p).",
+                                    "Di chuyển Trạm nghỉ -> TTTP Ninh Bình (~30-40 phút)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà Nghỉ Osaka Hà Nội",
+                                    "description": "Điểm xuất phát.",
+                                    "mapUrl": "https://maps.app.goo.gl/LM5LRsurRzSausMDA"
+                                },
+                                {
+                                    "name": "Trà Sen Cụ Trưởng An",
+                                    "description": "Điểm dừng chân nghỉ ngơi, uống nước, vệ sinh cá nhân.",
+                                    "mapUrl": "https://google.com/maps/place/Trà+Sen+Cụ+Trưởng+An/data=!4m6!3m5!1s0x3135c92918e52ab3:0x96b8020e159c128d!8m2!3d20.638379!4d105.9186411!16s"
+                                },
+                                {
+                                    "name": "Cầu Đoan Vĩ",
+                                    "description": "Cầu bắc qua sông Đáy. Là ranh giới Hà Nam/Ninh Bình."
+                                },
+                                {
+                                    "name": "Lâu Đài Thành Thắng",
+                                    "description": "Lâu đài của người nhà giàu"
+                                },
+                                {
+                                    "name": "Cổng chào Ninh Bình",
+                                    "description": "Có thể checkin chụp ảnh ở đây."
+                                },
+                                {
+                                    "name": "Phố đi bộ Ninh Bình, Trung tâm TP. Ninh Bình",
+                                    "description": "Điểm đến (Phố đi bộ Ninh Bình)",
+                                    "mapUrl": "https://www.google.com/maps/search/Ph%E1%BB%91+%C4%91i+b%E1%BB%99+Ninh+B%C3%ACnh"
+                                },
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Phòng nghỉ",
+                                    "amount": 350000,
+                                    "category": "hotel", // Phân loại. Các giá trị: hotel | food | drink | transport | ticket | shopping | relax | other
+                                    "note": "Ngủ qua đêm trước chuyến đi. Lựa chọn chỗ gần điểm đến hơn và tránh cụm tắc đường đi đến bến xe Nước Ngầm cuối tuần."
+                                },
+                                {
+                                    "name": "Xăng xe lượt đi",
+                                    "amount": 60000,
+                                    "category": "transport",
+                                    "note": "Đầy bình xăng xe máy Khoảng 3 lít"
+                                },
+                                {
+                                    "name": "Cafe, trà",
+                                    "amount": 80000,
+                                    "category": "drink",
+                                    "note": "Dừng nghỉ ngơi giữa đường"
+                                },
+                                {
+                                    "name": "Ăn sáng",
+                                    "amount": 50000,
+                                    "category": "food",
+                                    "note": "Chi phí bánh mỳ/đồ ăn sáng mang theo chuẩn bị trước"
+                                }
+                            ],
+                            "reason": "Xuất phát sớm để tránh tắc đường, tận dụng thời gian ban ngày, nghỉ ngơi giữa đường và ăn sáng tự túc để tiết kiệm thời gian. Đến TTTP checkin trước khi di chuyển tiếp."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T07:15:00",
+                            "endTime": "2025-11-15T08:00:00"
+                        },
+                        "title": "Đến Ninh Bình checkin & Chuẩn bị",
+                        "summary": "Chụp ảnh check-in, gửi hành lý tại nhà nghỉ, ăn nhanh.",
+                        "iconType": "ticket",
+                        "details": {
+                            "directions": {
+                                "steps": ["Di chuyển trong TTTP đến nhà nghỉ và Phố đi bộ."]
+                            },
+                            "places": [
+                                {
+                                    "name": "Cổng chào Ninh Bình",
+                                    "description": "Có thể checkin chụp ảnh ở đây (~10p)."
+                                },
+                                {
+                                    "name": "Phố đi bộ Ninh Bình",
+                                    "description": "Chụp ảnh check-in nhanh (~15p). Ăn nhanh bánh mỳ (nếu mang theo mà chưa ăn) (~10p)."
+                                },
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Đến nhà nghỉ (đã liên hệ trước) để gửi đồ (~10p)."
+                                },
+                                {
+                                    "name": "Quán ăn sáng TTTP (tùy chọn)",
+                                    "description": "Nếu chưa ăn sáng. Gợi ý Miến Lươn Bà Phấn hoặc quán khác gần đó. (~30p)",
+                                    "mapUrl": "https://www.google.com/maps/search/Ăn+sáng,+Ninh+Bình"
+                                }
+                            ],
+                            "budgets": [], // Bỏ 80k ăn sáng (đã chuyển lên mục trước)
+                            "reason": "Dừng chân nhanh 45 phút: Giải quyết hành lý, ăn nhanh (nếu cần), và chụp ảnh check-in đầu tiên tại Phố đi bộ."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T08:00:00",
+                            "endTime": "2025-11-15T11:30:00"
+                        },
+                        "title": "Tham quan Cụm Tam Cốc",
+                        "summary": "Lái xe ra Tam Cốc (20p). Đi thuyền Tam Cốc (2 tiếng). Tham quan Chùa Bích Động (45p). (Option: Đền Thái Vi).",
+                        "iconType": "boat",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/w2HQMmjK7JRuwam87",
+                                "steps": [
+                                    "Di chuyển TTTP -> Bến thuyền Tam Cốc (~7-8km, ~20 phút).",
+                                    "Đi thuyền Tam Cốc (08:30 - 10:30).",
+                                    "Di chuyển Bến thuyền Tam Cốc -> Chùa Bích Động (~2-3km, ~7 phút xe máy).",
+                                    "Tham quan Chùa Bích Động (10:40 - 11:25).",
+                                    "(Option) Nếu còn sớm, di chuyển Bích Động -> Đền Thái Vi (~1.5km, 5p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Bến thuyền Tam Cốc",
+                                    "description": "Trải nghiệm đi thuyền 2 tiếng trên sông Ngô Đồng, xuyên 3 hang (Cả, Hai, Ba). Cảnh quan núi non hùng vĩ, được mệnh danh là \"Hạ Long trên cạn\".",
+                                    "mapUrl": "https://maps.app.goo.gl/9dJCr52N1C5QVopC8"
+                                },
+                                {
+                                    "name": "Chùa Bích Động",
+                                    "description": "\"Nam thiên đệ nhị động\". Chùa cổ dựa lưng vào núi, gồm 3 chùa (Hạ, Trung, Thượng). Cổng chùa là điểm check-in nổi tiếng, kinh điển. Leo nhẹ nhàng, miễn phí vé.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Đền Thái Vi (Option)",
+                                    "description": "Nằm gần Tam Cốc, đền cổ, không gian rất yên tĩnh và đẹp, ít khách du lịch hơn. Miễn phí tham quan. (Nếu đi nhanh 2 điểm trên, có thể ghé qua).",
+                                    "mapUrl": "https://www.google.com/maps/search/Đền+Thái+Vi,+Ninh+Bình"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé Tam Cốc",
+                                    "amount": 500000,
+                                    "category": "ticket",
+                                    "note": "250k/người x 2. Đã gồm vé thuyền & vé thắng cảnh. Đi thuyền dọc sông Ngô Đồng tham quan các địa điểm thắng cảnh nổi tiếng. Mỗi thuyền khoảng 4-6 người. Có thể ghép hoặc bao thuyền."
+                                },
+                                {
+                                    "name": "Vé đi xe điện Tam Cốc",
+                                    "amount": 200000,
+                                    "category": "ticket",
+                                    "note": "100k/người x 2. Trung chuyển các điểm tham quan",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 10000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Tip cho người chèo thuyền",
+                                    "amount": 50000,
+                                    "category": "other",
+                                    "note": "Tùy tâm (50k-100k/thuyền) nếu hài lòng",
+                                    "isOptional": true
+                                }
+                            ],
+                            "reason": "Bắt đầu ngày mới bằng hoạt động thư giãn (đi thuyền). Đây là 2 điểm \"kinh điển\". Hai địa điểm này nằm cùng 1 cụm, rất tiện di chuyển. Đi sáng sớm vắng vẻ, trời mát."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T11:30:00",
+                            "endTime": "2025-11-15T13:30:00"
+                        },
+                        "title": "Ăn trưa & Nghỉ ngơi tại Tam Cốc",
+                        "summary": "Ăn trưa 1 tiếng tại Tam Cốc. Nghỉ ngơi 1 tiếng (2 lựa chọn).",
+                        "iconType": "food",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "",
+                                "steps": [
+                                    "Di chuyển từ Chùa Bích Động/Đền Thái Vi về khu nhà hàng Tam Cốc (~5-10p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà hàng Tam Cốc (Du lịch, Gần)",
+                                    "description": "Gợi ý: Nhà hàng Chính Thư (cũng có ở Tam Cốc, nổi tiếng).",
+                                    "mapUrl": "https://maps.app.goo.gl/f4d722wj9TXrpM5T6"
+                                },
+                                {
+                                    "name": "Nhà hàng (Địa phương, Gần)",
+                                    "description": "Gợi ý: Anh Dũng Restaurant (Gà đồi, Cá sông), Minh Tâm Restaurant (Cơm bình dân, rẻ).",
+                                    "mapUrl": "https://maps.app.goo.gl/fYqAWtppdzPrfXwA9"
+                                },
+                                {
+                                    "name": "Option 1: Quán cà phê Tam Cốc",
+                                    "description": "Nghỉ ngơi 1 tiếng tại quán có view đẹp ra đồng lúa/núi non."
+                                },
+                                {
+                                    "name": "Option 2: Nhà nghỉ theo giờ (Gần Tam Cốc)",
+                                    "description": "(Nếu cần ngủ trưa) Thuê nhà nghỉ theo giờ ngay tại khu Tam Cốc. Nghỉ 1-2 giờ."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn trưa tại nhà hàng",
+                                    "amount": 500000,
+                                    "category": "food",
+                                    "note": "2 người. Có thể ăn thường (Gà 150k, Cá 200k), hoặc ăn Dê núi nếu muốn, giá sẽ cao hơn."
+                                },
+                                {
+                                    "name": "Cà phê/Đồ uống",
+                                    "amount": 80000,
+                                    "category": "drink",
+                                    "note": "Nghỉ ngơi giờ trưa, chọn một quán cafe yên tình và có view đẹp để thư giãn và nghỉ ngơi"
+                                },
+                                {
+                                    "name": "Nhà nghỉ theo giờ",
+                                    "amount": 150000,
+                                    "category": "hotel",
+                                    "note": "Nghỉ 1-2 giờ. Nếu bạn cần ngủ trưa lấy lại sức khỏe để chuẩn bị cho buổi chiều đi chơi đầy năng lượng",
+                                    "isOptional": true
+                                }
+                            ],
+                            "reason": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư. Cung cấp 2 lựa chọn (nghỉ tại chỗ hoặc thuê phòng gần đó)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T13:30:00",
+                            "endTime": "2025-11-15T17:05:00"
+                        },
+                        "title": "Tham quan Cụm Hoa Lư & Tuyệt Tình Cốc",
+                        "summary": "Lái xe ra Hoa Lư (25p). Tham quan Cố đô Hoa Lư (1.5 tiếng). (Option: Chùa Nhất Trụ). Tham quan Tuyệt Tình Cốc (1.15 tiếng).",
+                        "iconType": "explore",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/ctgRVUdjpRcFn1Xv5",
+                                "steps": [
+                                    "Di chuyển Tam Cốc -> Cố đô Hoa Lư (~10-12km, ~25 phút xe máy).",
+                                    "Tham quan Cố đô (14:00 - 15:30).",
+                                    "(Option) Ghé Chùa Nhất Trụ (ngay cạnh).",
+                                    "Di chuyển Cố đô -> Tuyệt Tình Cốc (~400m, ~2 phút).",
+                                    "Tham quan Tuyệt Tình Cốc (Động Am Tiên) (15:30 - 16:45)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Cố đô Hoa Lư",
+                                    "description": "Kinh đô xưa. Thăm đền Vua Đinh Tiên Hoàng, Vua Lê Đại Hành. Không khí cổ kính. Nên thuê hướng dẫn viên (~100k-200k) hoặc đọc trước lịch sử.",
+                                    "mapUrl": "https://maps.app.goo.gl/GwmWXKjFid2ztRat5"
+                                },
+                                {
+                                    "name": "Chùa Nhất Trụ (Option)",
+                                    "description": "Ngay cạnh Cố đô. Chùa cổ, nổi tiếng với Cột kinh Phật bằng đá độc đáo. Miễn phí.",
+                                    "mapUrl": "https://www.google.com/maps/search/Chùa+Nhất+Trụ,+Ninh+Bình"
+                                },
+                                {
+                                    "name": "Tuyệt Tình Cốc (Động Am Tiên)",
+                                    "description": "Hồ nước xanh ngọc bích, vách núi đá vôi bao quanh. Chùa nhỏ trong động phía trên. Cảnh đẹp \"sống ảo\".",
+                                    "mapUrl": "https://maps.app.goo.gl/FBxPaybsXtsCE5Xq9"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé Cố đô Hoa Lư",
+                                    "amount": 40000,
+                                    "category": "ticket",
+                                    "note": "20k/người x 2. Vé vào cừa, có thể có hướng dẫn viên miễn phí nếu đi theo đoàn"
+                                },
+                                {
+                                    "name": "Vé đi thuyền tham quan Cố đô Hoa Lư",
+                                    "amount": 200000,
+                                    "category": "ticket",
+                                    "note": "100k/người x 2. Vé thuyền VIP (có mái) là 150k/người",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Vé Tuyệt Tình Cốc",
+                                    "amount": 100000,
+                                    "category": "ticket",
+                                    "note": "50k/người x 2"
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 20000,
+                                    "category": "transport",
+                                    "note": "~10k/điểm x 2 điểm. Cố đô Hoa Lư & Tuyệt Tình Cốc"
+                                }
+                            ],
+                            "reason": "Hai địa điểm này nằm ngay cạnh nhau, gộp thành 1 cụm tham quan buổi chiều là tối ưu nhất. Thời gian này nắng chiều cũng đẹp để chụp ảnh cho Tuyệt Tình Cốc."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T17:05:00",
+                            "endTime": "2025-11-15T18:30:00"
+                        },
+                        "title": "Về nhận phòng, nghỉ ngơi, tắm rửa & mua sắm nhanh nếu cần",
+                        "summary": "Về TTTP, mua sắm nhanh, nhận phòng, tắm rửa, nghỉ ngơi (1h 25m).",
+                        "iconType": "hotel",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/8ZeLiTqWv1sEv1Te6",
+                                "steps": [
+                                    "Di chuyển từ Hoa Lư về TTTP (~20p), dừng siêu thị mini/tạp hóa (~20p).",
+                                    "Di chuyển từ siêu thị -> Nhà nghỉ TTTP (~5 phút).",
+                                    "Nhận phòng, tắm rửa, nghỉ ngơi (17:50 - 18:30)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Siêu thị mini / Tạp hóa (TTTP)",
+                                    "description": "(Nếu cần) Mua nước uống, đồ ăn vặt, vật dụng cần thiết... mang về nhà nghỉ. Yêu cầu của bạn: Mua đồ trước khi về nhà nghỉ sẽ tiện lợi hơn là đi mua lúc đêm muộn."
+                                },
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Nhận phòng (lấy lại đồ), tắm rửa, nghỉ ngơi chuẩn bị đi chơi tối.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Quà lưu niệm (Option)",
+                                    "description": "Có thể mua tại các cửa hàng đặc sản (Chợ Rồng) trên đường về. Gợi ý: Cơm cháy (100-150k), Rượu Kim Sơn (200-300k), Đồ thêu ren Văn Lâm."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Đồ ăn vặt, nước uống, quà",
+                                    "amount": 100000,
+                                    "category": "shopping",
+                                    "note": "Dự phòng mua về nhà nghỉ/làm quà"
+                                },
+                                {
+                                    "name": "Phòng nghỉ 1 đêm",
+                                    "amount": 350000,
+                                    "category": "hotel",
+                                    "note": "Ước tính cho phòng 2 người, mức trung bình. Phòng ở trung tâm TP, Cần đặt trước phòng chủ động"
+                                }
+                            ],
+                            "reason": "Đây là ưu tiên của bạn: ở TTTP để tiện tắm rửa, sạch sẽ trước khi đi chơi tối. Thời gian này cũng khớp để bắt đầu giờ ăn tối (18:30)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T18:30:00",
+                            "endTime": "2025-11-15T19:30:00"
+                        },
+                        "title": "Ăn tối & Khám phá Ẩm thực",
+                        "summary": "Di chuyển 5-10p. Ăn tối tại Phố ẩm thực Cù Chính Lan (Phố 8). (Thêm 4 lựa chọn khác).",
+                        "iconType": "food",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ nhà nghỉ đến địa điểm ăn tối (~5-10p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Lựa chọn 1: Phố 8 (Cù Chính Lan)",
+                                    "description": "Khu ẩm thực đêm nổi tiếng nhất TTTP, tập trung nhiều quán lẩu, nướng, ốc, đặc sản địa phương. Rất sầm uất. Đông vui, nhiều lựa chọn.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 2: Quán Dê núi",
+                                    "description": "Thử đặc sản dê núi (VD: Dê núi Đức Trọc, Quán Chính Thư...).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 3: Quán ăn địa phương",
+                                    "description": "Ăn các món dân dã, ngon (VD: Miến lươn Bà Phấn - ăn tối, Bún mọc...).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 4: Đặc sản khác (Vặt/Nhậu)",
+                                    "description": "Ốc núi luộc/xào (70-100k/đĩa), Gỏi cá nhệch (~300-400k/suất), Chân gà nướng Phố 8 (~15k/cái)."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn tối (Lẩu/Nướng/Dê)",
+                                    "amount": 450000,
+                                    "category": "food",
+                                    "note": "Ước tính cho 2 người: Dê (150k/món), Lẩu (250-300k/nồi), Ốc núi (70-100k/đĩa)."
+                                }
+                            ],
+                            "reason": "Đúng khung giờ ăn tối bạn muốn. Rất tiện vì ở ngay TTTP. Nhiều lựa chọn. Đúng chất \"khám phá ẩm thực\" (lẩu, nướng) địa phương hoặc món ăn no."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T19:30:00",
+                            "endTime": "2025-11-15T23:00:00"
+                        },
+                        "title": "Dạo chơi Phố đêm (Phố cổ, Tháp Tứ Ân)",
+                        "summary": "Dạo Phố đi bộ. Tham quan Phố cổ Hoa Lư (bao gồm Tháp Tứ Ân, Đền Mẫu). (Option: Chơi khuya).",
+                        "iconType": "nightlife",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển/Đi bộ Phố 8 -> Phố cổ Hoa Lư (~1-2km, ~5 phút xe máy).",
+                                    "Lộ trình đi bộ gợi ý: Gửi xe tại Phố cổ -> Bắt đầu từ Hồ Kỳ Lân -> đi Cầu phao -> Tham quan Chùa Bạc, Tháp Tứ Ân, Đền Mẫu -> Dạo quanh các gian hàng và khu ẩm thực Phố cổ."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Phố đi bộ (Phố 8)",
+                                    "description": "Khu vực ăn uống bạn vừa ăn xong, có thể có hoạt động đường phố cuối tuần."
+                                },
+                                {
+                                    "name": "Phố cổ Hoa Lư",
+                                    "description": "Khu phố tái hiện, đèn lồng lung linh, gian hàng thủ công, hoạt động văn nghệ. (Miễn phí vào cổng)."
+                                },
+                                {
+                                    "name": "Tháp Tứ Ân & Đền Mẫu (Chùa Bạc)",
+                                    "description": "Nằm trong khuôn viên Phố cổ Hoa Lư, trên núi Kỳ Lân. Lên đèn buổi tối, có thể lên tham quan."
+                                },
+                                {
+                                    "name": "Quà lưu niệm Phố cổ (Option)",
+                                    "description": "Mua sắm tại các gian hàng: Đèn lồng (50-150k), Tò he (20k), Thư pháp (100k), Đồ thêu ren."
+                                },
+                                {
+                                    "name": "Các quán Bar/Pub (Option - Chơi khuya)",
+                                    "description": "Nếu còn sức (sau 23:00), có thể ghé: Chookie's Beer Garden, King Kong Bar, Bamboo Bar... (Cách TTTP ~1-3km, mở đến 1-2h sáng).",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Gửi xe",
+                                    "amount": 10000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Đồ uống/Ăn vặt (Nếu có)",
+                                    "amount": 100000,
+                                    "category": "drink",
+                                    "note": "Khu vực phố cổ"
+                                },
+                                {
+                                    "name": "Dịch vụ khác",
+                                    "amount": 50000,
+                                    "category": "other",
+                                    "note": "Mua sắm, Trò chơi, chụp ảnh..."
+                                },
+                                {
+                                    "name": "Chi phí chơi khuya",
+                                    "amount": 250000,
+                                    "category": "relax",
+                                    "note": "Nếu đi bar/pub (phát sinh)",
+                                    "isOptional": true
+                                }
+                            ],
+                            "reason": "Đây là các điểm vui chơi tối chính bạn muốn đến. Cực kỳ tiện lợi vì đều nằm ở TTTP. Tháp Tứ Ân & Đền Mẫu nằm ngay trong khuôn viên Phố cổ Hoa Lư, rất dễ kết hợp."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-15T23:00:00",
+                            "endTime": "2025-11-16T07:30:00"
+                        },
+                        "title": "Về nhà nghỉ",
+                        "summary": "Kết thúc Ngày 1, nghỉ ngơi.",
+                        "iconType": "hotel",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ Phố cổ về nhà nghỉ (~1-2km, ~5p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Nghỉ ngơi qua đêm.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "reason": "Bạn đã ở TTTP nên về nhà nghỉ lúc 23:00 rất nhanh chóng và an toàn. Ghi chú: Sạc pin, chuẩn bị thuốc/y tế dự phòng. Ngủ sớm giữ sức và đặt báo thức (khoảng 07:00)."
+                        }
+                    }
+                ]
+            },
+            // NGÀY 2
+            {
+                "dayInfo": {
+                    "day": 2,
+                    "date": "2025-11-16",
+                    "title": "Ngày 2: Chủ Nhật, 16/11 (Tràng An, Bái Đính & Trở về)",
+                    "mapUrl": ""
+                },
+                "timelineItems": [
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T07:30:00",
+                            "endTime": "2025-11-16T08:30:00"
+                        },
+                        "title": "Thức dậy, Ăn sáng & Trả phòng",
+                        "summary": "Dậy, Vệ sinh cá nhân (dự phòng 15p ngủ nướng). Check-out. Di chuyển đi ăn sáng.",
+                        "iconType": "food",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Vệ sinh cá nhân, dọn đồ, trả phòng (07:30 - 08:00).",
+                                    "Di chuyển (đi bộ/xe máy) đến quán ăn sáng (08:00 - 08:30)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà nghỉ (TTTP)",
+                                    "description": "Vệ sinh cá nhân, dọn đồ, làm thủ tục Check-out. Mang hành lý theo xe."
+                                },
+                                {
+                                    "name": "Quán ăn sáng TTTP",
+                                    "description": "Gợi ý: 1. Bún chả que tre (Phố 8, ~35k), 2. Bánh cuốn (gần nhà nghỉ, ~30k), 3. Miến lươn Bà Phấn (~40k)."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn sáng (2 người)",
+                                    "amount": 80000,
+                                    "category": "food",
+                                    "note": "~40k/người"
+                                }
+                            ],
+                            "reason": "Đây là yêu cầu của bạn: trả phòng sớm để linh hoạt, không bị ràng buộc. Bạn chấp nhận mang hành lý nhẹ theo người. Ăn sáng đặc sản địa phương. Đã dự phòng 15p ngủ nướng."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T08:30:00",
+                            "endTime": "2025-11-16T12:30:00"
+                        },
+                        "title": "Tham quan Cụm Tràng An",
+                        "summary": "Lái xe ra Tràng An (20p). Gửi hành lý (10p). Đi thuyền Tràng An (3 tiếng). Lấy lại hành lý (10p).",
+                        "iconType": "boat",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/KdAKf5us5wmeGTEUA",
+                                "steps": [
+                                    "Di chuyển TTTP -> Bến thuyền Tràng An (~7-8km, ~20 phút).",
+                                    "Gửi hành lý (08:50 - 09:00).",
+                                    "Đi thuyền Tràng An (09:00 - 12:00).",
+                                    "Lấy lại hành lý (12:00 - 12:10).",
+                                    "Di chuyển Bến thuyền -> Nhà hàng ăn trưa (~5-10p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Khu du lịch sinh thái Tràng An",
+                                    "description": "Di sản UNESCO. Có 3 tuyến, thuyền đi 4-6 người. Gợi ý: Tuyến 2 (Phim trường, 3 đền) hoặc Tuyến 3 (nhiều hang động dài). Tour kéo dài ~3 tiếng qua hang động, hồ nước, núi đá vôi, thăm đền chùa cổ.",
+                                    "mapUrl": "https://maps.app.goo.gl/R7y4EViUgpEW1Gg29"
+                                },
+                                {
+                                    "name": "Phòng vé Bến thuyền Tràng An",
+                                    "description": "Dịch vụ gửi đồ Tràng An. Xác nhận: Có quầy trông giữ hành lý (miễn phí hoặc phí nhỏ) rất an toàn cho khách đi thuyền. Gửi tại khu vực nhà điều hành/bán vé."
+                                },
+                                {
+                                    "name": "Đền Trình",
+                                    "description": "Địa điểm sẽ đi qua khi đi thuyền."
+                                },
+                                {
+                                    "name": "Phim Trường Kong Skull Island Ninh Bình (Option)",
+                                    "description": "Địa điểm quay phim King Kong",
+                                    "mapUrl": "https://maps.app.goo.gl/zaA4Nnoc42kHoHut9"
+                                },
+                                {
+                                    "name": "Thung Tối (Hang Tối) (Option)",
+                                    "description": "Cách Tràng An khoảng 2Km. Hang tối dài khoản 1 km có nhiều thạch nhũ trong hang rất đẹp.",
+                                    "mapUrl": "https://maps.app.goo.gl/iHQ5oJ8JEW6Zjjs78"
+                                },
+                                {
+                                    "name": "Khu Cơm Cháy (Option)",
+                                    "description": "Trên đường ra bến thuyền, có thể ghé mua cơm cháy đặc sản (nếu muốn)."
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé Tràng An",
+                                    "amount": 500000,
+                                    "category": "ticket",
+                                    "note": "250k/người x 2. Giá vé đã bao gồm cả phí đò và phí danh lam"
+                                },
+                                {
+                                    "name": "Gửi hành lý (ước tính)",
+                                    "amount": 10000,
+                                    "category": "ticket"
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 10000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Tip cho người chèo thuyền",
+                                    "amount": 50000,
+                                    "category": "other",
+                                    "note": "Tùy tâm (50k-100k/thuyền) nếu hài lòng",
+                                    isOptional: true,
+                                },
+                                {
+                                    "name": "Hướng dẫn viên khu Tràng An",
+                                    "amount": 300000,
+                                    "category": "ticket",
+                                    isOptional: true,
+                                },
+                            ],
+                            "reason": "Trải nghiệm Di sản UNESCO \"phải đi\" cho bạn gái bạn. Giải pháp gửi đồ tại bến thuyền là tối ưu để bạn đi thuyền 3 tiếng mà không vướng bận hành lý."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T12:30:00",
+                            "endTime": "2025-11-16T13:30:00"
+                        },
+                        "title": "Ăn trưa (Nhiều lựa chọn)",
+                        "summary": "Ăn trưa (Dê núi, Gà đồi, Cơm cháy, Cơm...) tại nhà hàng khu Tràng An (mang theo hành lý).",
+                        "iconType": "food",
+                        "details": {
+                            "directions": {
+                                "steps": ["Di chuyển từ bến Tràng An đến nhà hàng (~5-10p)."]
+                            },
+                            "places": [
+                                {
+                                    "name": "Lựa chọn 1: Nhà hàng khu Tràng An (Du lịch, Gần)",
+                                    "description": "Gợi ý: Nhà hàng Chính Thư, Thăng Long (ngay gần bến Tràng An, đông vui, nổi tiếng với du khách).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 2: Nhà hàng (Địa phương, Xa hơn)",
+                                    "description": "Gợi ý: Dê núi Đức Trọc, Quán Ba Cửa (cách 3-4km, dân địa phương đánh giá cao).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 3: Đặc sản khác",
+                                    "description": "Gợi ý: Gà đồi (Quán Tùng Gà, gần Tràng An).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 4: Lẩu cá sông",
+                                    "description": "Bạn cũng có thể thử Lẩu cá sông (VD: Lẩu cá Minh Phượng).",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lựa chọn 5: Cơm bình dân (Nhanh, Rẻ)",
+                                    "description": "Gợi ý: Cơm Phở Dũng (gần Tràng An, ~40-60k/suất, no bụng, nhanh gọn).",
+                                    "mapUrl": ""
+                                },
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn trưa Dê núi (2 người)",
+                                    "amount": 300000,
+                                    "category": "food",
+                                    "note": "Ước tính cho bữa Dê núi (150-170k/món). Nếu ăn cơm bình dân sẽ rẻ hơn."
+                                }
+                            ],
+                            "reason": "Ăn trưa trước khi đi Bái Đính. Cung cấp nhiều lựa chọn (Dê núi, Gà đồi, Cơm) để bạn quyết định. Các đặc sản nổi tiếng nhất Ninh Bình. Ăn ngay tại khu Tràng An sau khi đi thuyền là tiện nhất, không mất thời gian di chuyển. Bạn sẽ ăn cùng với hành lý đã lấy."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T13:30:00",
+                            "endTime": "2025-11-16T16:15:00"
+                        },
+                        "title": "Tham quan Chùa Bái Đính (Nhanh)",
+                        "summary": "Di chuyển (30p). Gửi đồ (15p). Tham quan (1h 45m). Lấy đồ (15p). Nếu không đi chùa Bái Đính thì chọn một trong hai phương án: (A) Tìm quán cà phê tại TTTP để nghỉ ngơi, hoặc (B) Thuê nhà nghỉ theo giờ để nghỉ ngơi tắm rửa giữ sức chuẩn bị về Hà Nội.",
+                        "iconType": "explore",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển Tràng An -> Chùa Bái Đính (~15-17km, ~30 phút).",
+                                    "Gửi hành lý tại cổng (14:00 - 14:15).",
+                                    "Lộ trình tham quan (14:15 - 16:00, 1h 45m): Mua vé xe điện -> Vào (tham quan Chùa Quan Âm, Điện Pháp Chủ) -> [Option: Lên Bảo Tháp (mất phí, 50k)] -> Điện Tam Thế -> Ra xe điện.",
+                                    "Lấy lại hành lý (16:00 - 16:15)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Chùa Bái Đính",
+                                    "description": "Quần thể chùa lớn nhất VN. Rất rộng, đi bộ nhiều. Gợi ý: tập trung vào các điện chính, bỏ qua các điểm nhỏ nếu không đủ giờ.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Dịch vụ gửi đồ Bái Đính",
+                                    "description": "Tại khu vực cổng.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Khu vực xung quanh (Option)",
+                                    "description": "Trên đường có thể thấy Cổng Tam Quan, nhưng không cần dừng lại nếu vội.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Vé xe điện (khứ hồi)",
+                                    "amount": 200000,
+                                    "category": "transport",
+                                    "note": "100k/người x 2",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Xe điện + bảo tháp",
+                                    "amount": 300000,
+                                    "category": "transport",
+                                    "note": "150k/người x 2"
+                                },
+                                {
+                                    "name": "Vé xe điện VIP, bao gồm vào bảo tháp",
+                                    "amount": 500000,
+                                    "category": "transport",
+                                    "note": "250k/người x 2",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Xe điện trung chuyển (bao gồm: xe điện trung chuyển các điểm, vé Bảo Tháp, ngâm chân)",
+                                    "amount": 600000,
+                                    "category": "transport",
+                                    "note": "300k/người x 2",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Vé thăm quan Bảo tháp",
+                                    "amount": 120000,
+                                    "category": "ticket",
+                                    "note": "60k/người x 2 (Nếu muốn lên)"
+                                },
+                                {
+                                    "name": "Hướng dẫn viên",
+                                    "amount": 500000,
+                                    "category": "ticket",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "Gửi xe máy",
+                                    "amount": 15000,
+                                    "category": "transport"
+                                },
+                                {
+                                    "name": "Gửi hành lý",
+                                    "amount": 15000,
+                                    "category": "ticket"
+                                }
+                            ],
+                            "reason": "Bạn muốn thêm Bái Đính. Lịch trình này cố gắng đi nhanh để kịp giờ về, nhưng sẽ khá mệt và gấp. Hoặc bạn có thể bỏ lịch đi chùa này, chuyển sang lịch cafe nghỉ ngơi để hồi sức trước khi về. Vì đã trả phòng, bạn có thể linh hoạt. Nghỉ ngơi tại TTTP sẽ tiện đường ra QL1A hơn là quay lại Tam Cốc."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T16:15:00",
+                            "endTime": "2025-11-16T16:45:00"
+                        },
+                        "title": "Chuẩn bị về",
+                        "summary": "Di chuyển ra QL1A (20p). Kiểm tra xăng xe, đảm bảo an toàn (10p).",
+                        "iconType": "time",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Di chuyển từ Bái Đính ra cây xăng gần QL1A (~15-17km, ~20p)."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Cây xăng gần QL1A",
+                                    "description": "Đổ xăng, kiểm tra xe (lốp, phanh) trước khi về.",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Xăng xe lượt về (ước tính)",
+                                    "amount": 60000,
+                                    "category": "transport",
+                                    "note": "Đầy bình xăng xe máy Khoảng 3 lít"
+                                }
+                            ],
+                            "reason": "Ghi chú: Kiểm tra kỹ xăng, lốp, phanh an toàn. Bước chuẩn bị cuối cùng để đảm bảo an toàn cho chặng đường về (về lúc 16:45 để kịp có mặt tại HN lúc 20:15)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T16:45:00",
+                            "endTime": "2025-11-16T18:15:00"
+                        },
+                        "title": "Lái xe về Vân Đình",
+                        "summary": "Chú ý đổ xăng. Di chuyển từ Ninh Bình đến Vân Đình để ăn tối. Dừng nghỉ giữa đường nếu cần.",
+                        "iconType": "time",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/Qj7romYTkeJWYwwe6",
+                                "steps": [
+                                    "Lộ trình: Ninh Bình (QL1A) -> Phủ Lý -> Đồng Văn -> Vân Đình (Ứng Hòa).",
+                                    "Quãng đường ~60-70km, ~1h 30p xe máy.",
+                                    "Cần gọi điện hỏi trước về tình trạng chỗ ngồi và món ăn ở các quán Vịt Vân Đình.",
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Chùa Bái Đính",
+                                    "description": "Điểm xuất phát",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Lâu Đài Thành Thắng",
+                                    "description": "Xem lâu đài buổi tối lên đèn, xem có đẹp hơn buổi sáng không.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Cầu Đoan Vĩ",
+                                    "description": "Cầu bắc qua sông Đáy. Là ranh giới Hà Nam/Ninh Bình.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Cửa hàng Xăng dầu Petrolimex Số 114",
+                                    "description": "Đổ xăng trước khi đi tiếp về Hà Nội",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Tp. Phủ Lý, Hà Nam (Option)",
+                                    "description": "Có thể dừng nghỉ 5-10p uống nước nếu mệt. Đi đến đây là đã đi được ~35Km, còn lại ~30Km nữa đến Vân Đình ăn tối.",
+                                    "mapUrl": ""
+                                },
+                                {
+                                    "name": "Quán Vịt cỏ Vân Đình",
+                                    "description": "Ăn tối",
+                                    "mapUrl": ""
+                                }
+                            ],
+                            "reason": "Đây là chặng 1 của đường về, đến đúng địa điểm ăn tối (Vân Đình) vào giờ ăn tối (18:15)."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T18:15:00",
+                            "endTime": "2025-11-16T19:15:00"
+                        },
+                        "title": "Ăn tối Vịt cỏ Vân Đình",
+                        "summary": "Dừng chân ăn tối với đặc sản Vịt cỏ Vân Đình. Cần gọi điện hỏi trước về tình trạng chỗ ngồi và món ăn.",
+                        "iconType": "food",
+                        "details": {
+                            "directions": {
+                                "steps": [
+                                    "Chùa Bái Đính -> Vân Đình -> Quán ăn Vịt cỏ."
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Nhà Hàng Vịt Doãn Thọ (có 2 cơ sở)",
+                                    "description": "Đây là một trong những thương hiệu nổi tiếng và lâu đời nhất (khoảng 30 năm) tại Vân Đình. Quán được đánh giá cao về chất lượng vịt cỏ và tay nghề chế biến.",
+                                    "mapUrl": "https://maps.google.com/?cid=8180557401541000411&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ&authuser=1"
+                                },
+                                {
+                                    "name": "Quán Vịt Khải Lê",
+                                    "description": "Một địa chỉ rất nổi tiếng và có thâm niên hàng chục năm tại Vân Đình, được nhiều người biết đến và thường xuyên ghé qua.",
+                                    "mapUrl": "https://maps.google.com/?cid=13958931727172999411&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ&authuser=1"
+                                },
+                                {
+                                    "name": "Vịt Quay Doãn Ngọc bé",
+                                    "description": "Địa điểm được nhiều đánh giá tên Google Map",
+                                    "mapUrl": "https://maps.app.goo.gl/HBXVEJJHH1PnsUTu6"
+                                },
+                                {
+                                    "name": "Nhà Hàng Uyển Linh VTV1",
+                                    "description": "Hiếu xem trên Google Map thấy bảo được lên VTV1 nên đưa vào danh sách tham khảo xem sao. Hehe.",
+                                    "mapUrl": "https://maps.app.goo.gl/oprwMcSYpKWe4C7s7"
+                                },
+                                {
+                                    "name": "Quán Chè Khánh Huyền",
+                                    "description": "Có thể ăn vặt sau khi ăn tối. Nhưng hơi ngược đường. Cần chú ý thời gian đi về Hà Nội kẻo muộn",
+                                    "mapUrl": "https://maps.app.goo.gl/SsuBmSSmMc4cnrgq9"
+                                }
+                            ],
+                            "budgets": [
+                                {
+                                    "name": "Ăn tối Vịt (2 người)",
+                                    "amount": 250000,
+                                    "category": "food",
+                                    "note": "Ước tính: Nửa con vịt nướng (~150k), Cháo, Canh măng, Bún, Bánh cuốn."
+                                }
+                            ],
+                            "reason": "Thực hiện kế hoạch của bạn là ăn đặc sản trên đường về."
+                        }
+                    },
+                    {
+                        "timeInfo": {
+                            "startTime": "2025-11-16T19:15:00",
+                            "endTime": "2025-11-16T20:15:00"
+                        },
+                        "title": "Về đến Hà Nội",
+                        "summary": "Lái xe chặng cuối về Hà Nội. Kết thúc chuyến đi!",
+                        "iconType": "time",
+                        "details": {
+                            "directions": {
+                                "mapUrl": "https://maps.app.goo.gl/ukeenbRF9PXEhEP26",
+                                "steps": [
+                                    "Di chuyển Vân Đình -> Hà Nội (~30-40km, ~1 tiếng xe máy).",
+                                    "-> Ng. 55 P. Chính Kinh (Phòng Vân Chi)",
+                                    "-> Ng. 14 P. Vũ Hữu (Phòng Hiếu iceTea)",
+                                ]
+                            },
+                            "places": [
+                                {
+                                    "name": "Trung tâm Hà Nội",
+                                    "description": "Điểm kết thúc chuyến đi.",
+                                    "mapUrl": "https://www.google.com/maps/search/Thanh+Xuân,+Hà+Nội"
+                                }
+                            ],
+                            "reason": "Hoàn thành mục tiêu về đến Hà Nội lúc 20:15, kịp nghỉ ngơi cho ngày làm việc hôm sau."
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+
+    // --- ICON SVG (Lấy từ v2.html) ---
+    // ĐÃ CHỈNH SỬA: Thay đổi kích thước (width, height) thành 16
+    // và màu (stroke) thành "white" để khớp với icon 24px mới
+    const icons = {
+        time: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock-3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+        logistics: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-baggage-claim"><path d="M22 18H6a2 2 0 0 1-2-2V7a2 2 0 0 0-2-2"/><path d="M17 14V4a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v10"/><rect width="13" height="8" x="8" y="6" rx="1"/><circle cx="18" cy="20" r="2"/><circle cx="9" cy="20" r="2"/></svg>`,
+        boat: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ship"><path d="M2 21c.6.5 1.2 1 2.5 1 1.6 0 2.2-1.8 3.5-1.8 1.4 0 2.2 1.8 3.5 1.8 1.3 0 2-.5 3.5-1.8 1.4 0 2.2 1.8 3.5 1.8 1.3 0 1.9-.5 2.5-1H2z"/><path d="M19.3 19.3c-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4"/><path d="M22 10.5c0-.9-.5-1.8-1.4-2.3-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4-1.4-1-2.9-1.4-4.3-1.4-1.4 0-2.9.4-4.3 1.4C2.5 8.7 2 9.6 2 10.5V16h20v-5.5z"/><path d="M16 6.2C14.5 5.2 13 5 11.5 5c-1.5 0-3 .2-4.5.8"/><path d="M12 12v4"/></svg>`,
+        food: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils-crossed"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z"/><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"/><path d="m2.1 2.1 6.4 6.4"/></svg>`,
+        explore: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+        hotel: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bed-double"><path d="M2 17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v4Z"/><path d="M4 11V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/><path d="M12 11V6"/><path d="M6 11V6"/><path d="M18 11V6"/></svg>`,
+        nightlife: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-star"><path d="M12 3a6.364 6.364 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/><path d="m19 11 1.5 1.5"/><path d="M22 12.5h-3"/></svg>`,
+        relax: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-coffee"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2Z"/><path d="M6 2v2"/><path d="M18 15v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2c0 1.1.9 2 2 2h8a4 4 0 0 0 4-4Z"/><path d="M20 15h-2a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h2v6Z"/></svg>`,
+        default: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar-days"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>`
+    };
+
+    function getIcon(iconType) {
+        return icons[iconType] || icons.default;
+    }
+
+    // --- HÀM CATEGORY DISPLAY ---
+    /**
+     * Lấy thông tin hiển thị cho category
+     * @param {string} category - Mã category (hotel, food, drink, ...)
+     * @returns {{icon: string, name: string}} - Icon và tên hiển thị
+     */
+    function getCategoryDisplay(category) {
+        return CATEGORY_MAP[category] || CATEGORY_MAP.other;
+    }
+
+    // --- HÀM FORMAT TIỀN TỆ ---
+    /**
+     * Format số tiền theo định dạng Việt Nam
+     * @param {number} amount - Số tiền
+     * @param {boolean} includeUnit - Có thêm đơn vị "đ" không (default: true)
+     * @returns {string} - VD: "350.000đ" (với đơn vị) hoặc "350.000" (không đơn vị)
+     */
+    function formatCurrency(amount, includeUnit = true) {
+        if (!amount || amount === 0) return includeUnit ? '0đ' : '0';
+        const formatted = amount.toLocaleString('vi-VN');
+        return includeUnit ? formatted + 'đ' : formatted;
+    }
+
+    /**
+     * Format số tiền dạng ngắn gọn (cho tooltip)
+     *
+     * Logic (theo thứ tự ưu tiên):
+     * - Chia hết cho 1 triệu → "1tr", "2tr", "5tr"
+     * - Chia hết cho 100 nghìn → "1.5tr", "2.3tr", "4.2tr"
+     * - Chia hết cho 1 nghìn (>= 1 triệu) → "4tr255k", "1tr234k"
+     * - Chia hết cho 1 nghìn (< 1 triệu) → "500k", "515k"
+     * - Chia hết cho 100 → "515.5k"
+     * - Không chia hết → format đầy đủ "1.234.567đ"
+     *
+     * CHÚ Ý: Hàm này KHÔNG bao giờ làm tròn số tiền
+     * Chỉ format ngắn khi số tiền chia hết (100% chính xác)
+     *
+     * @param {number} amount - Số tiền
+     * @returns {string} Vd: "1tr", "1.5tr", "4tr255k", "515k", "515.5k", "1.234.567đ"
+     */
+    function formatCurrencyShort(amount) {
+        if (!amount || amount === 0) return '0đ';
+
+        // === TRIỆU ===
+        if (amount >= 1000000) {
+            // Chia hết cho 1 triệu → "1tr", "2tr"
+            if (amount % 1000000 === 0) {
+                return (amount / 1000000) + 'tr';
+            }
+            // Chia hết cho 100 nghìn → "1.5tr", "2.3tr"
+            if (amount % 100000 === 0) {
+                const millions = Math.floor(amount / 1000000);
+                const hundredThousands = (amount % 1000000) / 100000;
+                return millions + '.' + hundredThousands + 'tr';
+            }
+            // Chia hết cho 1 nghìn → "4tr255k", "1tr234k"
+            if (amount % 1000 === 0) {
+                const millions = Math.floor(amount / 1000000);
+                const thousands = (amount % 1000000) / 1000;
+                return millions + 'tr' + thousands + 'k';
+            }
+            // Không chia hết → format đầy đủ
+            return amount.toLocaleString('vi-VN') + 'đ';
+        }
+
+        // === NGHÌN ===
+        if (amount >= 1000) {
+            // Chia hết cho 1 nghìn → "500k", "515k"
+            if (amount % 1000 === 0) {
+                return (amount / 1000) + 'k';
+            }
+            // Chia hết cho 100 → "515.5k"
+            if (amount % 100 === 0) {
+                const thousands = Math.floor(amount / 1000);
+                const hundreds = (amount % 1000) / 100;
+                return thousands + '.' + hundreds + 'k';
+            }
+            // Không chia hết → format đầy đủ
+            return amount.toLocaleString('vi-VN') + 'đ';
+        }
+
+        // Dưới 1000
+        return amount + 'đ';
+    }
+
+    // --- HÀM TÍNH TOÁN CHI PHÍ ---
+    /**
+     * Tính tổng chi phí từ scheduleData
+     * Chỉ gọi hàm này khi cần (lazy calculation)
+     *
+     * @param {Object} scheduleData - Dữ liệu lịch trình
+     * @returns {Object} { total: number, optional: number }
+     *   - total: Tổng chi phí CƠ BẢN (không tính isOptional)
+     *   - optional: Tổng chi phí TÙY CHỌN (chỉ tính isOptional)
+     */
+    function calculateBudgets(scheduleData) {
+        let total = 0;
+        let optional = 0;
+
+        scheduleData.schedule.forEach(day => {
+            day.timelineItems.forEach(item => {
+                if (item.details?.budgets) {
+                    item.details.budgets.forEach(budget => {
+                        const amount = budget.amount || 0;
+                        if (budget.isOptional) {
+                            optional += amount;
+                        } else {
+                            total += amount;
+                        }
+                    });
+                }
+            });
+        });
+
+        return {total, optional};
+    }
+
+    /**
+     * Lấy thông tin chi phí để hiển thị
+     *
+     * Logic:
+     * - totalBudget = null → return null (ẩn hoàn toàn)
+     * - totalBudget = undefined → tính tự động (nếu = 0 thì ẩn)
+     * - totalBudget = 0 hoặc > 0 → hiển thị giá trị thủ công
+     *
+     * @param {Object} scheduleData - Dữ liệu lịch trình
+     * @returns {Object|null} Budget info hoặc null nếu cần ẩn
+     *   - value: Giá trị hiển thị
+     *   - isAuto: true/false
+     *   - tooltip: Text cho title attribute
+     */
+    function getBudgetInfo(scheduleData) {
+        const manual = scheduleData.tripInfo.totalBudget;
+
+        // CASE 1: null → Ẩn hoàn toàn
+        if (manual === null) {
+            return null;
+        }
+
+        // CASE 2: undefined → Tính tự động
+        if (manual === undefined) {
+            const calculated = calculateBudgets(scheduleData);
+
+            // Nếu tính ra = 0 → Ẩn
+            if (calculated.total === 0) {
+                return null;
+            }
+
+            // Có chi phí → Hiển thị
+            return {
+                value: calculated.total,
+                isAuto: true,
+                optional: calculated.optional,
+                tooltip: calculated.optional > 0
+                    ? `Tự động tính • Không gồm chi phí tùy chọn (+${formatCurrencyShort(calculated.optional)})`
+                    : 'Tự động tính • Tổng tất cả chi phí'
+            };
+        }
+
+        // CASE 3 & 4: Có giá trị (0 hoặc > 0) → Hiển thị manual
+        return {
+            value: manual,
+            isAuto: false,
+            tooltip: 'Nhập thủ công • Xóa để tự động tính'
+        };
+    }
+
+    // --- HÀM RENDER CHI PHÍ (BUDGET) ---
+    /**
+     * Render section "Chi phí" (từ details.budgets)
+     * @param {Array} budgets - Mảng budget items từ details.budgets
+     * @returns {string} - HTML string hoặc empty string
+     */
+    function renderBudget(budgets) {
+        // Kiểm tra budgets có tồn tại và là array không rỗng
+        if (!budgets || !Array.isArray(budgets) || budgets.length === 0) {
+            return '';
+        }
+
+        // Icon mapping cho categories
+        const categoryIcons = {
+            "hotel": "🏠",
+            "food": "🍜",
+            "drink": "☕",
+            "transport": "🚕",
+            "ticket": "🎫",
+            "shopping": "🛍️",
+            "relax": "💆",
+            "other": "💰"
+        };
+
+        // Heading:
+        let html = '<h4>Chi phí</h4>';
+        html += '<ul class="budget-list">';
+
+        budgets.forEach(item => {
+            const icon = item.category ? categoryIcons[item.category] || "💰" : "💰";
+            const amount = formatCurrency(item.amount || 0);
+
+            // Thêm " (tùy chọn)" nếu isOptional = true
+            const optionalLabel = item.isOptional
+                ? ' <span class="text-gray-400 text-xs">(tùy chọn)</span>'
+                : '';
+
+            // Format: 🎫 Vé tham quan: 120.000đ
+            // Hoặc: 🏠 Nhà nghỉ theo giờ (tùy chọn): 150.000đ
+            let itemText = `${icon} ${item.name}${optionalLabel}: ${amount}`;
+
+            // Thêm note nếu có (trong ngoặc đơn)
+            if (item.note) {
+                itemText += ` <span class="text-gray-500 text-xs">(${item.note})</span>`;
+            }
+
+            html += `<li>${itemText}</li>`;
+        });
+
+        html += '</ul>';
+
+        return html;
+    }
+
+    // --- HÀM TÍNH TOÁN THỜI GIAN TỰ ĐỘNG ---
+    /**
+     * Tính toán và format thời gian khoảng cách giữa startTime và endTime
+     * @param {string|Date} startTime - Thời gian bắt đầu (ISO string hoặc Date object)
+     * @param {string|Date} endTime - Thời gian kết thúc (ISO string hoặc Date object)
+     * @returns {string} - Chuỗi thời gian đã format (vd: "1 giờ 45 phút", "30 phút", "2 giờ")
+     */
+    function calculateDuration(startTime, endTime) {
+        const start = new Date(startTime);
+        const end = new Date(endTime);
+
+        // Tính khoảng cách tính bằng milliseconds
+        const durationMs = end.getTime() - start.getTime();
+
+        // Chuyển đổi sang phút và giờ
+        const totalMinutes = Math.floor(durationMs / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        // Format chuỗi kết quả
+        if (hours > 0 && minutes > 0) {
+            return `${hours} giờ ${minutes} phút`;
+        } else if (hours > 0) {
+            return `${hours} giờ`;
+        } else if (minutes > 0) {
+            return `${minutes} phút`;
+        } else {
+            return ""; // Trường hợp đặc biệt: thời gian = 0
+        }
+    }
+
+    // --- HÀM TỰ ĐỘNG TẠO GOOGLE MAPS DIRECTIONS URL ---
+    /**
+     * Tự động tạo Google Maps Directions URL từ danh sách địa điểm (2+ địa điểm)
+     * @param {Array} places - Mảng các địa điểm (có thể là object hoặc string)
+     * @param {string|null} region - Vùng/tỉnh (optional, tự động lấy từ scheduleData.tripInfo.defaultRegion nếu không truyền)
+     * @returns {string|null} - Google Maps directions URL hoặc null nếu không hợp lệ
+     */
+    function generateDirectionsMapUrl(places, region = null) {
+        if (!places || !Array.isArray(places) || places.length === 0) {
+            return null;
+        }
+
+        // Lấy tên địa điểm (hỗ trợ cả object và string)
+        const locationNames = places.map(place => {
+            if (typeof place === 'object' && place.name) {
+                return place.name;
+            }
+            return place;
+        }).filter(Boolean);
+
+        if (locationNames.length === 0) {
+            return null;
+        }
+
+        // Tự động lấy region từ scheduleData.tripInfo.defaultRegion nếu không truyền vào
+        if (!region && scheduleData && scheduleData.tripInfo && scheduleData.tripInfo.defaultRegion) {
+            region = scheduleData.tripInfo.defaultRegion;
+        }
+
+        // Encode và tạo URL
+        const encodedLocations = locationNames
+            .map(name => encodeURIComponent(
+                region
+                    ? `${name.trim()}, ${region}`
+                    : name.trim()
+            ))
+            .join('/');
+
+        return `https://www.google.com/maps/dir/${encodedLocations}`;
+    }
+
+    // --- HÀM TỰ ĐỘNG TẠO GOOGLE MAPS SEARCH URL CHO 1 ĐỊA ĐIỂM ---
+    /**
+     * Tự động tạo Google Maps Search URL cho 1 địa điểm
+     * @param {string} placeName - Tên địa điểm
+     * @param {string|null} region - Vùng/tỉnh (optional, tự động lấy từ scheduleData.tripInfo.defaultRegion nếu không truyền)
+     * @returns {string|null} - Google Maps search URL hoặc null nếu không hợp lệ
+     */
+    function generatePlaceSearchUrl(placeName, region = null) {
+        if (!placeName || typeof placeName !== 'string') {
+            return null;
+        }
+
+        // Tự động lấy region từ scheduleData.tripInfo.defaultRegion nếu không truyền vào
+        if (!region && scheduleData && scheduleData.tripInfo && scheduleData.tripInfo.defaultRegion) {
+            region = scheduleData.tripInfo.defaultRegion;
+        }
+
+        // Tạo search query (có hoặc không có region)
+        const searchQuery = region
+            ? `${placeName.trim()}, ${region}`
+            : placeName.trim();
+
+        const encoded = encodeURIComponent(searchQuery);
+        return `https://www.google.com/maps/search/${encoded}`;
+    }
+
+    // --- HÀM RENDER NÚT GOOGLE MAPS DIRECTIONS ---
+    /**
+     * Render nút link Google Maps Directions (chỉ đường) với mapUrl
+     * @param {string|null} mapUrl - URL Google Maps directions (null/empty = auto-generate từ places)
+     * @param {Array} places - Mảng các địa điểm (dùng để tự động tạo directions URL nếu mapUrl rỗng)
+     * @returns {string} - HTML string cho nút Google Maps Directions hoặc empty string
+     */
+    function renderDirectionsMapUrlButton(mapUrl, places) {
+        let isAutoGenerated = false;
+
+        // Tự động tạo mapUrl nếu chưa có và có places >= 2
+        if (!mapUrl && places && Array.isArray(places) && places.length >= 2) {
+            mapUrl = generateDirectionsMapUrl(places);
+            isAutoGenerated = true;
+        }
+
+        // Không có mapUrl thì không hiển thị gì
+        if (!mapUrl) {
+            return '';
+        }
+
+        // Label cho mapUrl tự động (nested span với style riêng)
+        const autoLabel = isAutoGenerated
+            ? ' <span class="text-xs text-gray-500 italic">(Tự động tạo)</span>'
+            : '';
+
+        // Return HTML
+        // Wrap text + autoLabel vào <span> để chúng luôn dính liền nhau (1 flex item)
+        // Wrap SVG trong <span class="shrink-0"> để icon không bị co lại khi mobile
+        return `
+            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 hover:underline mb-2 text-sm font-medium">
+                <span class="shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </span>
+                <span>Xem toàn bộ hành trình trên Google Maps${autoLabel}</span>
+            </a>
+        `;
+    }
+
+    // --- HÀM RENDER ICON GOOGLE MAPS CHO 1 ĐỊA ĐIỂM ---
+    /**
+     * Render icon Google Maps inline cho 1 địa điểm
+     * @param {string} placeName - Tên địa điểm (dùng để tạo URL và tooltip)
+     * @param {string} mapUrl - URL Google Maps (empty string = auto-generate)
+     * @returns {string} - HTML string cho icon inline hoặc empty string
+     */
+    function renderPlaceMapIcon(placeName, mapUrl) {
+        // Nếu mapUrl được set là null thì không render.
+        if (mapUrl === null) {
+            return '';
+        }
+
+        // Nếu không có tên địa điểm thì không render
+        if (!placeName) {
+            return '';
+        }
+
+        let finalUrl = mapUrl;
+        let isAutoGenerated = false;
+
+        // Tự động tạo URL nếu mapUrl là empty string
+        if (!mapUrl || mapUrl === '') {
+            finalUrl = generatePlaceSearchUrl(placeName);
+            isAutoGenerated = true;
+        }
+
+        // Nếu không có URL (cả manual và auto) thì không render
+        if (!finalUrl) {
+            return '';
+        }
+
+        // Tạo tooltip text
+        const tooltipText = isAutoGenerated
+            ? 'Xem trên Google Maps (Tự động tạo)'
+            : 'Xem trên Google Maps';
+
+        // Return icon HTML inline
+        return `<a href="${finalUrl}" target="_blank" rel="noopener noreferrer" class="place-map-icon" data-tippy-content="${tooltipText}" data-tippy-delay="[500, 100]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></a>`;
+    }
+
+    // --- HÀM RENDER LINK TÀI LIỆU CHUYẾN ĐI ---
+    /**
+     * Render icon link tài liệu chuyến đi (inline với tiêu đề chính)
+     * @param {string} documentUrl - URL tài liệu chuyến đi
+     * @returns {string} - HTML string cho icon link hoặc empty string
+     */
+    function renderTripDocumentLink(documentUrl) {
+        // Nếu không có documentUrl thì không render
+        if (!documentUrl) {
+            return '';
+        }
+
+        // Return icon HTML inline (File Text icon - Lucide)
+        return `
+            <a href="${documentUrl}" target="_blank" rel="noopener noreferrer" class="trip-doc-link" data-tippy-content="Xem tài liệu chuyến đi" data-tippy-delay="[300, 100]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+            </a>
+        `;
+    }
+
+    // --- HÀM ĐỊNH DẠNG CHI TIẾT (Lấy từ v2.html) ---
+    // Hàm này sẽ tự động tạo HTML cho mục 'details' trong JSON
+    function formatDetails(details) {
+        let html = '';
+
+        // Hàm trợ giúp để render một mảng (list) hoặc một chuỗi (p)
+        const renderDetail = (data) => {
+            if (Array.isArray(data)) {
+                return `<ul>${data.map(item => {
+                    // Kiểm tra nếu item là object (có name và description)
+                    if (typeof item === 'object' && item !== null) {
+                        // Render map icon inline (tự động tạo URL nếu mapUrl là empty string)
+                        const mapIcon = renderPlaceMapIcon(item.name, item.mapUrl);
+                        return `<li><strong>${item.name}${mapIcon}${item.description ? ':' : ''}</strong> ${item.description}</li>`;
+                    }
+                    // Backward compatibility: Nếu vẫn là string
+                    return `<li>${item}</li>`;
+                }).join('')}</ul>`;
+            }
+            return `<p>${data}</p>`;
+        };
+
+        // Điều kiện hiển thị khối "Chi tiết Di chuyển":
+        // 1. Có directions (bất kỳ), HOẶC
+        // 2. Có places >= 2 (có thể tạo URL hành trình tự động)
+        const hasDirections = details.directions;
+        const canGenerateRoute = details.places && Array.isArray(details.places) && details.places.length >= 2;
+
+        if (hasDirections || canGenerateRoute) {
+            html += `<h4>Chi tiết Di chuyển</h4>`;
+
+            // Render nút Google Maps Directions (nếu có đủ điều kiện: places >= 2)
+            html += renderDirectionsMapUrlButton(
+                details.directions?.mapUrl || null,
+                details.places
+            );
+
+            // Render steps (chỉ khi có directions và steps)
+            // Note: directions luôn có cấu trúc: { steps: string[], mapUrl?: string }
+            if (hasDirections && details.directions.steps) {
+                html += renderDetail(details.directions.steps);
+            }
+        }
+        if (details.places) {
+            html += `<h4>Thông tin Địa điểm</h4>${renderDetail(details.places)}`;
+        }
+        if (details.budgets) {
+            html += renderBudget(details.budgets);
+        }
+        if (details.reason) {
+            html += `<h4>Lý do Lựa chọn</h4><p>${details.reason}</p>`;
+        }
+
+        return html;
+    }
+
+    // --- HÀM RENDER ICON MAP CHO DAY HEADER ---
+    /**
+     * Render HTML cho icon map của day header (tổng quan hành trình cả ngày)
+     * @param {string} mapUrl - URL Google Maps cho tổng quan cả ngày
+     * @returns {string} - HTML string hoặc empty string nếu không có URL
+     */
+    function renderDayMapLink(mapUrl) {
+        if (!mapUrl) {
+            return '';
+        }
+
+        return `
+            <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
+               class="day-map-link"
+               data-tippy-content="Xem tổng quan hành trình cả ngày trên Google Maps" data-tippy-delay="[300, 100]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span>Xem bản đồ</span>
+            </a>
+        `;
+    }
+
+    // --- HÀM RENDER LỊCH TRÌNH (Lấy từ v2.html, chỉnh sửa HTML output) ---
+    function renderTimeline(data) {
+        const container = document.getElementById('timeline-container');
+        container.innerHTML = ''; // Xóa nội dung cũ
+
+        // Cập nhật tiêu đề chính (với icon link tài liệu nếu có)
+        const docLinkHTML = renderTripDocumentLink(data.tripInfo.documentUrl);
+        document.getElementById('main-title').innerHTML = `${data.tripInfo.title}${docLinkHTML}`;
+
+        // Cập nhật subtitle với budget info
+        const budgetInfo = getBudgetInfo(data);
+        let budgetInfoHtml = '';
+        if (budgetInfo !== null) {
+            // Có budget → thêm vào subtitle với tooltip
+            budgetInfoHtml = ` | <span id="header-budget-display" class="budget-display" data-tippy-content="${budgetInfo.tooltip}">Chi phí: ${formatCurrencyShort(budgetInfo.value)}</span>`;
+        }
+        document.getElementById('main-subtitle').innerHTML = `${data.tripInfo.subtitle} (${data.tripInfo.dates})${budgetInfoHtml}`;
+
+        // Cập nhật tiêu đề của tab trình duyệt
+        document.title = `${data.tripInfo.title} - ${data.tripInfo.subtitle} (${data.tripInfo.dates}) | Hiếu iceTea`;
+
+        data.schedule.forEach((day, dayIndex) => {
+            // ================================================================
+            // === TẠO WRAPPER CONTAINER CHO MỖI NGÀY ===
+            // ================================================================
+            const dayContainer = document.createElement('div');
+            dayContainer.className = 'timeline-day';
+
+            // Thêm lề trên cho ngày thứ 2 trở đi
+            if (dayIndex > 0) {
+                dayContainer.classList.add("mt-12");
+            }
+
+            // ================================================================
+            // === THÊM TIÊU ĐỀ NGÀY VÀO CONTAINER ===
+            // ================================================================
+            const dayHeader = document.createElement('h2');
+            dayHeader.className = "text-2xl font-bold text-gray-900 mb-6 pb-2 border-b-2 border-blue-200";
+            // Set nội dung: title + icon map
+            const dayMapIconHTML = renderDayMapLink(day.dayInfo.mapUrl);
+            dayHeader.innerHTML = `${day.dayInfo.title}${dayMapIconHTML}`;
+
+            // Append header vào dayContainer (thay vì container chính)
+            dayContainer.appendChild(dayHeader);
+
+            // ================================================================
+            // === THÊM CÁC MỤC TIMELINE VÀO CONTAINER ===
+            // ================================================================
+            day.timelineItems.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'timeline-item status-future'; // Mặc định là 'sắp tới'
+                itemEl.dataset.startTime = item.timeInfo.startTime;
+                itemEl.dataset.endTime = item.timeInfo.endTime;
+                itemEl.id = `item-${item.timeInfo.startTime}`;
+
+                const startTime = new Date(item.timeInfo.startTime);
+                const endTime = new Date(item.timeInfo.endTime);
+
+                const timeString = `${startTime.toLocaleTimeString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })} – ${endTime.toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'})}`;
+
+                // Tự động tính toán durationText (nếu không có trong JSON)
+                const durationText = item.timeInfo.durationText || calculateDuration(item.timeInfo.startTime, item.timeInfo.endTime);
+
+                //
+                // HTML OUTPUT ĐÃ ĐƯỢC CHỈNH SỬA
+                // - Dùng .timeline-line và .icon-container
+                // - Dùng .timeline-card (style của index.html)
+                // - Dùng nút .toggle-details (style của index.html)
+                //
+                itemEl.innerHTML = `
+                        <!-- Đường kẻ dọc -->
+                        <div class="timeline-line"></div>
+
+                        <!-- Icon -->
+                        <div class="icon-container">
+                            ${getIcon(item.iconType)}
+                        </div>
+
+                        <!-- Box nội dung (Thêm class 'timeline-card' từ index.html) -->
+                        <div class="timeline-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 transition-all duration-300">
+
+                            <!-- Wrapper flexbox cho 2 thời gian (1 hàng ngang, không xuống dòng) -->
+                            <div class="flex justify-between items-start mb-1">
+                                <!-- Thời gian chính -->
+                                <time class="text-sm font-semibold text-blue-600">${timeString} ${durationText ? `(${durationText})` : ''}</time>
+
+                                <!-- Thời gian còn lại -->
+                                <!-- shrink-0: không co lại khi flex container bị thu hẹp -->
+                                <p class="time-remaining text-sm font-medium text-red-600 hidden shrink-0 text-right">còn lại: --:--:--</p>
+                            </div>
+
+                            <!-- Tiêu đề (Style của index.html) -->
+                            <h3 class="item-title text-lg font-semibold text-gray-900">${item.title}</h3>
+
+                            <!-- Tóm tắt (Style của index.html) -->
+                            <p class="text-sm font-normal text-gray-500 mb-2">${item.summary}</p>
+
+                            <!-- Thời gian còn lại (Giữ từ v2) -->
+                            <!-- (ĐÃ SỬA) ĐÃ BỊ DI CHUYỂN LÊN TRÊN -->
+                            <!-- <p class="time-remaining text-sm font-medium text-red-600 mb-2 hidden"></p> -->
+
+                            <!-- Nút Xem chi tiết (Style của index.html) -->
+                            <button class="toggle-details text-blue-600 font-medium text-sm hover:underline inline-flex items-center mt-1">
+                                <span>Xem chi tiết</span>
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+
+                            <!-- Nội dung chi tiết (ẩn) -->
+                            <!-- (ĐÃ SỬA) Xóa class mt-3, pt-3, border-t, border-gray-200 khỏi đây -->
+                            <!-- CSS sẽ tự động thêm các style này khi class 'expanded' được thêm vào -->
+                            <div class="details-content">
+                                ${formatDetails(item.details)}
+                            </div>
+                        </div>
+                    `;
+
+                // Thêm sự kiện click cho nút "Xem chi tiết" (Logic của v2)
+                const toggleButton = itemEl.querySelector('.toggle-details');
+                const detailsContent = itemEl.querySelector('.details-content');
+                const buttonText = toggleButton.querySelector('span'); // Lấy phần text
+
+                toggleButton.addEventListener('click', () => {
+                    // Toggle class 'expanded' trên cả nút và nội dung
+                    const isExpanded = detailsContent.classList.toggle('expanded');
+                    toggleButton.classList.toggle('expanded'); // Để xoay icon
+
+                    if (isExpanded) {
+                        // Mở ra - Gọi helper function
+                        expandTimelineItemDetails(detailsContent);
+                        buttonText.innerText = 'Thu gọn';
+                        itemEl.dataset.userExpanded = 'true'; // Đánh dấu người dùng MỞ
+                        delete itemEl.dataset.userCollapsed;
+                    } else {
+                        // Thu gọn - Gọi helper function
+                        collapseTimelineItemDetails(detailsContent);
+                        buttonText.innerText = 'Xem chi tiết';
+                        itemEl.dataset.userCollapsed = 'true'; // Đánh dấu người dùng THU GỌN
+                        delete itemEl.dataset.userExpanded;
+                    }
+                });
+
+                // Append timeline item vào dayContainer (thay vì container chính)
+                dayContainer.appendChild(itemEl);
+            });
+
+            // ================================================================
+            // === APPEND DAY CONTAINER VÀO MAIN TIMELINE CONTAINER ===
+            // ================================================================
+            container.appendChild(dayContainer);
+        });
+    }
+
+    // --- LOGIC THỜI GIAN THỰC (Lấy 100% từ v2.html) ---
+    // Đây là toàn bộ phần logic "xịn" mà bạn thích
+
+    const timeOverrideDateInput = document.getElementById('time-override-date');
+    const timeOverrideTimeInput = document.getElementById('time-override-time');
+    const resetTimeButton = document.getElementById('reset-time');
+    const clockDisplay = document.getElementById('real-time-clock');
+    const currentActivityContainer = document.getElementById('current-activity-container');
+    const currentActivityDisplay = document.getElementById('current-activity-display');
+    const header = document.getElementById('header');
+
+    let lastScrolledItemId = null; // Biến để tránh cuộn trang liên tục
+
+    // Lấy thời gian hiện tại (hoặc thời gian giả lập)
+    function getCurrentTime() {
+        const dateValue = timeOverrideDateInput.value;
+        const timeValue = timeOverrideTimeInput.value;
+
+        if (dateValue && timeValue) {
+            return new Date(`${dateValue}T${timeValue}`);
+        } else if (dateValue) {
+            const now = new Date();
+            const simulatedDate = new Date(dateValue);
+            simulatedDate.setHours(now.getHours());
+            simulatedDate.setMinutes(now.getMinutes());
+            simulatedDate.setSeconds(now.getSeconds());
+            return simulatedDate;
+        }
+        return new Date();
+    }
+
+    // Cập nhật URL param
+    function updateUrlParams() {
+        // (ĐÃ SỬA LỖI)
+        // Bọc toàn bộ hàm trong try...catch
+        // Lỗi SecurityError xảy ra khi chạy trong một số môi trường (như blob: URL)
+        // không cho phép can thiệp vào history.
+        try {
+            const dateValue = timeOverrideDateInput.value;
+            const timeValue = timeOverrideTimeInput.value;
+            const url = new URL(window.location);
+
+            if (dateValue) {
+                if (timeValue) {
+                    url.searchParams.set('time', `${dateValue}T${timeValue}`);
+                } else {
+                    url.searchParams.set('time', dateValue);
+                }
+            } else {
+                url.searchParams.delete('time');
+            }
+            window.history.pushState({}, '', url);
+        } catch (e) {
+            // Ghi lại lỗi một cách "nhẹ nhàng" thay vì làm crash script
+            console.warn("Không thể cập nhật URL (lỗi bảo mật có thể xảy ra trong iframe/blob):", e.message);
+        }
+    }
+
+    // Định dạng số (thêm số 0)
+    const pad = (num) => String(num).padStart(2, '0');
+
+    // Hàm định dạng thời gian còn lại
+    function formatRemainingTime(milliseconds) {
+        let totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+        // (ĐÃ SỬA) Hiển thị "Sắp kết thúc" khi còn 5 giây
+        if (totalSeconds <= 5) return "Sắp kết thúc...";
+
+        let hours = Math.floor(totalSeconds / 3600);
+        totalSeconds %= 3600;
+        let minutes = Math.floor(totalSeconds / 60);
+        let seconds = totalSeconds % 60;
+
+        // (ĐÃ SỬA) Thêm chữ "còn lại: "
+        return `còn lại: ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+
+    // ================================================================
+    // === HELPER FUNCTIONS - Expand/Collapse Timeline Item Details ===
+    // ================================================================
+
+    /**
+     * Mở rộng nội dung chi tiết của mục timeline
+     * Sử dụng transitionend event và unique ID để an toàn với rapid clicks
+     * @param {HTMLElement} contentEl - Element .details-content
+     */
+    function expandTimelineItemDetails(contentEl) {
+        // Tạo unique ID cho lần expand này (timestamp + random)
+        const expandId = Date.now() + Math.random();
+        contentEl._currentExpandId = expandId;
+
+        // Set scrollHeight để animation chạy mượt
+        contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+
+        // Lắng nghe transition end để set về 'none' (tự động co dãn)
+        // NOTE: Không dùng { once: true } vì CSS dùng "transition: all" → nhiều properties → nhiều events
+        // Phải check propertyName và manual remove listener
+        function handleTransitionEnd(e) {
+            // Check 4 điều kiện:
+            // 1. Property là max-height (không phải margin-top, padding-top, border, etc.)
+            // 2. Event từ đúng element (không phải từ children)
+            // 3. Vẫn đang expanded
+            // 4. Expand ID match (không bị override bởi expand khác - an toàn với rapid clicks)
+            if (e.propertyName === 'max-height' && e.target === contentEl && contentEl.classList.contains('expanded') && contentEl._currentExpandId === expandId) {
+                contentEl.style.maxHeight = 'none'; // Tự động co dãn khi resize
+                contentEl._currentExpandId = null; // Cleanup ID
+                contentEl.removeEventListener('transitionend', handleTransitionEnd); // Cleanup listener
+            }
+        }
+
+        contentEl.addEventListener('transitionend', handleTransitionEnd);
+    }
+
+    /**
+     * Thu gọn nội dung chi tiết của mục timeline
+     * @param {HTMLElement} contentEl - Element .details-content
+     */
+    function collapseTimelineItemDetails(contentEl) {
+        // Clear expand ID (cancel pending expand nếu có)
+        contentEl._currentExpandId = null;
+
+        // Nếu đang là 'none', chuyển về scrollHeight trước
+        if (contentEl.style.maxHeight === 'none') {
+            contentEl.style.maxHeight = contentEl.scrollHeight + 'px';
+            contentEl.offsetHeight; // Force reflow để browser nhận giá trị mới
+        }
+
+        // Set về 0 để animation chạy
+        contentEl.style.maxHeight = '0px';
+    }
+
+    // Hàm cập nhật chính, chạy mỗi giây
+    function updateTimeline() {
+        const now = getCurrentTime();
+
+        // 1. Cập nhật đồng hồ
+        const timeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+        const dateStr = now.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        clockDisplay.innerHTML = `
+                <div class="font-mono font-bold text-2xl text-gray-900">${timeStr}</div>
+                <div class="text-sm text-gray-500">${dateStr}</div>
+            `;
+
+        let currentItem = null;
+        const allItems = document.querySelectorAll('.timeline-item');
+
+        allItems.forEach(itemEl => {
+            const startTime = new Date(itemEl.dataset.startTime);
+            const endTime = new Date(itemEl.dataset.endTime);
+            const detailsContent = itemEl.querySelector('.details-content');
+            const toggleButton = itemEl.querySelector('.toggle-details');
+            const buttonText = toggleButton.querySelector('span');
+            const remEl = itemEl.querySelector('.time-remaining');
+
+            // 2. Phân loại trạng thái (Quá khứ, Hiện tại, Tương lai)
+            if (now >= endTime) {
+                // Đã qua
+                itemEl.className = 'timeline-item status-past';
+                // Tự động đóng (nếu đang mở VÀ không phải do người dùng tự mở)
+                if (detailsContent.classList.contains('expanded') && !itemEl.dataset.userExpanded) {
+                    detailsContent.classList.remove('expanded');
+                    toggleButton.classList.remove('expanded');
+                    detailsContent.style.maxHeight = '0px';
+                    buttonText.innerText = 'Xem chi tiết';
+                }
+                if (itemEl.dataset.userCollapsed) {
+                    delete itemEl.dataset.userCollapsed;
+                }
+                remEl.classList.add('hidden');
+                // (MỚI) Đảm bảo xóa cả 2 class khi mục đã trôi qua
+                remEl.classList.remove('time-warning-30min', 'pulse-urgent');
+            } else if (now >= startTime && now < endTime) {
+                // Đang diễn ra
+                itemEl.className = 'timeline-item status-current';
+                currentItem = itemEl;
+
+                // Tự động mở (nếu đang đóng VÀ người dùng CHƯA TỰ THU GỌN NÓ)
+                if (!detailsContent.classList.contains('expanded') && !itemEl.dataset.userCollapsed) {
+                    detailsContent.classList.add('expanded');
+                    toggleButton.classList.add('expanded');
+                    expandTimelineItemDetails(detailsContent); // Gọi helper function
+                    buttonText.innerText = 'Thu gọn';
+                }
+
+                // Cập nhật thời gian còn lại
+                const remainingMs = endTime.getTime() - now.getTime();
+                const remainingSeconds = Math.floor(remainingMs / 1000); // (MỚI) Lấy số giây
+                remEl.innerText = formatRemainingTime(remainingMs);
+                remEl.classList.remove('hidden');
+
+                // (ĐÃ SỬA) Logic 2 tầng cho 30 phút và 15 phút
+
+                // 1. Dưới 30 phút (1800s)
+                if (remainingSeconds < 1800 && remainingSeconds > 0) {
+                    remEl.classList.add('time-warning-30min'); // Thêm class 'time-warning-30min' của Tailwind
+                } else {
+                    remEl.classList.remove('time-warning-30min'); // Xóa nếu trên 30 phút
+                }
+
+                // 2. Dưới 15 phút (900s)
+                if (remainingSeconds < 900 && remainingSeconds > 0) {
+                    remEl.classList.add('pulse-urgent'); // Thêm pulse
+                } else {
+                    remEl.classList.remove('pulse-urgent'); // Xóa nếu trên 15 phút
+                }
+
+            } else {
+                // Sắp tới
+                itemEl.className = 'timeline-item status-future';
+                // Tự động đóng (nếu đang mở VÀ không phải do người dùng tự mở)
+                if (detailsContent.classList.contains('expanded') && !itemEl.dataset.userExpanded) {
+                    detailsContent.classList.remove('expanded');
+                    toggleButton.classList.remove('expanded');
+                    detailsContent.style.maxHeight = '0px';
+                    buttonText.innerText = 'Xem chi tiết';
+                }
+                if (itemEl.dataset.userCollapsed) {
+                    delete itemEl.dataset.userCollapsed;
+                }
+                remEl.classList.add('hidden');
+                remEl.classList.remove('pulse-urgent');
+                // (MỚI) Đảm bảo xóa cả time-warning-30min
+                remEl.classList.remove('time-warning-30min');
+            }
+        });
+
+        // 3. Cập nhật thanh Hoạt động hiện tại
+        if (currentItem) {
+            currentActivityDisplay.innerText = currentItem.querySelector('.item-title').innerText;
+            currentActivityContainer.classList.remove('hidden'); // Hiện box
+
+            // 4. Tự động cuộn trang (chỉ cuộn 1 lần khi mục thay đổi)
+            if (currentItem.id !== lastScrolledItemId) {
+                const newTargetId = currentItem.id;
+                lastScrolledItemId = newTargetId;
+
+                setTimeout(() => {
+                    const currentTargetEl = document.getElementById(newTargetId);
+                    if (currentTargetEl && currentTargetEl.classList.contains('status-current')) {
+                        const headerHeight = header.offsetHeight;
+                        const itemTop = currentTargetEl.getBoundingClientRect().top + window.scrollY;
+
+                        window.scrollTo({
+                            top: itemTop - headerHeight - 20, // 20px lề
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 300);
+            }
+        } else {
+            currentActivityContainer.classList.add('hidden'); // Ẩn box
+            lastScrolledItemId = null; // Reset
+        }
+    }
+
+    // ========================================================================
+    // === MODAL HELPER FUNCTIONS ===
+    // ========================================================================
+
+    /**
+     * SVG icons for modal buttons
+     * Expand: Arrows pointing outward to 4 corners (maximize)
+     * Shrink: Arrows pointing inward from 4 corners (minimize)
+     */
+    const MODAL_ICONS = {
+        expand: `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM1 10h2v3h3v2H1v-5zm14 0v5h-5v-2h3v-3h2z" fill="currentColor"/>
+        </svg>`,
+        shrink: `<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+        <svg fill="#000000" width="800px" height="800px" viewBox="0 0 1920 1920" xmlns="http://www.w3.org/2000/svg">
+            <path d="M876.612 1043.388v710.171H761.27v-513.28L81.663 1920 0 1838.337l679.72-679.606H166.442v-115.343h710.171ZM1838.394 0l81.548 81.548-679.605 679.72h513.28v115.344h-710.172V166.441h115.344v513.164L1838.394 0Z" fill-rule="evenodd"/>
+        </svg>`
+    };
+
+    /**
+     * Tạo HTML structure cho modal
+     * @param {string} id - ID của modal (phải unique)
+     * @param {string} title - Tiêu đề modal
+     * @param {string} contentHTML - Nội dung HTML
+     * @returns {string} - HTML string
+     */
+    function createModalHTML(id, title, contentHTML) {
+        return `
+            <div id="${id}" class="modal-backdrop hidden">
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h2 class="modal-title">${title}</h2>
+                        <div class="modal-header-buttons">
+                            <button class="modal-fullscreen-btn" aria-label="Phóng to toàn màn hình" data-tippy-content="Phóng to toàn màn hình">
+                                <span class="fullscreen-expand-icon">${MODAL_ICONS.expand}</span>
+                                <span class="fullscreen-shrink-icon" style="display: none;">${MODAL_ICONS.shrink}</span>
+                            </button>
+                            <button class="modal-close" aria-label="Đóng" data-tippy-content="Đóng">✕</button>
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        ${contentHTML}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Toggle modal fullscreen mode
+     * @param {HTMLElement} modalElement - Modal element
+     * @param {boolean} forceState - Force fullscreen state (optional)
+     */
+    function toggleModalFullscreen(modalElement, forceState) {
+        const container = modalElement.querySelector('.modal-container');
+        const fullscreenBtn = modalElement.querySelector('.modal-fullscreen-btn');
+        const expandIcon = fullscreenBtn.querySelector('.fullscreen-expand-icon');
+        const shrinkIcon = fullscreenBtn.querySelector('.fullscreen-shrink-icon');
+
+        // Toggle or set state
+        const isFullscreen = forceState !== undefined
+            ? forceState
+            : !container.classList.contains('fullscreen');
+
+        if (isFullscreen) {
+            container.classList.add('fullscreen');
+            expandIcon.style.display = 'none';
+            shrinkIcon.style.display = 'block';
+            fullscreenBtn.setAttribute('aria-label', 'Thu nhỏ');
+            fullscreenBtn.setAttribute('data-tippy-content', 'Thu nhỏ');
+        } else {
+            container.classList.remove('fullscreen');
+            expandIcon.style.display = 'block';
+            shrinkIcon.style.display = 'none';
+            fullscreenBtn.setAttribute('aria-label', 'Phóng to toàn màn hình');
+            fullscreenBtn.setAttribute('data-tippy-content', 'Phóng to toàn màn hình');
+        }
+
+        // Update URL
+        syncModalStateToURL(modalElement, isFullscreen);
+
+        // Refresh tippy
+        if (window.tippy) {
+            const instance = fullscreenBtn._tippy;
+            if (instance) {
+                instance.setContent(isFullscreen ? 'Thu nhỏ' : 'Phóng to toàn màn hình');
+            }
+        }
+    }
+
+    /**
+     * Sync modal state to URL params
+     * @param {HTMLElement} modalElement - Modal element
+     * @param {boolean} isFullscreen - Is modal in fullscreen mode
+     */
+    function syncModalStateToURL(modalElement, isFullscreen) {
+        const modalId = modalElement.id;
+        const params = new URLSearchParams(window.location.search);
+        const modalName = modalId.replace('-modal', ''); // 'budget-modal' -> 'budget'
+
+        // Always set modal param when modal is open
+        params.set('modal', modalName);
+
+        if (isFullscreen) {
+            // Fullscreen mode: ?modal=budget&modal-fullscreen=true
+            params.set('modal-fullscreen', 'true');
+        } else {
+            // Normal mode: ?modal=budget (without fullscreen param)
+            params.delete('modal-fullscreen');
+        }
+
+        window.history.replaceState({}, '', `?${params.toString()}`);
+    }
+
+    /**
+     * Setup event listeners cho modal
+     * @param {HTMLElement} modalElement - Modal element
+     * @param {Function} onClose - Callback khi đóng (optional)
+     */
+    function setupModalListeners(modalElement, onClose) {
+        const closeBtn = modalElement.querySelector('.modal-close');
+        const fullscreenBtn = modalElement.querySelector('.modal-fullscreen-btn');
+
+        const closeHandler = () => {
+            closeModal(modalElement);
+            if (onClose) onClose();
+        };
+
+        // Close button
+        closeBtn.addEventListener('click', closeHandler);
+
+        // Fullscreen button
+        if (fullscreenBtn) {
+            fullscreenBtn.addEventListener('click', () => {
+                toggleModalFullscreen(modalElement);
+            });
+        }
+
+        // Backdrop click (click ra ngoài để đóng)
+        modalElement.addEventListener('click', (e) => {
+            if (e.target === modalElement) closeHandler();
+        });
+
+        // ESC key (chỉ đóng nếu modal đang show)
+        const escHandler = (e) => {
+            if (e.key === 'Escape' && modalElement.classList.contains('show')) {
+                closeHandler();
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+
+        // Store handler để có thể remove sau này (nếu cần cleanup)
+        modalElement._escHandler = escHandler;
+    }
+
+    /**
+     * Mở modal
+     * @param {HTMLElement} modalElement - Modal element
+     */
+    function openModal(modalElement) {
+        modalElement.classList.remove('hidden');
+        // Force reflow để animation chạy mượt
+        modalElement.offsetHeight;
+        modalElement.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Lock body scroll
+
+        // Sync URL params when opening modal
+        const container = modalElement.querySelector('.modal-container');
+        const isFullscreen = container && container.classList.contains('fullscreen');
+        syncModalStateToURL(modalElement, isFullscreen);
+    }
+
+    /**
+     * Đóng modal
+     * @param {HTMLElement} modalElement - Modal element
+     */
+    function closeModal(modalElement) {
+        // Remove 'show' class to trigger fade-out animation
+        modalElement.classList.remove('show');
+
+        // Wait for CSS transition to complete (300ms) before hiding
+        setTimeout(() => {
+            modalElement.classList.add('hidden');
+        }, 300); // Match with CSS transition duration (0.3s)
+
+        // Unlock body scroll immediately for better UX
+        document.body.style.overflow = '';
+
+        // Remove URL params when closing modal
+        const params = new URLSearchParams(window.location.search);
+        params.delete('modal');
+        params.delete('modal-fullscreen');
+        const newURL = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', newURL);
+    }
+
+    /**
+     * Tạo modal (high-level API)
+     * Tự động check duplicate ID, insert vào DOM, và setup listeners
+     *
+     * @param {Object} config - Cấu hình modal
+     * @param {string} config.id - ID của modal (required, phải unique)
+     * @param {string} config.title - Tiêu đề modal (required)
+     * @param {string} config.content - Nội dung HTML (required)
+     * @param {Function} config.onClose - Callback khi đóng (optional)
+     * @returns {HTMLElement} Modal element
+     * @throws {Error} Nếu ID đã tồn tại hoặc thiếu required fields
+     */
+    function createModal(config) {
+        const {id, title, content, onClose} = config;
+
+        // Validate required fields
+        if (!id || !title || !content) {
+            throw new Error('createModal: Missing required fields (id, title, content)');
+        }
+
+        // Check duplicate ID
+        const existingModal = document.getElementById(id);
+        if (existingModal !== null) {
+            console.error(`[createModal] Modal with ID "${id}" already exists!`, existingModal);
+            throw new Error(`Modal with ID "${id}" already exists. Use a different ID or remove the existing modal first.`);
+        }
+
+        // Create HTML using helper
+        const modalHTML = createModalHTML(id, title, content);
+
+        // Insert vào DOM
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        const modalElement = document.getElementById(id);
+
+        // Setup listeners using helper
+        setupModalListeners(modalElement, onClose);
+
+        return modalElement;
+    }
+
+    // ========================================================================
+    // === MOCK DATA UTILITIES (Xóa khi có data đầy đủ) ===
+    // ========================================================================
+
+    /**
+     * Check if scheduleData has ANY paidBy data
+     * @param {Object} scheduleData - Schedule data
+     * @returns {boolean} True if any paidBy exists
+     */
+    function hasPaidByData(scheduleData) {
+        for (const day of scheduleData.schedule) {
+            for (const item of day.timelineItems) {
+                if (item.details?.budgets) {
+                    for (const budget of item.details.budgets) {
+                        if (budget.paidBy) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Mock paidBy data for non-optional items
+     * Only runs if NO paidBy data exists in entire dataset
+     * @param {Object} scheduleData - Schedule data (will be mutated)
+     */
+    function mockPaidByData(scheduleData) {
+        // Check if ANY paidBy exists
+        if (hasPaidByData(scheduleData)) {
+            console.log('[Mock] paidBy data exists, skipping mock');
+            return;
+        }
+
+        console.log('[Mock] No paidBy data found, adding mock data...');
+        const persons = ['Hiếu', 'Chi'];
+        let personIndex = 0;
+
+        scheduleData.schedule.forEach(day => {
+            day.timelineItems.forEach(item => {
+                if (item.details?.budgets) {
+                    item.details.budgets.forEach(budget => {
+                        // Only add paidBy to non-optional items
+                        if (!budget.isOptional || budget.isOptional === false) {
+                            if (!budget.paidBy) {
+                                budget.paidBy = persons[personIndex % persons.length];
+                                personIndex++;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        console.log('[Mock] Mock paidBy data added successfully');
+    }
+
+    // ========================================================================
+    // === BUDGET-SPECIFIC FUNCTIONS ===
+    // ========================================================================
+
+    /**
+     * Rút trích danh sách chi phí từ scheduleData
+     * @param {Object} scheduleData - Dữ liệu lịch trình
+     * @returns {Array} Mảng các budget items với cấu trúc flat
+     */
+    function extractBudgetList(scheduleData) {
+        // === MOCK DATA (Commented out - data is now in scheduleData) ===
+        // mockPaidByData(scheduleData);
+        // ========================================================
+
+        const rows = [];
+
+        scheduleData.schedule.forEach(day => {
+            const dayDate = new Date(day.dayInfo.date);
+            const dateStr = `${dayDate.getDate()}/${dayDate.getMonth() + 1}`;
+            const fullDate = day.dayInfo.date; // For date-based operations
+
+            day.timelineItems.forEach(item => {
+                if (item.details?.budgets) {
+                    item.details.budgets.forEach(budget => {
+                        rows.push({
+                            date: dateStr,
+                            fullDate: fullDate,
+                            activityTitle: item.title,
+                            category: budget.category,
+                            name: budget.name,
+                            amount: budget.amount,
+                            isOptional: budget.isOptional,
+                            note: budget.note,
+                            paidBy: budget.paidBy || null, // Explicit null if no data
+                        });
+                    });
+                }
+            });
+        });
+
+        return rows;
+    }
+
+    /**
+     * Filter rows based on budgetState (search, category, optional)
+     * @param {Array} rows - All budget rows
+     * @returns {Array} Filtered rows
+     */
+    function filterBudgetRows(rows) {
+        let filtered = [...rows];
+
+        // Filter by search query (#6)
+        if (budgetState.searchQuery) {
+            const query = budgetState.searchQuery.toLowerCase();
+            filtered = filtered.filter(row => {
+                return (row.name && row.name.toLowerCase().includes(query)) ||
+                    (row.activityTitle && row.activityTitle.toLowerCase().includes(query)) ||
+                    (row.note && row.note.toLowerCase().includes(query));
+            });
+        }
+
+        // Filter by category (#3)
+        if (budgetState.categoryFilter !== 'all') {
+            filtered = filtered.filter(row => row.category === budgetState.categoryFilter);
+        }
+
+        // Filter optional items (#8)
+        if (!budgetState.showOptional) {
+            filtered = filtered.filter(row => !row.isOptional);
+        }
+
+        return filtered;
+    }
+
+    /**
+     * Sort rows based on budgetState (sortColumn, sortDirection)
+     * @param {Array} rows - Budget rows to sort
+     * @returns {Array} Sorted rows
+     */
+    function sortBudgetRows(rows) {
+        if (!budgetState.sortColumn || !budgetState.sortDirection) {
+            return rows;
+        }
+
+        const sorted = [...rows];
+        const column = budgetState.sortColumn;
+        const direction = budgetState.sortDirection === 'asc' ? 1 : -1;
+
+        sorted.sort((a, b) => {
+            let aVal = a[column];
+            let bVal = b[column];
+
+            // Handle null/undefined
+            if (aVal == null) aVal = '';
+            if (bVal == null) bVal = '';
+
+            // Numeric sort for amount
+            if (column === 'amount') {
+                return (aVal - bVal) * direction;
+            }
+
+            // Boolean sort for isOptional (false/undefined before true)
+            if (column === 'isOptional') {
+                const optA = aVal ? 1 : 0; // true = 1, false/undefined = 0
+                const optB = bVal ? 1 : 0;
+                return (optA - optB) * direction;
+            }
+
+            // String sort for others
+            return String(aVal).localeCompare(String(bVal)) * direction;
+        });
+
+        return sorted;
+    }
+
+    /**
+     * Sort rows within groups (for timeline, category, person views)
+     * Preserves grouping structure while sorting items within each group
+     * @param {Array} rows - Rows with group headers/subtotals
+     * @param {string} view - Current view type ('timeline', 'category', 'person')
+     * @returns {Array} Sorted rows with groups preserved
+     */
+    function sortWithinGroups(rows, view) {
+        if (!budgetState.sortColumn || rows.length === 0) {
+            return rows;
+        }
+
+        const result = [];
+        let currentGroup = [];
+
+        rows.forEach((row, index) => {
+            // Check if this is a group boundary
+            const isGroupHeader = row.isDateHeader || row.isCategoryHeader || row.isPersonHeader;
+
+            if (isGroupHeader) {
+                // Sort and add previous group
+                if (currentGroup.length > 0) {
+                    const sorted = sortBudgetRows(currentGroup);
+                    result.push(...sorted);
+                    currentGroup = [];
+                }
+                // Add the group header
+                result.push(row);
+            } else {
+                // Regular row - add to current group
+                currentGroup.push(row);
+            }
+
+            // Last iteration - add remaining group
+            if (index === rows.length - 1 && currentGroup.length > 0) {
+                const sorted = sortBudgetRows(currentGroup);
+                result.push(...sorted);
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Group rows by date and add date header rows (#1)
+     * @param {Array} rows - Budget rows
+     * @returns {Array} Rows with date headers inserted at the beginning of each date group
+     */
+    function addDateHeaders(rows) {
+        if (rows.length === 0) return [];
+
+        const result = [];
+        let currentDate = null;
+        let currentGroup = [];
+
+        rows.forEach((row, index) => {
+            // Check if date changed
+            if (currentDate !== null && row.date !== currentDate) {
+                // Add header + items for previous date group
+                result.push({
+                    isDateHeader: true,
+                    date: currentDate,
+                    count: currentGroup.length,
+                    total: currentGroup.reduce((sum, r) => sum + (r.amount || 0), 0),
+                });
+                result.push(...currentGroup);
+                currentGroup = [];
+            }
+
+            currentDate = row.date;
+            currentGroup.push(row);
+
+            // Last row: add final header + group
+            if (index === rows.length - 1) {
+                result.push({
+                    isDateHeader: true,
+                    date: currentDate,
+                    count: currentGroup.length,
+                    total: currentGroup.reduce((sum, r) => sum + (r.amount || 0), 0),
+                });
+                result.push(...currentGroup);
+            }
+        });
+
+        return result;
+    }
+
+    /**
+     * Group rows by category (#2)
+     * @param {Array} rows - Budget rows
+     * @returns {Array} Rows grouped by category with headers
+     */
+    function groupByCategory(rows) {
+        if (rows.length === 0) return [];
+
+        const grouped = {};
+        const categoryTotals = {};
+
+        // Group by category
+        rows.forEach(row => {
+            const cat = row.category || 'other';
+            if (!grouped[cat]) {
+                grouped[cat] = [];
+                categoryTotals[cat] = 0;
+            }
+            grouped[cat].push(row);
+            categoryTotals[cat] += row.amount || 0;
+        });
+
+        // Build result with headers
+        const result = [];
+        Object.keys(grouped).sort().forEach(cat => {
+            const categoryInfo = getCategoryDisplay(cat);
+
+            // Category header
+            result.push({
+                isCategoryHeader: true,
+                category: cat,
+                categoryInfo: categoryInfo,
+                total: categoryTotals[cat],
+                count: grouped[cat].length,
+            });
+
+            // Category items
+            grouped[cat].forEach(row => result.push(row));
+        });
+
+        return result;
+    }
+
+    /**
+     * Group rows by person (#7)
+     * @param {Array} rows - Budget rows
+     * @returns {Object} { grouped: [...], personTotals: {...} }
+     */
+    function groupByPerson(rows) {
+        if (rows.length === 0) return {grouped: [], personTotals: {}};
+
+        // Check if paidBy data exists (defensive coding)
+        const hasPaidBy = rows.some(r => r.paidBy);
+        if (!hasPaidBy) {
+            console.warn('[groupByPerson] No paidBy data found. Feature may not work correctly.');
+        }
+
+        const grouped = {};
+        const personTotals = {};
+
+        // Group by paidBy
+        rows.forEach(row => {
+            const person = row.paidBy || 'Không xác định';
+            if (!grouped[person]) {
+                grouped[person] = [];
+                personTotals[person] = 0;
+            }
+            grouped[person].push(row);
+            personTotals[person] += row.amount || 0;
+        });
+
+        // Build result with headers
+        const result = [];
+        Object.keys(grouped).sort().forEach(person => {
+            // Person header
+            result.push({
+                isPersonHeader: true,
+                person: person,
+                total: personTotals[person],
+                count: grouped[person].length,
+            });
+
+            // Person items
+            grouped[person].forEach(row => result.push(row));
+        });
+
+        return {grouped: result, personTotals};
+    }
+
+    /**
+     * Calculate split balance between persons (#7)
+     * @param {Object} personTotals - { 'Hiếu': 2500000, 'Chi': 2010000 }
+     * @returns {Object} { from: 'Hiếu', to: 'Chi', amount: 245000 }
+     */
+    function calculateSplitBalance(personTotals) {
+        const persons = Object.keys(personTotals);
+        if (persons.length !== 2) return null;
+
+        const [person1, person2] = persons;
+        const total1 = personTotals[person1];
+        const total2 = personTotals[person2];
+        const grandTotal = total1 + total2;
+        const half = grandTotal / 2;
+
+        const balance1 = total1 - half;
+        const balance2 = total2 - half;
+
+        if (balance1 > 0) {
+            return {from: person2, to: person1, amount: Math.abs(balance2)};
+        } else {
+            return {from: person1, to: person2, amount: Math.abs(balance1)};
+        }
+    }
+
+    /**
+     * Render toolbar with filters and controls
+     * @returns {string} HTML string của toolbar
+     */
+    function renderBudgetToolbar() {
+        // Get unique categories for dropdown
+        const categories = Object.keys(CATEGORY_MAP);
+
+        return `
+            <div class="budget-toolbar">
+                <!-- View switcher (tabs) -->
+                <div class="budget-view-switcher">
+                    <button class="budget-view-tab ${budgetState.view === 'timeline' ? 'active' : ''}" data-view="timeline">
+                        📅 Theo thời gian
+                    </button>
+                    <button class="budget-view-tab ${budgetState.view === 'category' ? 'active' : ''}" data-view="category">
+                        📊 Theo danh mục
+                    </button>
+                    <button class="budget-view-tab ${budgetState.view === 'person' ? 'active' : ''}" data-view="person">
+                        👤 Theo người
+                    </button>
+                </div>
+
+                <!-- Search box -->
+                <div class="budget-toolbar-section grow">
+                    <input type="text"
+                           class="budget-search"
+                           placeholder="🔍 Tìm kiếm tên khoản chi, hoạt động..."
+                           value="${budgetState.searchQuery}"
+                           id="budget-search-input">
+                </div>
+
+                <!-- Category filter -->
+                <div class="budget-toolbar-section">
+                    <select class="budget-filter-select" id="budget-category-filter">
+                        <option value="all" ${budgetState.categoryFilter === 'all' ? 'selected' : ''}>🔽 Tất cả danh mục</option>
+                        ${categories.map(cat => {
+            const info = CATEGORY_MAP[cat];
+            return `<option value="${cat}" ${budgetState.categoryFilter === cat ? 'selected' : ''}>${info.icon} ${info.name}</option>`;
+        }).join('')}
+                    </select>
+                </div>
+
+                <div class="budget-toolbar-section">
+                    <!-- Optional toggle -->
+                    <label class="budget-toggle-label" data-tippy-content="Hiển thị/ẩn các khoản chi tùy chọn (có thể bỏ qua)">
+                        <input type="checkbox"
+                               class="budget-toggle-checkbox"
+                               id="budget-optional-toggle"
+                               ${budgetState.showOptional ? 'checked' : ''}>
+                        <span>Chi phí tùy chọn</span>
+                    </label>
+
+                    <!-- Grouping toggle (universal for all views) -->
+                    <label class="budget-toggle-label" data-tippy-content="Hiển thị tổng phụ theo nhóm (ngày/danh mục/người)">
+                        <input type="checkbox"
+                               class="budget-toggle-checkbox"
+                               id="budget-grouping-toggle"
+                               ${budgetState.showGrouping ? 'checked' : ''}>
+                        <span>Gộp theo nhóm</span>
+                    </label>
+                </div>
+
+                <!-- Export CSV button -->
+                <div class="budget-toolbar-section">
+                    <button class="budget-btn budget-btn-secondary" id="budget-export-csv">
+                        📥 Tải CSV
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render a regular budget row
+     * @param {Object} row - Budget item
+     * @param {number} rowNumber - Row number for display
+     * @returns {string} HTML string
+     */
+    function renderBudgetRow(row, rowNumber) {
+        const categoryInfo = getCategoryDisplay(row.category);
+        const categoryDisplay = `${categoryInfo.name} ${categoryInfo.icon}`;
+        const amountDisplay = row.amount ? formatCurrency(row.amount, false) : '';
+        const paidByDisplay = row.paidBy || '<span style="color: #9ca3af;">N/A</span>';
+        const optionalDisplay = row.isOptional ? 'Tùy chọn' : '';
+
+        // Check if current activity (#9)
+        const isCurrentActivity = budgetState.currentActivityTitle &&
+            row.activityTitle === budgetState.currentActivityTitle;
+        const currentClass = isCurrentActivity ? ' current-activity' : '';
+
+        return `
+            <tr${currentClass}>
+                <td>${rowNumber}</td>
+                <td>${row.date || ''}</td>
+                <td>${row.activityTitle || ''}</td>
+                <td>${categoryDisplay}</td>
+                <td>${row.name || ''}</td>
+                <td class="text-right">${amountDisplay}</td>
+                <td class="text-center">${optionalDisplay}</td>
+                <td>${row.note || ''}</td>
+                <td class="text-center">${paidByDisplay}</td>
+            </tr>
+        `;
+    }
+
+    /**
+     * Render a date group header (for date grouping)
+     * @param {Object} row - Date header info
+     * @returns {string} HTML string
+     */
+    function renderDateHeader(row) {
+        return `
+            <tr class="date-group-header">
+                <td colspan="9">
+                    📅 Ngày ${row.date}: ${row.count} khoản - Tổng: ${formatCurrency(row.total, false)}đ
+                </td>
+            </tr>
+        `;
+    }
+
+    /**
+     * Render a category group header
+     * @param {Object} row - Category header info
+     * @returns {string} HTML string
+     */
+    function renderCategoryHeader(row) {
+        return `
+            <tr class="category-group-header">
+                <td colspan="9">
+                    ${row.categoryInfo.icon} ${row.categoryInfo.name.toUpperCase()}
+                    (${row.count} khoản - Tổng: ${formatCurrency(row.total, false)}đ)
+                </td>
+            </tr>
+        `;
+    }
+
+    /**
+     * Render a person group header
+     * @param {Object} row - Person header info
+     * @returns {string} HTML string
+     */
+    function renderPersonHeader(row) {
+        return `
+            <tr class="person-split-row">
+                <td colspan="9">
+                    👤 ${row.person} đã chi: ${row.count} khoản -
+                    Tổng: ${formatCurrency(row.total, false)}đ
+                </td>
+            </tr>
+        `;
+    }
+
+    /**
+     * Render bảng chi phí thành HTML
+     * @param {Array} rows - Mảng budget items từ extractBudgetList()
+     * @param {Object} totals - Tổng chi phí {total, optional} từ calculateBudgets()
+     * @returns {string} HTML string của bảng
+     */
+    function renderBudgetTable(rows, totals, personTotals = null) {
+        // Helper to generate sortable header
+        const getSortClass = (column) => {
+            if (budgetState.sortColumn === column) {
+                return ` sortable sort-${budgetState.sortDirection}`;
+            }
+            return ' sortable';
+        };
+
+        // Empty state
+        if (rows.length === 0) {
+            return `
+                <div class="budget-table-wrapper">
+                    <div class="budget-empty-state">
+                        <div class="budget-empty-state-icon">😕</div>
+                        <div class="budget-empty-state-text">Không tìm thấy khoản chi nào</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let html = `
+            <div class="budget-table-wrapper">
+                <table class="budget-table">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th class="${getSortClass('date')}" data-column="date">Ngày</th>
+                            <th>Cụm hoạt động</th>
+                            <th class="${getSortClass('category')}" data-column="category">Danh mục</th>
+                            <th class="${getSortClass('name')}" data-column="name">Khoản chi</th>
+                            <th class="text-right${getSortClass('amount')}" data-column="amount">Số tiền</th>
+                            <th class="text-center${getSortClass('isOptional')}" data-column="isOptional">Tùy chọn</th>
+                            <th>Ghi chú</th>
+                            <th class="text-center${getSortClass('paidBy')}" data-column="paidBy">Người chi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Render rows (handle different row types)
+        let rowNumber = 0;
+        rows.forEach((row) => {
+            // Check row type and render accordingly
+            if (row.isDateHeader) {
+                html += renderDateHeader(row);
+            } else if (row.isCategoryHeader) {
+                html += renderCategoryHeader(row);
+            } else if (row.isPersonHeader) {
+                html += renderPersonHeader(row);
+            } else {
+                // Regular budget row
+                rowNumber++;
+                html += renderBudgetRow(row, rowNumber);
+            }
+        });
+
+        // 1 dòng tổng (minimal & clean) + Person split nếu có
+        const grandTotal = totals.total + totals.optional;
+        html += `
+                    </tbody>
+                    <tfoot>
+                        <tr class="grand-total-row">
+                            <td colspan="8" class="text-right" style="padding-right: 1rem;">
+                                <span style="color: #374151; font-weight: 500;">💰 Tổng: </span>
+                                <span style="font-weight: 700; color: #111827;">${formatCurrency(totals.total, false)}</span>
+                                <span style="color: #6b7280; font-weight: 400; font-size: 0.9375rem;"> (cơ bản)</span>
+                                <span style="color: #6b7280; font-weight: 500;"> + </span>
+                                <span style="font-weight: 700; color: #111827;">${formatCurrency(totals.optional, false)}</span>
+                                <span style="color: #6b7280; font-weight: 400; font-size: 0.9375rem;"> (tùy chọn)</span>
+                                <span style="color: #3b82f6; font-weight: 700; font-size: 1.125rem; margin: 0 0.5rem;"> = </span>
+                            </td>
+                            <td class="text-right" style="font-weight: 700; font-size: 1.25rem; color: #1e40af;">
+                                ${formatCurrency(grandTotal, false)}đ
+                            </td>
+                        </tr>
+        `;
+
+        // Add person split info if in person view (#7)
+        if (personTotals && Object.keys(personTotals).length === 2) {
+            const split = calculateSplitBalance(personTotals);
+            if (split) {
+                html += `
+                        <tr class="person-split-row">
+                            <td colspan="9" style="text-align: center;">
+                                ⚖️ <strong>${split.from}</strong> nên chuyển cho <strong>${split.to}</strong>:
+                                <strong style="color: #ef4444;">${formatCurrency(split.amount, false)}đ</strong>
+                            </td>
+                        </tr>
+                `;
+            }
+        }
+
+        html += `
+                    </tfoot>
+                </table>
+            </div>
+        `;
+
+        return html;
+    }
+
+    /**
+     * Process and render budget content based on current state
+     * @returns {Object} { html: string, personTotals: object }
+     */
+    function renderBudgetContent() {
+        // Extract all rows once (cached in state)
+        if (budgetState.allRows.length === 0) {
+            budgetState.allRows = extractBudgetList(scheduleData);
+        }
+
+        let rows = budgetState.allRows;
+        let personTotals = null;
+
+        // Apply filters (#3, #6, #8)
+        rows = filterBudgetRows(rows);
+
+        // Calculate personTotals for "person" view (always, regardless of grouping)
+        // This ensures split balance is always displayed in person view
+        // Use allRows (not filtered) to calculate split balance for ALL items (including optional)
+        // Only calculate for items with known paidBy (skip null/undefined)
+        if (budgetState.view === 'person') {
+            const personGroups = {};
+            budgetState.allRows.forEach(row => {
+                // Skip items without paidBy - only process items with known person
+                if (row.paidBy) {
+                    if (!personGroups[row.paidBy]) personGroups[row.paidBy] = 0;
+                    personGroups[row.paidBy] += row.amount || 0;
+                }
+            });
+            personTotals = personGroups;
+        }
+
+        // Apply view-specific grouping (if enabled)
+        if (budgetState.showGrouping) {
+            if (budgetState.view === 'timeline') {
+                // Add date headers at the beginning of each date group (#1)
+                rows = addDateHeaders(rows);
+            } else if (budgetState.view === 'category') {
+                // Group by category (#2)
+                rows = groupByCategory(rows);
+            } else if (budgetState.view === 'person') {
+                // Group by person (#7)
+                const grouped = groupByPerson(rows);
+                rows = grouped.grouped;
+                // personTotals already calculated above
+            }
+        }
+
+        // Apply sorting (#4) - for all views
+        if (budgetState.sortColumn) {
+            if (budgetState.showGrouping) {
+                // Sort within groups (preserves grouping structure)
+                rows = sortWithinGroups(rows, budgetState.view);
+            } else {
+                // Sort all rows (flat list)
+                rows = sortBudgetRows(rows);
+            }
+        }
+
+        // Calculate totals (recalculate based on filtered rows)
+        const regularRows = rows.filter(r => !r.isDateHeader && !r.isCategoryHeader && !r.isPersonHeader);
+        const totals = {
+            total: regularRows.filter(r => !r.isOptional).reduce((sum, r) => sum + (r.amount || 0), 0),
+            optional: regularRows.filter(r => r.isOptional).reduce((sum, r) => sum + (r.amount || 0), 0),
+        };
+
+        // Render toolbar + table
+        const toolbarHTML = renderBudgetToolbar();
+        const tableHTML = renderBudgetTable(rows, totals, personTotals);
+
+        return {
+            html: toolbarHTML + tableHTML,
+            personTotals: personTotals,
+        };
+    }
+
+    /**
+     * Refresh budget modal content (re-render based on state)
+     * Save and restore focus to prevent input blur
+     */
+    function refreshBudgetModal() {
+        if (!budgetModalElement) return;
+
+        // Save focus state before re-rendering
+        const activeElement = document.activeElement;
+        const isSearchInput = activeElement && activeElement.id === 'budget-search-input';
+        const cursorPosition = isSearchInput ? activeElement.selectionStart : null;
+
+        const content = renderBudgetContent();
+        const modalBody = budgetModalElement.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.innerHTML = content.html;
+            // Re-attach event listeners
+            attachBudgetEventListeners();
+
+            // Reinitialize tooltips for new elements
+            initTooltips();
+
+            // Restore focus to search input if it was focused
+            if (isSearchInput) {
+                const searchInput = document.getElementById('budget-search-input');
+                if (searchInput) {
+                    searchInput.focus();
+                    // Restore cursor position
+                    if (cursorPosition !== null) {
+                        searchInput.setSelectionRange(cursorPosition, cursorPosition);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Export budget data to CSV (#5)
+     */
+    function exportBudgetToCSV() {
+        const rows = filterBudgetRows(budgetState.allRows);
+
+        // CSV header
+        let csv = 'STT,Ngày,Cụm hoạt động,Danh mục,Khoản chi,Số tiền,Tùy chọn,Ghi chú,Người chi\n';
+
+        // CSV rows
+        rows.forEach((row, index) => {
+            const rowNumber = index + 1;
+            const categoryInfo = getCategoryDisplay(row.category);
+            const categoryDisplay = `${categoryInfo.name} ${categoryInfo.icon}`;
+            const amount = row.amount || 0;
+            const optional = row.isOptional ? 'Tùy chọn' : '';
+            const note = (row.note || '').replace(/"/g, '""'); // Escape quotes
+            const activityTitle = (row.activityTitle || '').replace(/"/g, '""');
+            const name = (row.name || '').replace(/"/g, '""');
+
+            csv += `${rowNumber},"${row.date || ''}","${activityTitle}","${categoryDisplay}","${name}",${amount},"${optional}","${note}","${row.paidBy || ''}"\n`;
+        });
+
+        // Create download
+        const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `budget_${new Date().getTime()}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    /**
+     * Attach event listeners to budget modal controls
+     */
+    function attachBudgetEventListeners() {
+        // View switcher tabs
+        const viewTabs = document.querySelectorAll('.budget-view-tab');
+        viewTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const view = e.target.dataset.view;
+                if (view && view !== budgetState.view) {
+                    budgetState.view = view;
+                    budgetState.sortColumn = null; // Reset sort when changing view
+                    budgetState.sortDirection = null;
+                    refreshBudgetModal();
+                }
+            });
+        });
+
+        // Search input (#6) with debounce
+        const searchInput = document.getElementById('budget-search-input');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    budgetState.searchQuery = e.target.value;
+                    refreshBudgetModal();
+                }, 300); // 300ms debounce
+            });
+        }
+
+        // Category filter (#3)
+        const categoryFilter = document.getElementById('budget-category-filter');
+        if (categoryFilter) {
+            categoryFilter.addEventListener('change', (e) => {
+                budgetState.categoryFilter = e.target.value;
+                refreshBudgetModal();
+            });
+        }
+
+        // Optional toggle (#8)
+        const optionalToggle = document.getElementById('budget-optional-toggle');
+        if (optionalToggle) {
+            optionalToggle.addEventListener('change', (e) => {
+                budgetState.showOptional = e.target.checked;
+                refreshBudgetModal();
+            });
+        }
+
+        // Grouping toggle (universal for all views)
+        const groupingToggle = document.getElementById('budget-grouping-toggle');
+        if (groupingToggle) {
+            groupingToggle.addEventListener('change', (e) => {
+                budgetState.showGrouping = e.target.checked;
+                refreshBudgetModal();
+            });
+        }
+
+        // Export CSV (#5)
+        const exportBtn = document.getElementById('budget-export-csv');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', () => {
+                exportBudgetToCSV();
+            });
+        }
+
+        // Sortable headers (#4)
+        const sortableHeaders = document.querySelectorAll('.budget-table th.sortable');
+        sortableHeaders.forEach(th => {
+            th.addEventListener('click', (e) => {
+                const column = e.target.dataset.column;
+                if (!column) return;
+
+                // Toggle sort direction
+                if (budgetState.sortColumn === column) {
+                    if (budgetState.sortDirection === 'asc') {
+                        budgetState.sortDirection = 'desc';
+                    } else {
+                        // Reset sort
+                        budgetState.sortColumn = null;
+                        budgetState.sortDirection = null;
+                    }
+                } else {
+                    budgetState.sortColumn = column;
+                    budgetState.sortDirection = 'asc';
+                }
+
+                refreshBudgetModal();
+            });
+        });
+    }
+
+    /**
+     * Khởi tạo budget modal (chỉ gọi 1 lần)
+     */
+    function initBudgetModal() {
+        // Generate initial content
+        const content = renderBudgetContent();
+
+        // Use high-level createModal API
+        budgetModalElement = createModal({
+            id: 'budget-modal',
+            title: '💰 Bảng Kê Chi Phí Chi Tiết',
+            content: content.html
+        });
+
+        // Attach event listeners
+        attachBudgetEventListeners();
+
+        // Initialize tooltips for modal elements
+        initTooltips();
+    }
+
+    /**
+     * Detect current activity for highlighting (#9)
+     * @returns {string|null} Current activity title
+     */
+    function detectCurrentActivity() {
+        const currentActivityElement = document.querySelector('.activity-item.current-activity');
+        if (currentActivityElement) {
+            const titleElement = currentActivityElement.querySelector('.activity-title');
+            if (titleElement) {
+                return titleElement.textContent.trim();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Initialize/Reinitialize tooltips using Tippy.js
+     * Can be called multiple times safely
+     * @param {string} selector - CSS selector (default: '[data-tippy-content]')
+     */
+    function initTooltips(selector = '[data-tippy-content]') {
+        if (typeof tippy === 'undefined') return;
+
+        tippy(selector, {
+            trigger: 'mouseenter focus',
+            // touch: false,
+            placement: 'bottom',
+            maxWidth: 380,
+            animation: 'shift-away-subtle',
+            delay: 100,
+        });
+    }
+
+    /**
+     * Mở budget modal
+     */
+    function openBudgetModal() {
+        // Detect current activity for highlighting (#9)
+        budgetState.currentActivityTitle = detectCurrentActivity();
+
+        // Check tường minh: chỉ init nếu chưa có
+        if (budgetModalElement === null) {
+            initBudgetModal();
+        } else {
+            // Refresh to update highlight
+            refreshBudgetModal();
+        }
+
+        openModal(budgetModalElement);
+    }
+
+    // --- KHỞI CHẠY ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Render lịch trình lần đầu
+        renderTimeline(scheduleData);
+
+        // Setup Tippy.js tooltips for static elements (timeline, header, etc.)
+        initTooltips();
+
+        // Sự kiện cho nút Ẩn/Hiện Test Panel
+        const toggleTestPanelButton = document.getElementById('toggle-test-panel');
+        const testPanelContent = document.getElementById('test-panel-content');
+
+        toggleTestPanelButton.addEventListener('click', () => {
+            const isExpanded = testPanelContent.classList.toggle('expanded');
+            toggleTestPanelButton.classList.toggle('expanded'); // Để xoay icon (nếu có)
+            if (isExpanded) {
+                testPanelContent.style.maxHeight = testPanelContent.scrollHeight + 'px';
+            } else {
+                testPanelContent.style.maxHeight = '0px';
+            }
+        });
+
+        // Hàm xử lý khi thời gian giả lập thay đổi
+        function handleSimulatedTimeChange() {
+            updateTimeline();
+            updateUrlParams(); // Cập nhật URL
+        }
+
+        // Sự kiện cho nút reset
+        resetTimeButton.addEventListener('click', () => {
+            timeOverrideDateInput.value = '';
+            timeOverrideTimeInput.value = '';
+            handleSimulatedTimeChange();
+        });
+
+        // Sự kiện khi thay đổi input
+        timeOverrideDateInput.addEventListener('change', handleSimulatedTimeChange);
+        timeOverrideTimeInput.addEventListener('change', handleSimulatedTimeChange);
+
+        // --- XỬ LÝ PARAM TỪ URL (Lấy từ v2.html) ---
+        // Giúp bạn chia sẻ link với thời gian giả lập
+        // ví dụ: ...NinhBinh_v3.html?time=2025-11-15T09:30:00
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const timeParam = urlParams.get('time');
+
+            if (timeParam) {
+                const simulatedDate = new Date(timeParam);
+
+                if (!isNaN(simulatedDate.getTime())) {
+                    const dateValue = `${simulatedDate.getFullYear()}-${pad(simulatedDate.getMonth() + 1)}-${pad(simulatedDate.getDate())}`;
+                    timeOverrideDateInput.value = dateValue;
+
+                    const hasTime = /T|:| /.test(timeParam);
+                    if (hasTime) {
+                        const timeValue = `${pad(simulatedDate.getHours())}:${pad(simulatedDate.getMinutes())}:${pad(simulatedDate.getSeconds())}`;
+                        timeOverrideTimeInput.value = timeValue;
+                    }
+
+                    // Tự động mở panel
+                    if (!testPanelContent.classList.contains('expanded')) {
+                        testPanelContent.classList.add('expanded');
+                        toggleTestPanelButton.classList.add('expanded');
+                        testPanelContent.style.maxHeight = testPanelContent.scrollHeight + 'px';
+                    }
+                } else {
+                    console.warn("Giá trị 'time' trên URL không hợp lệ:", timeParam);
+                }
+            }
+        } catch (e) {
+            console.error("Lỗi khi xử lý URL param 'time':", e);
+        }
+        // --- KẾT THÚC XỬ LÝ PARAM ---
+
+        // --- AUTO-OPEN MODAL FROM URL PARAMS ---
+        // Check if modal param exists (?modal=budget&modal-fullscreen=true)
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const modalParam = urlParams.get('modal');
+            const modalFullscreenParam = urlParams.get('modal-fullscreen');
+
+            if (modalParam === 'budget') {
+                // Open budget modal
+                openBudgetModal();
+
+                // If modal-fullscreen=true, enter fullscreen mode
+                if (modalFullscreenParam === 'true' && budgetModalElement) {
+                    // Wait for modal to open then apply fullscreen
+                    setTimeout(() => {
+                        toggleModalFullscreen(budgetModalElement, true);
+                    }, 100); // Small delay to ensure modal is rendered
+                }
+            }
+        } catch (e) {
+            console.error("Lỗi khi xử lý URL param 'modal':", e);
+        }
+        // --- KẾT THÚC AUTO-OPEN MODAL ---
+
+        // --- SETUP EVENT LISTENER CHO BUDGET MODAL ---
+        // Tìm element bằng ID (unique, safe)
+        const budgetDisplayElement = document.getElementById('header-budget-display');
+        if (budgetDisplayElement) {
+            budgetDisplayElement.addEventListener('click', (e) => {
+                e.preventDefault(); // Ngăn default behavior nếu là link
+                openBudgetModal();
+            });
+        } else {
+            console.warn('Budget display element not found. Budget modal will not be available.');
+        }
+
+        // Bắt đầu vòng lặp cập nhật thời gian thực
+        setInterval(updateTimeline, 1000); // 1 giây một lần
+
+        // Chạy lần đầu tiên khi tải trang
+        updateTimeline();
+    });
+</script>
+</body>
+</html>
