@@ -294,6 +294,19 @@
             width: 18px; /* To hơn place-map-icon (16px) vì ở header */
             height: 18px;
         }
+
+        /* Hiển thị chi phí với tooltip (dotted underline) */
+        .budget-display {
+            /* Dotted underline nhẹ nhàng */
+            border-bottom: 1px dotted rgba(59, 130, 246, 0.2); /* blue-500 với 40% opacity */
+            cursor: help;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .budget-display:hover {
+            border-bottom-color: rgba(59, 130, 246, 0.7); /* Đậm hơn khi hover */
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -456,7 +469,8 @@
     //                 "name": string,          //     - Tên khoản chi
     //                 "amount": number,        //     - Số tiền (VNĐ)
     //                 "category": string,      //     - (Optional) Loại: hotel | food | drink | transport | ticket | shopping | relax | other
-    //                 "note": string           //     - (Optional) Ghi chú
+    //                 "note": string,          //     - (Optional) Ghi chú
+    //                 "isOptional": boolean    //     - (Optional) true = chi phí TÙY CHỌN (không tính vào tổng), false/undefined = tính vào tổng
     //               }
     //             ],
     //
@@ -507,6 +521,13 @@
     //    ✓ budgets.category: Chọn 1 trong các giá trị sau (để hiển thị emoji phù hợp):
     //      hotel 🏠 | food 🍜 | drink ☕ | transport 🚕 | ticket 🎫 | shopping 🛍️ | relax 💆 | other 💰
     //
+    //    ✓ budgets.isOptional:
+    //      - true: Chi phí TÙY CHỌN (không tính vào tổng tự động)
+    //        Ví dụ: "Nhà nghỉ theo giờ (Nếu chọn Option 2)" - có thể có hoặc không
+    //      - false hoặc undefined: Chi phí CƠ BẢN (tính vào tổng tự động)
+    //        Ví dụ: "Vé tham quan", "Ăn trưa" - chắc chắn phát sinh
+    //      - Sử dụng khi có nhiều lựa chọn cho cùng 1 mục, user có thể chọn hoặc không
+    //
     // 4. TÍ MẸO:
     //    - Dùng "Công cụ Giả lập thời gian" (ở header) để test lịch trình
     //    - Chia sẻ link với tham số ?time=2025-11-15T09:30:00 để xem tại thời điểm cụ thể
@@ -519,7 +540,7 @@
             "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
             "dates": "15-16/11/2025",
             "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
-            "totalBudget": 4015000, // Tính toán bằng tay và ghi tổng chi phí chuyến đi vào đây. (Tổng cho tất cả mọi người)
+            "totalBudget": undefined, // Tổng chi phí chuyến đi. (Tổng cho tất cả mọi người). Không điền để tính tự động. Điền để hiển thị số liệu tính toán bằng tay.
             "documentUrl": "https://docs.google.com/spreadsheets/d/1N9SNB6n3YJ2kndi1_ZtQd0aFdE9Ib-UudKnR86DUdbQ"
         },
         "schedule": [
@@ -760,7 +781,8 @@
                                     "name": "Nhà nghỉ theo giờ (Nếu chọn Option 2)",
                                     "amount": 150000,
                                     "category": "hotel",
-                                    "note": "(Chi phí phát sinh nếu chọn)"
+                                    "note": "(Chi phí phát sinh nếu chọn)",
+                                    "isOptional": true
                                 }
                             ],
                             "reason": "Đây là yêu cầu của bạn: có 1 tiếng nghỉ ngơi tại chỗ để hồi sức. Ăn trưa và nghỉ ngơi ngay tại Tam Cốc rất tiện lợi trước khi di chuyển sang cụm Hoa Lư. Cung cấp 2 lựa chọn (nghỉ tại chỗ hoặc thuê phòng gần đó)."
@@ -1386,6 +1408,150 @@
         return amount.toLocaleString('vi-VN') + 'đ';
     }
 
+    /**
+     * Format số tiền dạng ngắn gọn (cho tooltip)
+     *
+     * Logic (theo thứ tự ưu tiên):
+     * - Chia hết cho 1 triệu → "1tr", "2tr", "5tr"
+     * - Chia hết cho 100 nghìn → "1.5tr", "2.3tr", "4.2tr"
+     * - Chia hết cho 1 nghìn (>= 1 triệu) → "4tr255k", "1tr234k"
+     * - Chia hết cho 1 nghìn (< 1 triệu) → "500k", "515k"
+     * - Chia hết cho 100 → "515.5k"
+     * - Không chia hết → format đầy đủ "1.234.567đ"
+     *
+     * CHÚ Ý: Hàm này KHÔNG bao giờ làm tròn số tiền
+     * Chỉ format ngắn khi số tiền chia hết (100% chính xác)
+     *
+     * @param {number} amount - Số tiền
+     * @returns {string} Vd: "1tr", "1.5tr", "4tr255k", "515k", "515.5k", "1.234.567đ"
+     */
+    function formatCurrencyShort(amount) {
+        if (!amount || amount === 0) return '0đ';
+
+        // === TRIỆU ===
+        if (amount >= 1000000) {
+            // Chia hết cho 1 triệu → "1tr", "2tr"
+            if (amount % 1000000 === 0) {
+                return (amount / 1000000) + 'tr';
+            }
+            // Chia hết cho 100 nghìn → "1.5tr", "2.3tr"
+            if (amount % 100000 === 0) {
+                const millions = Math.floor(amount / 1000000);
+                const hundredThousands = (amount % 1000000) / 100000;
+                return millions + '.' + hundredThousands + 'tr';
+            }
+            // Chia hết cho 1 nghìn → "4tr255k", "1tr234k"
+            if (amount % 1000 === 0) {
+                const millions = Math.floor(amount / 1000000);
+                const thousands = (amount % 1000000) / 1000;
+                return millions + 'tr' + thousands + 'k';
+            }
+            // Không chia hết → format đầy đủ
+            return amount.toLocaleString('vi-VN') + 'đ';
+        }
+
+        // === NGHÌN ===
+        if (amount >= 1000) {
+            // Chia hết cho 1 nghìn → "500k", "515k"
+            if (amount % 1000 === 0) {
+                return (amount / 1000) + 'k';
+            }
+            // Chia hết cho 100 → "515.5k"
+            if (amount % 100 === 0) {
+                const thousands = Math.floor(amount / 1000);
+                const hundreds = (amount % 1000) / 100;
+                return thousands + '.' + hundreds + 'k';
+            }
+            // Không chia hết → format đầy đủ
+            return amount.toLocaleString('vi-VN') + 'đ';
+        }
+
+        // Dưới 1000
+        return amount + 'đ';
+    }
+
+    // --- HÀM TÍNH TOÁN CHI PHÍ ---
+    /**
+     * Tính tổng chi phí từ scheduleData
+     * Chỉ gọi hàm này khi cần (lazy calculation)
+     *
+     * @param {Object} scheduleData - Dữ liệu lịch trình
+     * @returns {Object} { total: number, optional: number }
+     *   - total: Tổng chi phí CƠ BẢN (không tính isOptional)
+     *   - optional: Tổng chi phí TÙY CHỌN (chỉ tính isOptional)
+     */
+    function calculateBudgets(scheduleData) {
+        let total = 0;
+        let optional = 0;
+
+        scheduleData.schedule.forEach(day => {
+            day.timelineItems.forEach(item => {
+                if (item.details?.budgets) {
+                    item.details.budgets.forEach(budget => {
+                        const amount = budget.amount || 0;
+                        if (budget.isOptional) {
+                            optional += amount;
+                        } else {
+                            total += amount;
+                        }
+                    });
+                }
+            });
+        });
+
+        return {total, optional};
+    }
+
+    /**
+     * Lấy thông tin chi phí để hiển thị
+     *
+     * Logic:
+     * - totalBudget = null → return null (ẩn hoàn toàn)
+     * - totalBudget = undefined → tính tự động (nếu = 0 thì ẩn)
+     * - totalBudget = 0 hoặc > 0 → hiển thị giá trị thủ công
+     *
+     * @param {Object} scheduleData - Dữ liệu lịch trình
+     * @returns {Object|null} Budget info hoặc null nếu cần ẩn
+     *   - value: Giá trị hiển thị
+     *   - isAuto: true/false
+     *   - tooltip: Text cho title attribute
+     */
+    function getBudgetInfo(scheduleData) {
+        const manual = scheduleData.tripInfo.totalBudget;
+
+        // CASE 1: null → Ẩn hoàn toàn
+        if (manual === null) {
+            return null;
+        }
+
+        // CASE 2: undefined → Tính tự động
+        if (manual === undefined) {
+            const calculated = calculateBudgets(scheduleData);
+
+            // Nếu tính ra = 0 → Ẩn
+            if (calculated.total === 0) {
+                return null;
+            }
+
+            // Có chi phí → Hiển thị
+            return {
+                value: calculated.total,
+                isAuto: true,
+                optional: calculated.optional,
+                tooltip: calculated.optional > 0
+                    ? `Tự động tính • Không gồm chi phí tùy chọn (+${formatCurrencyShort(calculated.optional)})`
+                    : 'Tự động tính • Tổng tất cả chi phí'
+            };
+        }
+
+        // CASE 3 & 4: Có giá trị (0 hoặc > 0) → Hiển thị manual
+        return {
+            value: manual,
+            isAuto: false,
+            tooltip: 'Nhập thủ công • Xóa để tự động tính'
+        };
+    }
+
     // --- HÀM RENDER CHI PHÍ (BUDGET) ---
     /**
      * Render section "Chi phí" (từ details.budgets)
@@ -1418,12 +1584,18 @@
             const icon = item.category ? categoryIcons[item.category] || "💰" : "💰";
             const amount = formatCurrency(item.amount || 0);
 
+            // Thêm " (tùy chọn)" nếu isOptional = true
+            const optionalLabel = item.isOptional
+                ? ' <span class="text-gray-400 text-xs">(tùy chọn)</span>'
+                : '';
+
             // Format: 🎫 Vé tham quan: 120.000đ
-            let itemText = `${icon} ${item.name}: ${amount}`;
+            // Hoặc: 🏠 Nhà nghỉ theo giờ (tùy chọn): 150.000đ
+            let itemText = `${icon} ${item.name}${optionalLabel}: ${amount}`;
 
             // Thêm note nếu có (trong ngoặc đơn)
             if (item.note) {
-                itemText += ` (${item.note})`;
+                itemText += ` <span class="text-gray-500 text-xs">(${item.note})</span>`;
             }
 
             html += `<li>${itemText}</li>`;
@@ -1727,15 +1899,17 @@
         const docLinkHTML = renderTripDocumentLink(data.tripInfo.documentUrl);
         document.getElementById('main-title').innerHTML = `${data.tripInfo.title}${docLinkHTML}`;
 
-        // Cập nhật subtitle với totalBudget
-        let totalBudgetText = ''
-        if (data.tripInfo.totalBudget) {
-            totalBudgetText += ` | Chi phí: ${formatCurrency(data.tripInfo.totalBudget)}`;
+        // Cập nhật subtitle với budget info
+        const budgetInfo = getBudgetInfo(data);
+        let budgetInfoHtml;
+        if (budgetInfo !== null) {
+            // Có budget → thêm vào subtitle với tooltip
+            budgetInfoHtml = ` | <span class="budget-display" title="${budgetInfo.tooltip}">Chi phí: ${formatCurrencyShort(budgetInfo.value)}</span>`;
         }
-        document.getElementById('main-subtitle').innerText = `${data.tripInfo.subtitle} (${data.tripInfo.dates})${totalBudgetText}`;
+        document.getElementById('main-subtitle').innerHTML = `${data.tripInfo.subtitle} (${data.tripInfo.dates})${budgetInfoHtml}`;
 
         // Cập nhật tiêu đề của tab trình duyệt
-        document.title = `${data.tripInfo.title} | Hiếu iceTea`;
+        document.title = `${data.tripInfo.title} - ${data.tripInfo.subtitle} (${data.tripInfo.dates}) | Hiếu iceTea`;
 
         data.schedule.forEach((day, dayIndex) => {
             // ================================================================
