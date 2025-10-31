@@ -8,8 +8,13 @@
       Tiêu đề tôi lấy từ file index.html của bạn
     -->
     <title>Your Trip</title>
+    <!-- tailwindcss 3.4.17 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="shortcut icon" href="route.png" type="image/x-icon">
+    <!-- Tippy.js for tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away-subtle.css">
     <style>
         /* Sử dụng font Inter mượt mà hơn */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -1901,10 +1906,10 @@
 
         // Cập nhật subtitle với budget info
         const budgetInfo = getBudgetInfo(data);
-        let budgetInfoHtml;
+        let budgetInfoHtml = '';
         if (budgetInfo !== null) {
             // Có budget → thêm vào subtitle với tooltip
-            budgetInfoHtml = ` | <span class="budget-display" title="${budgetInfo.tooltip}">Chi phí: ${formatCurrencyShort(budgetInfo.value)}</span>`;
+            budgetInfoHtml = ` | <span class="budget-display" data-tippy-content="${budgetInfo.tooltip}">Chi phí: ${formatCurrencyShort(budgetInfo.value)}</span>`;
         }
         document.getElementById('main-subtitle').innerHTML = `${data.tripInfo.subtitle} (${data.tripInfo.dates})${budgetInfoHtml}`;
 
@@ -2308,6 +2313,14 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Render lịch trình lần đầu
         renderTimeline(scheduleData);
+
+        // Setup Tippy.js tooltips
+        tippy('[data-tippy-content]', {
+            trigger: 'mouseenter focus click',
+            placement: 'bottom',
+            maxWidth: 360,
+            animation: 'shift-away-subtle',
+        });
 
         // Sự kiện cho nút Ẩn/Hiện Test Panel
         const toggleTestPanelButton = document.getElementById('toggle-test-panel');
