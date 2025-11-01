@@ -4203,6 +4203,15 @@
     function initTooltips(selector = '[data-tippy-content]') {
         if (typeof tippy === 'undefined') return;
 
+        // Destroy old tooltip instances first to prevent duplicates
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            if (el._tippy) {
+                el._tippy.destroy();
+            }
+        });
+
+        // Create new tooltip instances
         tippy(selector, {
             trigger: 'mouseenter focus',
             // touch: false,
