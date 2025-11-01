@@ -3137,18 +3137,19 @@
 
                 // Update position
                 if (instance.popperInstance) {
-                    const a = setInterval(() => {
+                    const intervalUpdatePosition = setInterval(() => {
                         instance.popperInstance.update()
-                        setTimeout(() => {
-                            clearInterval(a)
-                        }, 350);
-                    }, 1)
-                }
+                    }, 12)
 
-                setTimeout(() => {
-                    // instance.hide();
-                    fullscreenBtn.blur()
-                }, 500);
+                    setTimeout(() => {
+                        clearInterval(intervalUpdatePosition)
+                    }, 350);
+
+                    setTimeout(() => {
+                        // instance.hide();
+                        fullscreenBtn.blur()
+                    }, 500);
+                }
             }
         }
     }
