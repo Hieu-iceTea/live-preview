@@ -4235,13 +4235,33 @@
 
         // Create new tooltip instances
         tippy(selector, {
-            trigger: 'mouseenter focus',
+            trigger: 'mouseenter click',
             // touch: false,
             placement: 'bottom',
             maxWidth: 380,
             animation: 'shift-away-subtle',
             delay: 100,
+            onShown(instance) {
+                // Auto-hide tooltip cho modal buttons (close, fullscreen)
+                const isModalCloseButton = instance.reference.classList.contains('modal-close-btn');
+                const isModalFullscreenButton = instance.reference.classList.contains('modal-fullscreen-btn');
+
+                // instance.hide();
+                // instance.reference.blur(); // Works well for re-touch requirement
+                if ((isModalCloseButton || isModalFullscreenButton) && isTouchDevice()) {
+                    setTimeout(() => {
+                        if (instance.state.isVisible) {
+                            instance.hide();
+                            // instance.reference.blur(); // Works well for re-touch requirement
+                        }
+                    }, isModalCloseButton ? 300 : 1500);
+                }
+            },
         });
+    }
+
+    function isTouchDevice() {
+        return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
 
     /**
