@@ -3139,10 +3139,10 @@
                 if (instance.popperInstance) {
                     const startTime = performance.now();
                     const duration = 300; // Match CSS transition duration
-                    
+
                     const updatePosition = (currentTime) => {
                         const elapsed = currentTime - startTime;
-                        
+
                         if (elapsed < duration) {
                             // Keep updating during animation
                             instance.popperInstance.update();
@@ -3152,13 +3152,19 @@
                             instance.popperInstance.update();
                         }
                     };
-                    
+
                     // Start the update loop
                     requestAnimationFrame(updatePosition);
-                    
+
                     // Auto-hide after 500ms (300ms animation + 200ms view time)
                     setTimeout(() => {
                         fullscreenBtn.blur(); // Works well for re-touch requirement
+
+                        instance.hide();
+                        // Re-enable immediately to allow next touch
+                        setTimeout(() => {
+                            instance.enable();
+                        }, 50);
                     }, 500);
                 }
             }
