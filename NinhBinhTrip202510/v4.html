@@ -3134,6 +3134,21 @@
             const instance = fullscreenBtn._tippy;
             if (instance) {
                 instance.setContent(isFullscreen ? 'Thu nhỏ' : 'Phóng to toàn màn hình');
+
+                // Update position
+                if (instance.popperInstance) {
+                    const a = setInterval(() => {
+                        instance.popperInstance.update()
+                        setTimeout(() => {
+                            clearInterval(a)
+                        }, 350);
+                    }, 1)
+                }
+
+                setTimeout(() => {
+                    // instance.hide();
+                    fullscreenBtn.blur()
+                }, 500);
             }
         }
     }
