@@ -3135,19 +3135,30 @@
             if (instance) {
                 instance.setContent(isFullscreen ? 'Thu nhỏ' : 'Phóng to toàn màn hình');
 
-                // Update position
+                // Update position smoothly during animation using RAF (requestAnimationFrame)
                 if (instance.popperInstance) {
-                    const intervalUpdatePosition = setInterval(() => {
-                        instance.popperInstance.update()
-                    }, 12)
-
+                    const startTime = performance.now();
+                    const duration = 300; // Match CSS transition duration
+                    
+                    const updatePosition = (currentTime) => {
+                        const elapsed = currentTime - startTime;
+                        
+                        if (elapsed < duration) {
+                            // Keep updating during animation
+                            instance.popperInstance.update();
+                            requestAnimationFrame(updatePosition);
+                        } else {
+                            // Final update after animation completes
+                            instance.popperInstance.update();
+                        }
+                    };
+                    
+                    // Start the update loop
+                    requestAnimationFrame(updatePosition);
+                    
+                    // Auto-hide after 500ms (300ms animation + 200ms view time)
                     setTimeout(() => {
-                        clearInterval(intervalUpdatePosition)
-                    }, 350);
-
-                    setTimeout(() => {
-                        // instance.hide();
-                        fullscreenBtn.blur()
+                        fullscreenBtn.blur(); // Works well for re-touch requirement
                     }, 500);
                 }
             }
