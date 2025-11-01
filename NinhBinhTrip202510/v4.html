@@ -383,7 +383,7 @@
             margin: 0;
         }
 
-        .modal-close {
+        .modal-close-btn {
             background: none;
             border: none;
             font-size: 1.5rem;
@@ -400,7 +400,7 @@
             transition: background-color 0.2s ease, color 0.2s ease;
         }
 
-        .modal-close:hover {
+        .modal-close-btn:hover {
             background-color: #f3f4f6; /* gray-100 */
             color: #1f2937; /* gray-800 */
         }
@@ -3085,7 +3085,7 @@
                                 <span class="fullscreen-expand-icon">${MODAL_ICONS.expand}</span>
                                 <span class="fullscreen-shrink-icon" style="display: none;">${MODAL_ICONS.shrink}</span>
                             </button>
-                            <button class="modal-close" aria-label="Đóng" data-tippy-content="Đóng">✕</button>
+                            <button class="modal-close-btn" aria-label="Đóng" data-tippy-content="Đóng">✕</button>
                         </div>
                     </div>
                     <div class="modal-body">
@@ -3155,17 +3155,6 @@
 
                     // Start the update loop
                     requestAnimationFrame(updatePosition);
-
-                    // Auto-hide after 500ms (300ms animation + 200ms view time)
-                    setTimeout(() => {
-                        fullscreenBtn.blur(); // Works well for re-touch requirement
-
-                        instance.hide();
-                        // Re-enable immediately to allow next touch
-                        setTimeout(() => {
-                            instance.enable();
-                        }, 50);
-                    }, 500);
                 }
             }
         }
@@ -3201,7 +3190,7 @@
      * @param {Function} onClose - Callback khi đóng (optional)
      */
     function setupModalListeners(modalElement, onClose) {
-        const closeBtn = modalElement.querySelector('.modal-close');
+        const closeBtn = modalElement.querySelector('.modal-close-btn');
         const fullscreenBtn = modalElement.querySelector('.modal-fullscreen-btn');
 
         const closeHandler = () => {
