@@ -644,7 +644,7 @@
             font-size: 0.875rem;
             color: #374151;
             cursor: pointer;
-            user-select: none;
+            /*user-select: none;*/
         }
 
         .budget-toggle-checkbox {
@@ -721,7 +721,7 @@
         /* Sortable column headers */
         .budget-table th.sortable {
             cursor: pointer;
-            user-select: none;
+            /*user-select: none;*/
             position: relative;
             padding-right: 1.5rem;
         }
@@ -3726,7 +3726,7 @@
 
                 <div class="budget-toolbar-section">
                     <!-- Optional toggle -->
-                    <label class="budget-toggle-label" data-tippy-content="Hiển thị/ẩn các khoản chi tùy chọn (có thể bỏ qua)">
+                    <label class="budget-toggle-label" data-tippy-content="Hiển thị/ẩn các khoản chi tùy chọn (các khoản chi có thể bỏ qua)" data-tippy-maxWidth=250>
                         <input type="checkbox"
                                class="budget-toggle-checkbox"
                                id="budget-optional-toggle"
