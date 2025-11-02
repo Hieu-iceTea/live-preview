@@ -3355,6 +3355,119 @@
     }
 
     // ========================================================================
+    // === TOOLTIP UTILITIES ===
+    // ========================================================================
+
+    /**
+     * Initialize/Reinitialize tooltips using Tippy.js
+     * Can be called multiple times safely
+     * @param {string} selector - CSS selector (default: '[data-tippy-content]')
+     */
+    function initTippyTooltips(selector = '[data-tippy-content]') {
+        if (typeof tippy === 'undefined') return;
+
+        // Destroy old tooltip instances first to prevent duplicates
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+            if (el._tippy) {
+                el._tippy.destroy();
+            }
+        });
+
+        // Create new tooltip instances
+        tippy(selector, {
+            trigger: 'mouseenter focus',
+            // touch: false,
+            placement: 'bottom',
+            maxWidth: 380,
+            animation: 'shift-away-subtle',
+            delay: 100,
+            onShown(instance) {
+                // Auto-hide tooltip cho modal buttons (close, fullscreen)
+                const isModalCloseButton = instance.reference.classList.contains('modal-close-btn');
+                const isModalFullscreenButton = instance.reference.classList.contains('modal-fullscreen-btn');
+
+                // instance.hide();
+                // instance.reference.blur(); // Works well for re-touch requirement
+                if ((isModalCloseButton || isModalFullscreenButton) && isTouchDevice()) {
+                    setTimeout(() => {
+                        if (instance.state.isVisible) {
+                            instance.hide();
+                            // instance.reference.blur(); // Works well for re-touch requirement
+                        }
+                    }, isModalCloseButton ? 300 : 1500);
+                }
+            },
+        });
+    }
+
+    /**
+     * Update tooltip position smoothly during modal animation using RAF
+     *
+     * Continuously updates tooltip position at ~60fps to keep it aligned with
+     * its reference button as the modal resizes and the button moves.
+     * Includes defensive checks to prevent crashes if tooltip is destroyed.
+     *
+     * @param {Object} instance - Tippy.js instance
+     * @param {number} duration - Animation duration in milliseconds (typically 300ms)
+     */
+    function updateRAFPositionTippy(instance, duration) {
+        const startTime = performance.now();
+
+        const updatePosition = (currentTime) => {
+            const elapsed = currentTime - startTime;
+
+            // Defensive check: Stop if tooltip destroyed
+            if (!instance || !instance.popperInstance || !instance.state.isVisible) {
+                return;
+            }
+
+            if (elapsed < duration) {
+                // Keep updating during animation
+                instance.popperInstance.update();
+                requestAnimationFrame(updatePosition);
+            } else {
+                // Final update after animation completes
+                instance.popperInstance.update();
+            }
+        };
+
+        // Start the RAF update loop
+        requestAnimationFrame(updatePosition);
+    }
+
+    /**
+     * Force tooltip to stay visible during modal animation (Desktop only)
+     * Switches to manual mode to prevent mouseleave hide during button position changes
+     * After animation, restores trigger and intelligently hides if not hovering
+     *
+     * @param {Object} instance - Tippy.js instance
+     * @param {number} duration - Duration to keep manual mode (in milliseconds)
+     */
+    function forceManualShowTippy(instance, duration) {
+        const originalTrigger = instance.props.trigger;
+
+        // Switch to manual mode (prevent auto-hide on mouseleave)
+        instance.setProps({trigger: 'manual'});
+
+        // Ensure tooltip is visible
+        if (!instance.state.isVisible) {
+            instance.show();
+        }
+
+        // Restore original trigger after animation completes
+        setTimeout(() => {
+            if (instance) {
+                instance.setProps({trigger: originalTrigger});
+
+                if (!instance.reference.matches(':hover')) {
+                    instance.hide();
+                }
+            }
+        }, duration);
+    }
+
+    // ========================================================================
     // === BUDGET-SPECIFIC FUNCTIONS ===
     // ========================================================================
 
@@ -4207,114 +4320,9 @@
     }
 
     /**
-     * Initialize/Reinitialize tooltips using Tippy.js
-     * Can be called multiple times safely
-     * @param {string} selector - CSS selector (default: '[data-tippy-content]')
+     * Detect if device supports touch events
+     * @returns {boolean} True if touch device (mobile/tablet)
      */
-    function initTippyTooltips(selector = '[data-tippy-content]') {
-        if (typeof tippy === 'undefined') return;
-
-        // Destroy old tooltip instances first to prevent duplicates
-        const elements = document.querySelectorAll(selector);
-        elements.forEach(el => {
-            if (el._tippy) {
-                el._tippy.destroy();
-            }
-        });
-
-        // Create new tooltip instances
-        tippy(selector, {
-            trigger: 'mouseenter focus',
-            // touch: false,
-            placement: 'bottom',
-            maxWidth: 380,
-            animation: 'shift-away-subtle',
-            delay: 100,
-            onShown(instance) {
-                // Auto-hide tooltip cho modal buttons (close, fullscreen)
-                const isModalCloseButton = instance.reference.classList.contains('modal-close-btn');
-                const isModalFullscreenButton = instance.reference.classList.contains('modal-fullscreen-btn');
-
-                // instance.hide();
-                // instance.reference.blur(); // Works well for re-touch requirement
-                if ((isModalCloseButton || isModalFullscreenButton) && isTouchDevice()) {
-                    setTimeout(() => {
-                        if (instance.state.isVisible) {
-                            instance.hide();
-                            // instance.reference.blur(); // Works well for re-touch requirement
-                        }
-                    }, isModalCloseButton ? 300 : 1500);
-                }
-            },
-        });
-    }
-
-    /**
-     * Update tooltip position smoothly during modal animation using RAF
-     *
-     * Continuously updates tooltip position at ~60fps to keep it aligned with
-     * its reference button as the modal resizes and the button moves.
-     * Includes defensive checks to prevent crashes if tooltip is destroyed.
-     *
-     * @param {Object} instance - Tippy.js instance
-     * @param {number} duration - Animation duration in milliseconds (typically 300ms)
-     */
-    function updateRAFPositionTippy(instance, duration) {
-        const startTime = performance.now();
-
-        const updatePosition = (currentTime) => {
-            const elapsed = currentTime - startTime;
-
-            // Defensive check: Stop if tooltip destroyed
-            if (!instance || !instance.popperInstance || !instance.state.isVisible) {
-                return;
-            }
-
-            if (elapsed < duration) {
-                // Keep updating during animation
-                instance.popperInstance.update();
-                requestAnimationFrame(updatePosition);
-            } else {
-                // Final update after animation completes
-                instance.popperInstance.update();
-            }
-        };
-
-        // Start the RAF update loop
-        requestAnimationFrame(updatePosition);
-    }
-
-    /**
-     * Force tooltip to stay visible during modal animation (Desktop only)
-     * Switches to manual mode to prevent mouseleave hide during button position changes
-     * After animation, restores trigger and intelligently hides if not hovering
-     *
-     * @param {Object} instance - Tippy.js instance
-     * @param {number} duration - Duration to keep manual mode (in milliseconds)
-     */
-    function forceManualShowTippy(instance, duration) {
-        const originalTrigger = instance.props.trigger;
-
-        // Switch to manual mode (prevent auto-hide on mouseleave)
-        instance.setProps({trigger: 'manual'});
-
-        // Ensure tooltip is visible
-        if (!instance.state.isVisible) {
-            instance.show();
-        }
-
-        // Restore original trigger after animation completes
-        setTimeout(() => {
-            if (instance) {
-                instance.setProps({trigger: originalTrigger});
-
-                if (!instance.reference.matches(':hover')) {
-                    instance.hide();
-                }
-            }
-        }, duration);
-    }
-
     function isTouchDevice() {
         return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     }
