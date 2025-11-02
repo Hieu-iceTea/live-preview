@@ -3137,27 +3137,82 @@
 
                 // Update position smoothly during animation using RAF (requestAnimationFrame)
                 if (instance.popperInstance) {
-                    const startTime = performance.now();
                     const duration = 300; // Match CSS transition duration
 
-                    const updatePosition = (currentTime) => {
-                        const elapsed = currentTime - startTime;
+                    if (!isTouchDevice()) { // Desktop
+                        forceManualShowTippy(instance, duration + 300); // 300ms is showtime
+                    }
 
-                        if (elapsed < duration) {
-                            // Keep updating during animation
-                            instance.popperInstance.update();
-                            requestAnimationFrame(updatePosition);
-                        } else {
-                            // Final update after animation completes
-                            instance.popperInstance.update();
-                        }
-                    };
-
-                    // Start the update loop
-                    requestAnimationFrame(updatePosition);
+                    updateRAFPositionTippy(instance, duration);
                 }
             }
         }
+    }
+
+    /**
+     * Update tooltip position smoothly during modal animation using RAF
+     *
+     * Continuously updates tooltip position at ~60fps to keep it aligned with
+     * its reference button as the modal resizes and the button moves.
+     * Includes defensive checks to prevent crashes if tooltip is destroyed.
+     *
+     * @param {Object} instance - Tippy.js instance
+     * @param {number} duration - Animation duration in milliseconds (typically 300ms)
+     */
+    function updateRAFPositionTippy(instance, duration) {
+        const startTime = performance.now();
+
+        const updatePosition = (currentTime) => {
+            const elapsed = currentTime - startTime;
+
+            // Defensive check: Stop if tooltip destroyed
+            if (!instance || !instance.popperInstance || !instance.state.isVisible) {
+                return;
+            }
+
+            if (elapsed < duration) {
+                // Keep updating during animation
+                instance.popperInstance.update();
+                requestAnimationFrame(updatePosition);
+            } else {
+                // Final update after animation completes
+                instance.popperInstance.update();
+            }
+        };
+
+        // Start the RAF update loop
+        requestAnimationFrame(updatePosition);
+    }
+
+    /**
+     * Force tooltip to stay visible during modal animation (Desktop only)
+     * Switches to manual mode to prevent mouseleave hide during button position changes
+     * After animation, restores trigger and intelligently hides if not hovering
+     *
+     * @param {Object} instance - Tippy.js instance
+     * @param {number} duration - Duration to keep manual mode (in milliseconds)
+     */
+    function forceManualShowTippy(instance, duration) {
+        const originalTrigger = instance.props.trigger;
+
+        // Switch to manual mode (prevent auto-hide on mouseleave)
+        instance.setProps({trigger: 'manual'});
+
+        // Ensure tooltip is visible
+        if (!instance.state.isVisible) {
+            instance.show();
+        }
+
+        // Restore original trigger after animation completes
+        setTimeout(() => {
+            if (instance) {
+                instance.setProps({trigger: originalTrigger});
+
+                if (!instance.reference.matches(':hover')) {
+                    instance.hide();
+                }
+            }
+        }, duration);
     }
 
     /**
@@ -3629,7 +3684,7 @@
 
         // Group by paidBy
         rows.forEach(row => {
-            const person = row.paidBy || 'Không xác định';
+            const person = row.paidBy || 'N/A';
             if (!grouped[person]) {
                 grouped[person] = [];
                 personTotals[person] = 0;
