@@ -1782,7 +1782,7 @@
                             "places": [
                                 {
                                     "name": "Khu du lịch sinh thái Tràng An",
-                                    "description": "Di sản UNESCO. Có 3 tuyến, thuyền đi 4-6 người. Tour kéo dài ~3 tiếng qua hang động, hồ nước, núi đá vôi, thăm đền chùa cổ. Gợi ý: Tuyến 2 hoặc 3 phù hợp với lịch trình 3 tiếng.\n\n* **Tuyến 1 (Dài nhất 3.5-4h):** 9 hang, 3 đền (Đền Trình, Đền Trần, Phủ Khống). Chuyên sâu khám phá hang động.\n* **Tuyến 2 (Ngắn nhất ~2.5h):** 4 hang, 3 đền, có Phim trường Kong. Cảnh đẹp, thơ mộng, được yêu thích.\n* **Tuyến 3 (Cân bằng ~3h):** 3 hang, 3 đền, (nhiều hang động dài) có Hang Đột (dài 1000m) + Phim trường Kong.",
+                                    "description": "Di sản UNESCO. Thuyền đi 6-8 người. Tour kéo dài ~3 tiếng qua hang động, hồ nước, núi đá vôi, thăm đền chùa cổ. Có 3 tuyến. Gợi ý: Tuyến 2 hoặc 3 phù hợp với lịch trình 3 tiếng.\n‣ [Tuyến 1 (Dài nhất 3.5-4h)]: 9 hang, 3 đền (Đền Trình, Đền Trần, Phủ Khống). Chuyên sâu khám phá hang động.\n‣ [Tuyến 2 (Ngắn nhất ~2.5h)]: 4 hang, 3 đền, có Phim trường Kong. Cảnh đẹp, thơ mộng, được yêu thích.\n‣ [Tuyến 3 (Cân bằng ~3h)]: 3 hang, 3 đền, (nhiều hang động dài) có Hang Đột (dài 1000m) + Phim trường Kong.",
                                     "mapUrl": "https://maps.app.goo.gl/R7y4EViUgpEW1Gg29"
                                 },
                                 {
@@ -1924,7 +1924,7 @@
                             "places": [
                                 {
                                     "name": "Chùa Bái Đính",
-                                    "description": "Quần thể chùa lớn nhất Việt Nam. Rất rộng, đi bộ nhiều. Gợi ý: tập trung vào các điện chính, bỏ qua các điểm nhỏ nếu không đủ giờ. Lộ trình gợi ý (Khu Mới):\n\n* 1. Xe điện vào Cổng Tam Quan.\n* 2. Đi bộ qua **Hành lang La Hán** (500 tượng).\n* 3. Tham quan **Điện Pháp Chủ** (Tượng Phật Thích Ca).\n* 4. Tham quan **Điện Tam Thế** (Điện lớn nhất).\n* **Tùy chọn A (Nếu kịp):** Lên **Bảo Tháp** (vé 60k, ngắm toàn cảnh).\n* **Tùy chọn B (Nên bỏ qua):** **Khu Chùa Cổ** (phải leo 300 bậc).",
+                                    "description": "Quần thể chùa lớn nhất Việt Nam. Rất rộng, đi bộ nhiều. Gợi ý: tập trung vào các điện chính, bỏ qua các điểm nhỏ nếu không đủ giờ. Lộ trình gợi ý (Khu Mới):\n‣ 1. Xe điện vào Cổng Tam Quan.\n‣ 2. Đi bộ qua 'Hành lang La Hán' (500 tượng).\n‣ 3. Tham quan 'Điện Pháp Chủ' (Tượng Phật Thích Ca).\n‣ 4. Tham quan 'Điện Tam Thế' (Điện lớn nhất).\n‣ [Tùy chọn A (Nếu kịp)]: Lên 'Bảo Tháp' (vé 60k, ngắm toàn cảnh).\n‣ [Tùy chọn B (Nên bỏ qua)]: 'Khu Chùa Cổ' (phải leo 300 bậc).",
                                     "mapUrl": ""
                                 },
                                 {
@@ -2627,7 +2627,9 @@
                     if (typeof item === 'object' && item !== null) {
                         // Render map icon inline (tự động tạo URL nếu mapUrl là empty string)
                         const mapIcon = renderPlaceMapIcon(item.name, item.mapUrl);
-                        return `<li><strong>${item.name}${mapIcon}${item.description ? ':' : ''}</strong> ${item.description}</li>`;
+                        return `<li><strong>${item.name}${mapIcon}${item.description ? ':' : ''}</strong>
+                                    <span class="whitespace-pre-line">${item.description}</span>
+                                </li>`;
                     }
                     // Backward compatibility: Nếu vẫn là string
                     return `<li>${item}</li>`;
