@@ -3469,8 +3469,10 @@
             fullscreenBtn.setAttribute('data-tippy-content', 'Phóng to toàn màn hình');
         }
 
-        // Update URL
-        syncModalStateToURL(modalElement, isFullscreen);
+        // Update URL (chỉ khi syncUrl = true)
+        if (modalElement['_modalConfig']?.syncUrl !== false) { // Default true nếu undefined
+            syncModalStateToURL(modalElement, isFullscreen);
+        }
 
         // Refresh tippy
         if (window.tippy) {
@@ -3576,8 +3578,17 @@
 
         // Sync URL params when opening modal
         const container = modalElement.querySelector('.modal-container');
-        const isFullscreen = container && container.classList.contains('fullscreen');
-        syncModalStateToURL(modalElement, isFullscreen);
+
+        // Apply fullscreen nếu config = true
+        if (modalElement['_modalConfig']?.fullscreen && container) {
+            container.classList.add('fullscreen');
+        }
+
+        // Sync URL params (chỉ khi syncUrl = true)
+        if (modalElement['_modalConfig']?.syncUrl !== false) { // Default true nếu undefined
+            const isFullscreen = container && container.classList.contains('fullscreen');
+            syncModalStateToURL(modalElement, isFullscreen);
+        }
 
         modalElement['_modalConfig']?.onOpen?.(modalElement);
     }
@@ -3598,8 +3609,10 @@
         // Unlock body scroll immediately for better UX
         document.body.style.overflow = '';
 
-        // Remove URL params when closing modal
-        removeUrlParams(['modal', 'modal-fullscreen']);
+        // Remove URL params when closing modal (chỉ khi syncUrl = true)
+        if (modalElement['_modalConfig']?.syncUrl !== false) { // Default true nếu undefined
+            removeUrlParams(['modal', 'modal-fullscreen']);
+        }
 
         modalElement['_modalConfig']?.onClose?.(modalElement);
     }
@@ -3618,6 +3631,8 @@
      * @param {boolean} config.showFullscreenButton - Hiển thị nút fullscreen (default: true)
      * @param {boolean} config.backdropClosable - Cho phép đóng khi click backdrop (default: true)
      * @param {boolean} config.escapeClosable - Cho phép đóng khi nhấn ESC (default: true)
+     * @param {boolean} config.fullscreen - Mở modal ở chế độ toàn màn hình (default: false)
+     * @param {boolean} config.syncUrl - Đồng bộ trạng thái modal với URL params (default: true)
      * @returns {HTMLElement} Modal element
      * @throws {Error} Nếu ID đã tồn tại hoặc thiếu required fields
      */
@@ -3629,7 +3644,9 @@
             showCloseButton = true,
             showFullscreenButton = true,
             backdropClosable = true,
-            escapeClosable = true
+            escapeClosable = true,
+            fullscreen = false,
+            syncUrl = true,
         } = config;
 
         // Validate required fields
@@ -3655,6 +3672,8 @@
         modalElement._modalConfig = {
             onClose: config.onClose,
             onOpen: config.onOpen,
+            fullscreen: fullscreen,
+            syncUrl: syncUrl
         };
 
         // Setup listeners using helper
@@ -3792,11 +3811,9 @@
             showFullscreenButton: false,
             backdropClosable: false,
             escapeClosable: false,
+            fullscreen: true,   // Mở ở chế độ toàn màn hình
+            syncUrl: false,     // Không đồng bộ URL params
             onOpen: (modalElement) => {
-                // Force fullscreen
-                const container = modalElement.querySelector('.modal-container');
-                container.classList.add('fullscreen');
-
                 // Focus input
                 setTimeout(() => {
                     const input = document.getElementById('auth-password-input');
