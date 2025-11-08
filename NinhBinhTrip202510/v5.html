@@ -1142,7 +1142,7 @@
     //    - Nếu muốn ẩn 1 hoạt động tạm thời: Comment toàn bộ object {...} của item đó
     //
     // ========================================================================
-    const scheduleData = {
+    const scheduleData_NinhBinh202511 = {
         "tripInfo": {
             "title": "Ninh Bình trip 2025", // Đổi tiêu đề
             "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
@@ -2166,6 +2166,22 @@
         ]
     };
 
+    // Danh sách các schedules có sẵn
+    const SCHEDULE_LIST = [
+        {
+            key: "NinhBinh202511",
+            scheduleData: scheduleData_NinhBinh202511
+        },
+    ];
+
+    /**
+     * Schedule data được load từ URL param
+     * Load ngay khi khởi tạo script để validate sớm
+     * Nếu có lỗi (thiếu param hoặc param không hợp lệ) → throw error và dừng script
+     * @type {Object}
+     */
+    const scheduleData = loadScheduleData();
+
     // --- ICON SVG (Lấy từ v2.html) ---
     // ĐÃ CHỈNH SỬA: Thay đổi kích thước (width, height) thành 16
     // và màu (stroke) thành "white" để khớp với icon 24px mới
@@ -2881,6 +2897,51 @@
             return simulatedDate;
         }
         return new Date();
+    }
+
+    /**
+     * Hiển thị lỗi và dừng script
+     */
+    function showErrorAndStop(message, error) {
+        console.error('[ERROR]', error, message);
+        alert(`❌ Lỗi: ${message} \n\n [${error}]`);
+        throw new Error(`${error}. ${message}`);
+    }
+
+    function getScheduleKeyUrlParam() {
+        const scheduleKey = getUrlParam('schedule');
+
+        // Check có param không
+        if (!scheduleKey) {
+            showErrorAndStop(
+                'Thiếu tham số "schedule" trong URL.\n\nVí dụ: ?schedule=Hà_Nội_2025\n\nVui lòng liên hệ Hiếu iceTea để tìm hiểu thêm.',
+                'Missing schedule parameter'
+            )
+        }
+
+        return scheduleKey;
+    }
+
+    /**
+     * Load và validate schedule từ URL param
+     * @returns {Object} Schedule data nếu hợp lệ
+     * @throws {Error} Nếu thiếu param hoặc schedule không tồn tại
+     */
+    function loadScheduleData() {
+        const scheduleKey = getScheduleKeyUrlParam();
+
+        // Tìm trong SCHEDULE_LIST (Array.find - O(n))
+        const scheduleItem = SCHEDULE_LIST.find(s => s.key === scheduleKey);
+
+        if (!scheduleItem) {
+            showErrorAndStop(
+                `Schedule không tồn tại: "${scheduleKey}"\n\nVui lòng liên hệ Hiếu iceTea để lấy các mã Schedule hợp lệ.`,
+                `Invalid schedule: ${scheduleKey}`
+            )
+        }
+
+        // Return schedule data
+        return scheduleItem.scheduleData;
     }
 
     /**
