@@ -2883,8 +2883,31 @@
         return new Date();
     }
 
-    // Cập nhật URL param
-    function updateUrlParams() {
+    /**
+     * Lấy giá trị URL parameter
+     * Ví dụ: ?schedule=ABC&time=123 -> getUrlParam('schedule') = 'ABC'
+     */
+    function getUrlParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    /**
+     * Xóa URL parameter(s)
+     * Ví dụ:
+     *   removeUrlParams('time')                              // Xóa 1 param
+     *   removeUrlParams(['modal', 'modal-fullscreen'])       // Xóa nhiều params
+     */
+    function removeUrlParams(names) {
+        const nameArray = Array.isArray(names) ? names : [names];
+        const params = new URLSearchParams(window.location.search);
+        nameArray.forEach(name => params.delete(name));
+        const newURL = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        window.history.replaceState({}, '', newURL);
+    }
+
+    // Cập nhật URL param cho time simulation
+    function updateTimeUrlParams() {
         // (ĐÃ SỬA LỖI)
         // Bọc toàn bộ hàm trong try...catch
         // Lỗi SecurityError xảy ra khi chạy trong một số môi trường (như blob: URL)
@@ -3311,11 +3334,7 @@
         document.body.style.overflow = '';
 
         // Remove URL params when closing modal
-        const params = new URLSearchParams(window.location.search);
-        params.delete('modal');
-        params.delete('modal-fullscreen');
-        const newURL = params.toString() ? `?${params.toString()}` : window.location.pathname;
-        window.history.replaceState({}, '', newURL);
+        removeUrlParams(['modal', 'modal-fullscreen']);
     }
 
     /**
@@ -4433,7 +4452,7 @@
         // Hàm xử lý khi thời gian giả lập thay đổi
         function handleSimulatedTimeChange() {
             updateTimeline();
-            updateUrlParams(); // Cập nhật URL
+            updateTimeUrlParams(); // Cập nhật URL
         }
 
         // Sự kiện cho nút reset
@@ -4451,8 +4470,7 @@
         // Giúp bạn chia sẻ link với thời gian giả lập
         // ví dụ: ...NinhBinh_v3.html?time=2025-11-15T09:30:00
         try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const timeParam = urlParams.get('time');
+            const timeParam = getUrlParam('time');
 
             if (timeParam) {
                 const simulatedDate = new Date(timeParam);
@@ -4485,9 +4503,8 @@
         // --- AUTO-OPEN MODAL FROM URL PARAMS ---
         // Check if modal param exists (?modal=budget&modal-fullscreen=true)
         try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const modalParam = urlParams.get('modal');
-            const modalFullscreenParam = urlParams.get('modal-fullscreen');
+            const modalParam = getUrlParam('modal');
+            const modalFullscreenParam = getUrlParam('modal-fullscreen');
 
             if (modalParam === 'budget') {
                 // Open budget modal
