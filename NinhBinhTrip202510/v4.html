@@ -3219,21 +3219,35 @@
      * @param {string} id - ID của modal (phải unique)
      * @param {string} title - Tiêu đề modal
      * @param {string} contentHTML - Nội dung HTML
+     * @param {boolean} showFullscreenButton - Hiển thị nút fullscreen (default: true)
+     * @param {boolean} showCloseButton - Hiển thị nút close (default: true)
      * @returns {string} - HTML string
      */
-    function createModalHTML(id, title, contentHTML) {
+    function createModalHTML(id, title, contentHTML, showFullscreenButton = true, showCloseButton = true) {
+        // Build header buttons HTML
+        let buttonsHTML = '';
+
+        if (showFullscreenButton) {
+            buttonsHTML += `
+                <button class="modal-fullscreen-btn" aria-label="Phóng to toàn màn hình" data-tippy-content="Phóng to toàn màn hình">
+                    <span class="fullscreen-expand-icon">${MODAL_ICONS.expand}</span>
+                    <span class="fullscreen-shrink-icon" style="display: none;">${MODAL_ICONS.shrink}</span>
+                </button>
+            `;
+        }
+
+        if (showCloseButton) {
+            buttonsHTML += `
+                <button class="modal-close-btn" aria-label="Đóng" data-tippy-content="Đóng">✕</button>
+            `;
+        }
+
         return `
             <div id="${id}" class="modal-backdrop hidden">
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 class="modal-title">${title}</h2>
-                        <div class="modal-header-buttons">
-                            <button class="modal-fullscreen-btn" aria-label="Phóng to toàn màn hình" data-tippy-content="Phóng to toàn màn hình">
-                                <span class="fullscreen-expand-icon">${MODAL_ICONS.expand}</span>
-                                <span class="fullscreen-shrink-icon" style="display: none;">${MODAL_ICONS.shrink}</span>
-                            </button>
-                            <button class="modal-close-btn" aria-label="Đóng" data-tippy-content="Đóng">✕</button>
-                        </div>
+                        ${buttonsHTML ? `<div class="modal-header-buttons">${buttonsHTML}</div>` : ''}
                     </div>
                     <div class="modal-body">
                         ${contentHTML}
@@ -3323,8 +3337,10 @@
     /**
      * Setup event listeners cho modal
      * @param {HTMLElement} modalElement - Modal element
+     * @param {boolean} backdropClosable - Cho phép đóng khi click backdrop (default: true)
+     * @param {boolean} escapeClosable - Cho phép đóng khi nhấn ESC (default: true)
      */
-    function setupModalListeners(modalElement) {
+    function setupModalListeners(modalElement, backdropClosable = true, escapeClosable = true) {
         const closeBtn = modalElement.querySelector('.modal-close-btn');
         const fullscreenBtn = modalElement.querySelector('.modal-fullscreen-btn');
 
@@ -3332,31 +3348,37 @@
             closeModal(modalElement);
         };
 
-        // Close button
-        closeBtn.addEventListener('click', closeHandler);
+        // Close button (nếu có)
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeHandler);
+        }
 
-        // Fullscreen button
+        // Fullscreen button (nếu có)
         if (fullscreenBtn) {
             fullscreenBtn.addEventListener('click', () => {
                 toggleModalFullscreen(modalElement);
             });
         }
 
-        // Backdrop click (click ra ngoài để đóng)
-        modalElement.addEventListener('click', (e) => {
-            if (e.target === modalElement) closeHandler();
-        });
+        // Backdrop click (click ra ngoài để đóng. có thể disable)
+        if (backdropClosable) {
+            modalElement.addEventListener('click', (e) => {
+                if (e.target === modalElement) closeHandler();
+            });
+        }
 
-        // ESC key (chỉ đóng nếu modal đang show)
-        const escHandler = (e) => {
-            if (e.key === 'Escape' && modalElement.classList.contains('show')) {
-                closeHandler();
-            }
-        };
-        document.addEventListener('keydown', escHandler);
+        // ESC key (chỉ đóng nếu modal đang show. có thể disable)
+        if (escapeClosable) {
+            const escHandler = (e) => {
+                if (e.key === 'Escape' && modalElement.classList.contains('show')) {
+                    closeHandler();
+                }
+            };
+            document.addEventListener('keydown', escHandler);
 
-        // Store handler để có thể remove sau này (nếu cần cleanup)
-        modalElement._escHandler = escHandler;
+            // Store handler để có thể remove sau này (nếu cần cleanup)
+            modalElement._escHandler = escHandler;
+        }
     }
 
     /**
@@ -3374,6 +3396,8 @@
         const container = modalElement.querySelector('.modal-container');
         const isFullscreen = container && container.classList.contains('fullscreen');
         syncModalStateToURL(modalElement, isFullscreen);
+
+        modalElement['_modalConfig']?.onOpen?.(modalElement);
     }
 
     /**
@@ -3407,11 +3431,24 @@
      * @param {string} config.title - Tiêu đề modal (required)
      * @param {string} config.content - Nội dung HTML (required)
      * @param {Function} config.onClose - Callback khi đóng (optional)
+     * @param {Function} config.onOpen - Callback khi mở (optional)
+     * @param {boolean} config.showCloseButton - Hiển thị nút close (default: true)
+     * @param {boolean} config.showFullscreenButton - Hiển thị nút fullscreen (default: true)
+     * @param {boolean} config.backdropClosable - Cho phép đóng khi click backdrop (default: true)
+     * @param {boolean} config.escapeClosable - Cho phép đóng khi nhấn ESC (default: true)
      * @returns {HTMLElement} Modal element
      * @throws {Error} Nếu ID đã tồn tại hoặc thiếu required fields
      */
     function createModal(config) {
-        const {id, title, content} = config;
+        const {
+            id,
+            title,
+            content,
+            showCloseButton = true,
+            showFullscreenButton = true,
+            backdropClosable = true,
+            escapeClosable = true
+        } = config;
 
         // Validate required fields
         if (!id || !title || !content) {
@@ -3426,7 +3463,7 @@
         }
 
         // Create HTML using helper
-        const modalHTML = createModalHTML(id, title, content);
+        const modalHTML = createModalHTML(id, title, content, showFullscreenButton, showCloseButton);
 
         // Insert vào DOM
         document.body.insertAdjacentHTML('beforeend', modalHTML);
@@ -3435,10 +3472,11 @@
         // Store config để có thể truy vấn
         modalElement._modalConfig = {
             onClose: config.onClose,
+            onOpen: config.onOpen,
         };
 
         // Setup listeners using helper
-        setupModalListeners(modalElement);
+        setupModalListeners(modalElement, backdropClosable, escapeClosable);
 
         return modalElement;
     }
