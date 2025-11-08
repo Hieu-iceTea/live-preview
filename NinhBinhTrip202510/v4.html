@@ -496,6 +496,46 @@
             border-radius: 0; /* Remove border-radius in fullscreen */
         }
 
+        /* ============================================================================
+           AUTH MODAL
+           ============================================================================ */
+
+        #auth-modal .modal-header {
+            justify-content: center;
+            padding: 2rem;
+            border-bottom: none;
+        }
+
+        #auth-modal .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        #auth-modal .modal-body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Auth modal: Always fullscreen, custom background */
+        #auth-modal .modal-container.fullscreen {
+            background-color: #ffffff;
+        }
+
+        /* Shake animation for error */
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-10px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(10px);
+            }
+        }
+
         /* Budget table wrapper (for horizontal scroll) */
         .budget-table-wrapper {
             flex: 1; /* Take all remaining space after toolbar */
@@ -971,6 +1011,17 @@
     // ========================================================================
 
     /**
+     * Cấu hình toàn cục cho ứng dụng
+     */
+    const CONFIG = {
+        appName: 'trip-plan',
+        auth: {
+            defaultExpiryHours: 0.05, // Thời hạn lưu auth mặc định
+            version: '1.0', // Phiên bản auth (để migration sau này nếu cần)
+        }
+    };
+
+    /**
      * Category mapping for budget display
      * Maps category codes to display names and icons
      */
@@ -1150,6 +1201,10 @@
             "defaultRegion": "Ninh Bình", // Vùng/tỉnh mặc định cho tìm kiếm bản đồ
             "totalBudget": undefined, // Tổng chi phí chuyến đi. (Tổng cho tất cả mọi người). Không điền để tính tự động. Điền để hiển thị số liệu tính toán bằng tay.
             "documentUrl": "https://docs.google.com/spreadsheets/d/1N9SNB6n3YJ2kndi1_ZtQd0aFdE9Ib-UudKnR86DUdbQ"
+        },
+        "security": {
+            "secretCode": "MTIzNA==",  // Base64 encoded password. Để encode: btoa("your-password"). Ví dụ: btoa("1234") = "MTIzNA=="
+            "hint": "Ngày sinh của \"người ấy\" là gì?"  // Gợi ý mật khẩu (optional)
         },
         "schedule": [
             // NGÀY 1
@@ -3196,6 +3251,129 @@
     }
 
     // ========================================================================
+    // === AUTHENTICATION HELPERS ===
+    // ========================================================================
+
+    /**
+     * Tạo localStorage key cho schedule cụ thể
+     * @param {string} scheduleKey - Key của schedule
+     * @returns {string} - localStorage key
+     */
+    function getAuthStorageKey(scheduleKey) {
+        return `${CONFIG.appName}:auth:${scheduleKey}`;
+    }
+
+    /**
+     * Lưu thông tin đăng nhập vào localStorage
+     * @param {string} scheduleKey - Key của schedule
+     * @param {string} encodedPassword - Mật khẩu đã mã hóa Base64
+     */
+    function saveAuthData(scheduleKey, encodedPassword) {
+        const key = getAuthStorageKey(scheduleKey);
+
+        // Tính thời điểm hết hạn: Thời gian hiện tại + thời lượng cấu hình
+        // Ví dụ: defaultExpiryHours = 24 → expiry sau 24 giờ (1 ngày)
+        // Công thức: hours → minutes (×60) → seconds (×60) → milliseconds (×1000)
+        const expiry = Date.now() + (CONFIG.auth.defaultExpiryHours * 60 * 60 * 1000);
+
+        const authData = {
+            encodedPassword: encodedPassword,
+            expiry: expiry,
+            scheduleKey: scheduleKey,
+            version: CONFIG.auth.version
+        };
+
+        try {
+            localStorage.setItem(key, JSON.stringify(authData));
+        } catch (e) {
+            console.warn('Failed to save auth data to localStorage:', e);
+        }
+    }
+
+    /**
+     * Lấy thông tin đăng nhập từ localStorage
+     * @param {string} scheduleKey - Key của schedule
+     * @returns {Object|null} - Auth data hoặc null nếu không có/hết hạn
+     */
+    function getAuthData(scheduleKey) {
+        const key = getAuthStorageKey(scheduleKey);
+
+        try {
+            const data = localStorage.getItem(key);
+            if (!data) return null;
+
+            const authData = JSON.parse(data);
+
+            // Kiểm tra expiry
+            if (Date.now() > authData.expiry) {
+                // Hết hạn → xóa
+                clearAuthData(scheduleKey)
+                return null;
+            }
+
+            return authData;
+        } catch (e) {
+            console.warn('Failed to read auth data from localStorage:', e);
+            return null;
+        }
+    }
+
+    /**
+     * Xóa thông tin đăng nhập khỏi localStorage
+     * @param {string} scheduleKey - Key của schedule
+     */
+    function clearAuthData(scheduleKey) {
+        const key = getAuthStorageKey(scheduleKey);
+        try {
+            localStorage.removeItem(key);
+        } catch (e) {
+            console.warn('Failed to clear auth data:', e);
+        }
+    }
+
+    /**
+     * Kiểm tra mật khẩu có đúng không
+     * @param {string} inputPassword - Password người dùng nhập (plain text)
+     * @param {string} correctPassword - Password đúng từ scheduleData (Base64)
+     * @returns {boolean} - True nếu đúng
+     */
+    function verifyPassword(inputPassword, correctPassword) {
+        try {
+            // Encode input password to Base64
+            const encodedInput = btoa(inputPassword);
+            return encodedInput === correctPassword;
+        } catch (e) {
+            console.error('Failed to verify password:', e);
+            return false;
+        }
+    }
+
+    /**
+     * Kiểm tra authentication khi load trang
+     * @param {string} scheduleKey - Key của schedule hiện tại
+     * @param {string} correctPassword - Password đúng từ scheduleData (Base64)
+     * @returns {boolean} - True nếu đã authenticated
+     */
+    function checkAuthentication(scheduleKey, correctPassword) {
+        const authData = getAuthData(scheduleKey);
+
+        if (!authData) {
+            // Chưa đăng nhập
+            return false;
+        }
+
+        // Kiểm tra password có khớp không
+        if (authData.encodedPassword !== correctPassword) {
+            // Password không khớp (có thể đã đổi password trong scheduleData)
+            clearAuthData(scheduleKey);
+            return false;
+        }
+
+        // Authenticated thành công
+        return true;
+    }
+
+    // ========================================================================
     // === MODAL HELPER FUNCTIONS ===
     // ========================================================================
 
@@ -3479,6 +3657,149 @@
         setupModalListeners(modalElement, backdropClosable, escapeClosable);
 
         return modalElement;
+    }
+
+    // ========================================================================
+    // === AUTH MODAL ===
+    // ========================================================================
+
+    /**
+     * Tạo và hiển thị Auth Modal
+     * @param {string} scheduleKey - Key của schedule hiện tại
+     * @param {string} correctPassword - Password đúng từ scheduleData (Base64)
+     * @param {Function} onSuccess - Callback khi auth thành công
+     */
+    function showAuthModal(scheduleKey, correctPassword, onSuccess) {
+        // Lấy hint từ scheduleData nếu có
+        const hint = scheduleData.security?.hint || null;
+
+        // Tạo hint HTML nếu có (đặt dưới error message)
+        const hintHTML = hint ? `
+            <div id="auth-hint-message" class="flex items-start gap-2 text-blue-500 text-sm leading-snug mt-4">
+                <span class="shrink-0">💡</span>
+                <span>${hint}</span>
+            </div>
+        ` : '';
+
+        const contentHTML = `
+            <div class="max-w-sm w-full">
+                <div class="text-center mb-8">
+                    <div class="text-5xl mb-4">🔒</div>
+                    <p class="text-gray-500 text-base leading-normal">
+                        Vui lòng nhập mã bảo mật để xem nội dung
+                    </p>
+                </div>
+                
+                <div class="mb-6">
+                    <input 
+                        type="password" 
+                        id="auth-password-input" 
+                        placeholder="Nhập mã bảo mật"
+                        class="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg outline-none transition-colors duration-200 focus:border-blue-400"
+                        autocomplete="off"
+                    />
+                    <div id="auth-error-message" class="hidden text-red-500 text-sm leading-snug mt-2">
+                        ❌ Mã bảo mật không đúng. Vui lòng thử lại.
+                    </div>
+                    ${hintHTML}
+                </div>
+                
+                <button 
+                    id="auth-submit-btn"
+                    class="w-full px-4 py-3 text-base font-semibold text-white bg-blue-500 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-600"
+                >
+                    Xác nhận
+                </button>
+            </div>
+        `;
+
+        const authModal = createModal({
+            id: 'auth-modal',
+            title: 'Xác Thực',
+            content: contentHTML,
+            showCloseButton: false,
+            showFullscreenButton: false,
+            backdropClosable: false,
+            escapeClosable: false,
+            onOpen: (modalElement) => {
+                // Force fullscreen
+                const container = modalElement.querySelector('.modal-container');
+                container.classList.add('fullscreen');
+
+                // Focus input
+                setTimeout(() => {
+                    const input = document.getElementById('auth-password-input');
+                    if (input) input.focus();
+                }, 300);
+            }
+        });
+
+        // Setup form handlers
+        const input = document.getElementById('auth-password-input');
+        const submitBtn = document.getElementById('auth-submit-btn');
+        const errorMsg = document.getElementById('auth-error-message');
+
+        const handleSubmit = () => {
+            const inputValue = input.value.trim();
+
+            if (!inputValue) {
+                showError();
+                return;
+            }
+
+            if (verifyPassword(inputValue, correctPassword)) {
+                // Success
+                saveAuthData(scheduleKey, correctPassword);
+                closeModal(authModal);
+                if (onSuccess) onSuccess();
+            } else {
+                // Failed
+                showError();
+            }
+        };
+
+        const showError = () => {
+            errorMsg.style.display = 'block';
+            input.style.borderColor = '#ef4444';
+
+            // Shake animation
+            input.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                input.style.animation = '';
+            }, 500);
+
+            // Clear after 3s
+            setTimeout(() => {
+                errorMsg.style.display = 'none';
+                input.style.borderColor = '#e5e7eb';
+            }, 3000);
+        };
+
+        // Event listeners
+        submitBtn.addEventListener('click', handleSubmit);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSubmit();
+        });
+
+        // Hover effect for button
+        submitBtn.addEventListener('mouseenter', () => {
+            submitBtn.style.backgroundColor = '#2563eb';
+        });
+        submitBtn.addEventListener('mouseleave', () => {
+            submitBtn.style.backgroundColor = '#3b82f6';
+        });
+
+        // Focus effect for input
+        input.addEventListener('focus', () => {
+            input.style.borderColor = '#3b82f6';
+        });
+        input.addEventListener('blur', () => {
+            if (errorMsg.style.display === 'none') {
+                input.style.borderColor = '#e5e7eb';
+            }
+        });
+
+        openModal(authModal)
     }
 
     // ========================================================================
@@ -4531,8 +4852,7 @@
         openModal(budgetModalElement);
     }
 
-    // --- KHỞI CHẠY ---
-    document.addEventListener('DOMContentLoaded', () => {
+    function initializeApp() {
         // Render lịch trình lần đầu
         renderTimeline(scheduleData);
 
@@ -4644,6 +4964,34 @@
 
         // Chạy lần đầu tiên khi tải trang
         updateTimeline();
+    }
+
+    // --- KHỞI CHẠY ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Lấy schedule key từ URL
+        const scheduleKey = getScheduleKeyUrlParam();
+
+        // Kiểm tra xem schedule có yêu cầu authentication không
+        const requiresAuth = scheduleData.security && scheduleData.security.secretCode;
+
+        if (requiresAuth) {
+            // Kiểm tra authentication
+            const isAuthenticated = checkAuthentication(scheduleKey, scheduleData.security.secretCode);
+
+            if (isAuthenticated) {
+                // Đã authenticated → khởi tạo app
+                initializeApp();
+            } else {
+                // Chưa authenticated → hiển thị auth modal
+                showAuthModal(scheduleKey, scheduleData.security.secretCode, () => {
+                    // Callback khi auth thành công
+                    initializeApp();
+                });
+            }
+        } else {
+            // Không yêu cầu auth → khởi tạo app bình thường
+            initializeApp();
+        }
     });
 </script>
 </body>
