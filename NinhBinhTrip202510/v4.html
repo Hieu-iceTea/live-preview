@@ -536,6 +536,10 @@
             }
         }
 
+        .animate-shake {
+            animation: shake 0.5s;
+        }
+
         /* Budget table wrapper (for horizontal scroll) */
         .budget-table-wrapper {
             flex: 1; /* Take all remaining space after toolbar */
@@ -1203,8 +1207,8 @@
             "documentUrl": "https://docs.google.com/spreadsheets/d/1N9SNB6n3YJ2kndi1_ZtQd0aFdE9Ib-UudKnR86DUdbQ"
         },
         "security": {
-            "secretCode": "MTIzNA==",  // Base64 encoded password. Để encode: btoa("your-password"). Ví dụ: btoa("1234") = "MTIzNA=="
-            "hint": "Ngày sinh của \"người ấy\" là gì?"  // Gợi ý mật khẩu (optional)
+            "secretCode": "MTQxMQ==",  // Base64 encoded password. Để encode: btoa("your-password"). Ví dụ: btoa("1234") = "MTIzNA=="
+            "hint": "Ngày kỷ niệm của \"đôi ta\" là gì?"  // Gợi ý mật khẩu (optional)
         },
         "schedule": [
             // NGÀY 1
@@ -3734,19 +3738,24 @@
         };
 
         const showError = () => {
-            errorMsg.style.display = 'block';
-            input.style.borderColor = '#ef4444';
+            // Hiển thị error message
+            errorMsg.classList.remove('hidden');
+
+            // Đổi border sang màu đỏ
+            input.classList.remove('border-gray-200', 'focus:border-blue-400');
+            input.classList.add('border-red-500');
 
             // Shake animation
-            input.style.animation = 'shake 0.5s';
+            input.classList.add('animate-shake');
             setTimeout(() => {
-                input.style.animation = '';
+                input.classList.remove('animate-shake');
             }, 500);
 
-            // Clear after 3s
+            // Ẩn error sau 3s
             setTimeout(() => {
-                errorMsg.style.display = 'none';
-                input.style.borderColor = '#e5e7eb';
+                errorMsg.classList.add('hidden');
+                input.classList.remove('border-red-500');
+                input.classList.add('border-gray-200', 'focus:border-blue-400');
             }, 3000);
         };
 
@@ -3756,21 +3765,12 @@
             if (e.key === 'Enter') handleSubmit();
         });
 
-        // Hover effect for button
-        submitBtn.addEventListener('mouseenter', () => {
-            submitBtn.style.backgroundColor = '#2563eb';
-        });
-        submitBtn.addEventListener('mouseleave', () => {
-            submitBtn.style.backgroundColor = '#3b82f6';
-        });
-
-        // Focus effect for input
-        input.addEventListener('focus', () => {
-            input.style.borderColor = '#3b82f6';
-        });
-        input.addEventListener('blur', () => {
-            if (errorMsg.style.display === 'none') {
-                input.style.borderColor = '#e5e7eb';
+        // Ẩn error khi user bắt đầu gõ lại (better UX)
+        input.addEventListener('input', () => {
+            if (!errorMsg.classList.contains('hidden')) {
+                errorMsg.classList.add('hidden');
+                input.classList.remove('border-red-500');
+                input.classList.add('border-gray-200', 'focus:border-blue-400');
             }
         });
     }
