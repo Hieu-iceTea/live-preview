@@ -3323,15 +3323,13 @@
     /**
      * Setup event listeners cho modal
      * @param {HTMLElement} modalElement - Modal element
-     * @param {Function} onClose - Callback khi đóng (optional)
      */
-    function setupModalListeners(modalElement, onClose) {
+    function setupModalListeners(modalElement) {
         const closeBtn = modalElement.querySelector('.modal-close-btn');
         const fullscreenBtn = modalElement.querySelector('.modal-fullscreen-btn');
 
         const closeHandler = () => {
             closeModal(modalElement);
-            if (onClose) onClose();
         };
 
         // Close button
@@ -3396,6 +3394,8 @@
 
         // Remove URL params when closing modal
         removeUrlParams(['modal', 'modal-fullscreen']);
+
+        modalElement['_modalConfig']?.onClose?.(modalElement);
     }
 
     /**
@@ -3411,7 +3411,7 @@
      * @throws {Error} Nếu ID đã tồn tại hoặc thiếu required fields
      */
     function createModal(config) {
-        const {id, title, content, onClose} = config;
+        const {id, title, content} = config;
 
         // Validate required fields
         if (!id || !title || !content) {
@@ -3432,8 +3432,13 @@
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         const modalElement = document.getElementById(id);
 
+        // Store config để có thể truy vấn
+        modalElement._modalConfig = {
+            onClose: config.onClose,
+        };
+
         // Setup listeners using helper
-        setupModalListeners(modalElement, onClose);
+        setupModalListeners(modalElement);
 
         return modalElement;
     }
