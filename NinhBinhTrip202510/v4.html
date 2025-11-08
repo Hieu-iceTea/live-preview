@@ -3663,13 +3663,7 @@
     // === AUTH MODAL ===
     // ========================================================================
 
-    /**
-     * Tạo và hiển thị Auth Modal
-     * @param {string} scheduleKey - Key của schedule hiện tại
-     * @param {string} correctPassword - Password đúng từ scheduleData (Base64)
-     * @param {Function} onSuccess - Callback khi auth thành công
-     */
-    function showAuthModal(scheduleKey, correctPassword, onSuccess) {
+    function renderAuthContent() {
         // Lấy hint từ scheduleData nếu có
         const hint = scheduleData.security?.hint || null;
 
@@ -3681,7 +3675,7 @@
             </div>
         ` : '';
 
-        const contentHTML = `
+        return `
             <div class="max-w-sm w-full">
                 <div class="text-center mb-8">
                     <div class="text-5xl mb-4">🔒</div>
@@ -3689,11 +3683,11 @@
                         Vui lòng nhập mã bảo mật để xem nội dung
                     </p>
                 </div>
-                
+
                 <div class="mb-6">
-                    <input 
-                        type="password" 
-                        id="auth-password-input" 
+                    <input
+                        type="password"
+                        id="auth-password-input"
                         placeholder="Nhập mã bảo mật"
                         class="w-full px-4 py-3 text-base border-2 border-gray-200 rounded-lg outline-none transition-colors duration-200 focus:border-blue-400"
                         autocomplete="off"
@@ -3703,8 +3697,8 @@
                     </div>
                     ${hintHTML}
                 </div>
-                
-                <button 
+
+                <button
                     id="auth-submit-btn"
                     class="w-full px-4 py-3 text-base font-semibold text-white bg-blue-500 rounded-lg cursor-pointer transition-colors duration-200 hover:bg-blue-600"
                 >
@@ -3712,28 +3706,9 @@
                 </button>
             </div>
         `;
+    }
 
-        const authModal = createModal({
-            id: 'auth-modal',
-            title: 'Xác Thực',
-            content: contentHTML,
-            showCloseButton: false,
-            showFullscreenButton: false,
-            backdropClosable: false,
-            escapeClosable: false,
-            onOpen: (modalElement) => {
-                // Force fullscreen
-                const container = modalElement.querySelector('.modal-container');
-                container.classList.add('fullscreen');
-
-                // Focus input
-                setTimeout(() => {
-                    const input = document.getElementById('auth-password-input');
-                    if (input) input.focus();
-                }, 300);
-            }
-        });
-
+    function attachAuthEventListeners(authModal, scheduleKey, correctPassword, onSuccess) {
         // Setup form handlers
         const input = document.getElementById('auth-password-input');
         const submitBtn = document.getElementById('auth-submit-btn');
@@ -3798,6 +3773,39 @@
                 input.style.borderColor = '#e5e7eb';
             }
         });
+    }
+
+    /**
+     * Tạo và hiển thị Auth Modal
+     * @param {string} scheduleKey - Key của schedule hiện tại
+     * @param {string} correctPassword - Password đúng từ scheduleData (Base64)
+     * @param {Function} onSuccess - Callback khi auth thành công
+     */
+    function initAndOpenAuthModal(scheduleKey, correctPassword, onSuccess) {
+        const contentHTML = renderAuthContent();
+
+        const authModal = createModal({
+            id: 'auth-modal',
+            title: 'Xác Thực',
+            content: contentHTML,
+            showCloseButton: false,
+            showFullscreenButton: false,
+            backdropClosable: false,
+            escapeClosable: false,
+            onOpen: (modalElement) => {
+                // Force fullscreen
+                const container = modalElement.querySelector('.modal-container');
+                container.classList.add('fullscreen');
+
+                // Focus input
+                setTimeout(() => {
+                    const input = document.getElementById('auth-password-input');
+                    if (input) input.focus();
+                }, 300);
+            }
+        });
+
+        attachAuthEventListeners(authModal, scheduleKey, correctPassword, onSuccess);
 
         openModal(authModal)
     }
@@ -4983,7 +4991,7 @@
                 initializeApp();
             } else {
                 // Chưa authenticated → hiển thị auth modal
-                showAuthModal(scheduleKey, scheduleData.security.secretCode, () => {
+                initAndOpenAuthModal(scheduleKey, scheduleData.security.secretCode, () => {
                     // Callback khi auth thành công
                     initializeApp();
                 });
