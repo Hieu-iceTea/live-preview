@@ -7,7 +7,7 @@
     <!--
       Tiêu đề tôi lấy từ file index.html của bạn
     -->
-    <title>Your Trip</title>
+    <title>Trip Plan</title>
     <!-- tailwindcss 3.4.17 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="shortcut icon" href="route.png" type="image/x-icon">
@@ -945,14 +945,16 @@
                   ID 'main-title' và 'main-subtitle' được giữ lại từ v2.html
                   để JS tự động điền dữ liệu
                 -->
-                <h1 id="main-title" class="text-3xl font-bold text-blue-600"></h1>
-                <p id="main-subtitle" class="text-lg text-gray-600"></p>
+                <h1 id="main-title" class="text-3xl font-bold text-blue-600">Trip Plan</h1>
+                <p id="main-subtitle" class="text-lg text-gray-600">
+                    Lên kế hoạch & theo dõi chuyến đi của bạn theo thời gian thực.
+                </p>
             </div>
 
             <!-- Đồng hồ thời gian thực (Lấy ID 'real-time-clock' từ v2.html) -->
             <div id="real-time-clock" class="text-center sm:text-right mt-2 sm:mt-0">
-                <div class="font-mono font-bold text-2xl text-gray-900">...</div>
-                <div class="text-sm text-gray-500">...</div>
+                <div class="font-mono font-bold text-2xl text-gray-900">--:--:--</div>
+                <div class="text-sm text-gray-500">--/--/----</div>
             </div>
         </div>
 
