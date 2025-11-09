@@ -3601,7 +3601,9 @@
     }
 
     /**
-     * Đóng modal
+     * Đóng modal (hide, có thể mở lại)
+     * Modal vẫn còn trong DOM. Dùng destroyModal() nếu muốn remove khỏi DOM.
+     *
      * @param {HTMLElement} modalElement - Modal element
      */
     function closeModal(modalElement) {
@@ -3622,6 +3624,62 @@
         }
 
         modalElement['_modalConfig']?.onClose?.(modalElement);
+    }
+
+    /**
+     * Hủy modal và remove hoàn toàn khỏi DOM
+     * Use case: One-time modals (auth, wizards, temp dialogs)
+     *
+     * ⚠️ WARNING: Modal sẽ bị remove khỏi DOM hoàn toàn.
+     * Không thể mở lại sau khi destroy. Do NOT reuse element reference after calling this.
+     *
+     * @param {HTMLElement} modalElement - Modal element to destroy
+     */
+    function destroyModal(modalElement) {
+        // Guard 1: Null/undefined check
+        if (!modalElement) {
+            console.warn('[destroyModal] Modal element is null or undefined');
+            return;
+        }
+
+        // Guard 2: Already removed from DOM
+        if (!modalElement.isConnected) {
+            console.warn('[destroyModal] Modal already removed from DOM');
+            return;
+        }
+
+        // Cleanup ESC key listener (prevent memory leak)
+        if (modalElement._escHandler) {
+            document.removeEventListener('keydown', modalElement._escHandler);
+            delete modalElement._escHandler;
+        }
+
+        // Check modal state: open or closed?
+        const isOpen = modalElement.classList.contains('show');
+
+        if (isOpen) {
+            // Modal ĐANG MỞ → Close with animation, then destroy
+            closeModal(modalElement);
+
+            // Wait for CSS transition (300ms), then remove from DOM
+            setTimeout(() => {
+                if (modalElement.isConnected) {  // Double-check still in DOM
+                    modalElement.remove();
+                }
+            }, 300);  // Match CSS transition duration
+
+        } else {
+            // Modal ĐÃ ĐÓNG → Remove immediately (no animation needed)
+            modalElement.remove();
+
+            // Minimal cleanup (body scroll might already be unlocked by closeModal)
+            if (document.body.style.overflow === 'hidden') {
+                document.body.style.overflow = '';
+            }
+
+            // Note: onClose callback already called when modal was closed
+            // Note: URL params already removed when modal was closed
+        }
     }
 
     /**
@@ -3765,7 +3823,7 @@
             if (verifyPassword(inputValue, correctPassword)) {
                 // Success
                 saveAuthData(scheduleKey, correctPassword);
-                closeModal(authModal);
+                destroyModal(authModal);
                 if (onSuccess) onSuccess();
             } else {
                 // Failed
