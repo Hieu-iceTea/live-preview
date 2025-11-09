@@ -5067,30 +5067,19 @@
     }
 
     function innitVerifyAuthentication(onValidAuth) {
-        // Lấy schedule key từ URL
-        const scheduleKey = getScheduleKeyUrlParam();
-
-        // Kiểm tra xem schedule có yêu cầu authentication không
-        const requiresAuth = scheduleData.security && scheduleData.security.secretCode;
-
-        if (requiresAuth) {
-            // Kiểm tra authentication
-            const isAuthenticated = checkAuthentication(scheduleKey, scheduleData.security.secretCode);
-
-            if (isAuthenticated) {
-                // Đã authenticated → khởi tạo app
-                onValidAuth();
-            } else {
-                // Chưa authenticated → hiển thị auth modal
+        if (scheduleData.security?.secretCode) {
+            const scheduleKey = getScheduleKeyUrlParam();
+            if (!checkAuthentication(scheduleKey, scheduleData.security.secretCode)) {
                 initAndOpenAuthModal(scheduleKey, scheduleData.security.secretCode, () => {
                     // Callback khi auth thành công
                     onValidAuth();
                 });
+                return;
             }
-        } else {
-            // Không yêu cầu auth → khởi tạo app bình thường
-            onValidAuth();
         }
+
+        // Đã authenticated hoặc không yêu cầu auth → khởi tạo app bình thường
+        onValidAuth();
     }
 
     // --- KHỞI CHẠY ---
