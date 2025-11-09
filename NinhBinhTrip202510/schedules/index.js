@@ -57,7 +57,7 @@
 const SCHEDULE_LIST = [
     {
         key: "NinhBinh202511",
-        scheduleData: scheduleData_NinhBinh202511
+        filePath: "ninh-binh-202511.js"
     },
     // Thêm schedules mới tại đây...
 ];

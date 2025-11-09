@@ -37,11 +37,10 @@
          - Update schedules/index.js: Thêm entry vào SCHEDULE_LIST
     -->
 
-    <!-- 1. Load schedule data files -->
-    <script src="schedules/ninh-binh-202511.js"></script>
-    <!-- Thêm schedules mới tại đây... -->
+    <!-- Load schedule data: load trong DOMContentLoaded -->
+    <!--<script src="schedules/ha-noi-2025.js"></script>-->
 
-    <!-- 2. Load schedule list (index) -->
+    <!-- Load schedule list (index) -->
     <script src="schedules/index.js"></script>
 
     <style>
@@ -1090,14 +1089,6 @@
         allRows: [], // Cache of all budget rows
     };
 
-    /**
-     * Schedule data được load từ URL param
-     * Load ngay khi khởi tạo script để validate sớm
-     * Nếu có lỗi (thiếu param hoặc param không hợp lệ) → throw error và dừng script
-     * @type {Object}
-     */
-    const scheduleData = loadScheduleData();
-
     // --- ICON SVG (Lấy từ v2.html) ---
     // ĐÃ CHỈNH SỬA: Thay đổi kích thước (width, height) thành 16
     // và màu (stroke) thành "white" để khớp với icon 24px mới
@@ -1838,12 +1829,51 @@
         return scheduleKey;
     }
 
+    // Singleton: Chỉ load 1 schedule
+    let _loadingScheduleData = false;
+
+    /**
+     * Load schedule file động (bằng script injection)
+     * Singleton: Chỉ load 1 file, return cached nếu đã load
+     */
+    function loadScheduleFile(filename) {
+        // Đã load? → Return cached
+        if (typeof scheduleData !== 'undefined') return Promise.reject(new Error('Already loaded'));
+
+        // Đang load? → Reject
+        if (_loadingScheduleData) return Promise.reject(new Error('Already loading'));
+
+        return new Promise((resolve, reject) => {
+            _loadingScheduleData = true;
+
+            const script = document.createElement('script');
+            script.src = `./schedules/${filename}`;
+
+            script.onload = () => {
+                if (typeof scheduleData !== 'undefined') {
+                    _loadingScheduleData = false;
+                    resolve(scheduleData);
+                } else {
+                    _loadingScheduleData = false;
+                    reject(new Error('File không có scheduleData'));
+                }
+            };
+
+            script.onerror = () => {
+                _loadingScheduleData = false;
+                reject(new Error(`Không load được: ${filename}`));
+            };
+
+            document.head.appendChild(script);
+        });
+    }
+
     /**
      * Load và validate schedule từ URL param
-     * @returns {Object} Schedule data nếu hợp lệ
+     * @returns {Promise<Object>} Schedule data nếu hợp lệ
      * @throws {Error} Nếu thiếu param hoặc schedule không tồn tại
      */
-    function loadScheduleData() {
+    async function loadScheduleData() {
         const scheduleKey = getScheduleKeyUrlParam();
 
         // Tìm trong SCHEDULE_LIST (Array.find - O(n))
@@ -1856,8 +1886,13 @@
             )
         }
 
-        // Return schedule data
-        return scheduleItem.scheduleData;
+        // Load động bằng script injection
+        try {
+            // Return schedule data
+            return await loadScheduleFile(scheduleItem.filePath);
+        } catch (error) {
+            showErrorAndStop(`Lỗi load schedule: ${error.message}`, error);
+        }
     }
 
     /**
@@ -3938,7 +3973,10 @@
     }
 
     // --- KHỞI CHẠY ---
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Load schedule data
+        await loadScheduleData()
+
         innitVerifyAuthentication(() => {
             // onValidAuth
             initializeApp();

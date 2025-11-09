@@ -165,7 +165,7 @@
 //        └── da-lat-202512.js              ← Schedule data mới (future)
 //
 // ========================================================================
-const scheduleData_NinhBinh202511 = {
+const scheduleData = {
     "tripInfo": {
         "title": "Ninh Bình trip 2025", // Đổi tiêu đề
         "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
