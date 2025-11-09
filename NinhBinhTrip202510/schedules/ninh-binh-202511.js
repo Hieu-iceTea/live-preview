@@ -92,28 +92,39 @@
 // 1. TẠO CHUYẾN ĐI MỚI:
 //
 //    BƯỚC 1: Tạo file data mới
-//    - Copy file này thành file mới: cp ninh-binh-202511.js da-lat-202512.js
-//    - Đổi tên biến: scheduleData_NinhBinh202511 → scheduleData_DaLat202512
-//    - Sửa data: tripInfo (title, subtitle, dates, defaultRegion, totalBudget)
-//    - Sửa data: schedule (các ngày và hoạt động)
+//    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//    - Copy file này thành file mới:
+//      cp schedules/ninh-binh-202511.js schedules/da-lat-202512.js
+//    
+//    - Sửa nội dung data trong file mới:
+//      • tripInfo: title, subtitle, dates, defaultRegion, totalBudget
+//      • schedule: Các ngày và hoạt động trong lịch trình
+//    
+//    - ⚠️ QUAN TRỌNG: KHÔNG đổi tên biến!
+//      • Giữ nguyên: const scheduleData = { ... };
+//      • Lý do: File được load động, chỉ 1 file active tại 1 thời điểm
+//    
+//    - ⚠️ KHÔNG cần export hoặc thêm <script> tag vào HTML
 //
-//    BƯỚC 2: Load file data trong file ".html"
-//    - Mở file ".html"
-//    - Thêm dòng: <script src="schedules/da-lat-202512.js"></script>
-//    - ⚠️ QUAN TRỌNG: Thêm TRƯỚC dòng <script src="schedules/index.js">
-//
-//    BƯỚC 3: Thêm entry vào schedules/index.js
-//    - Mở schedules/index.js
-//    - Thêm vào SCHEDULE_LIST:
+//    BƯỚC 2: Update schedules/index.js
+//    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//    - Mở file: schedules/index.js
+//    - Thêm entry mới vào SCHEDULE_LIST:
 //      {
-//          key: "DaLat202512",
-//          name: "Đà Lạt 2025",
-//          scheduleData: scheduleData_DaLat202512
+//          key: "DaLat202512",              // Key dùng trong URL
+//          filePath: "da-lat-202512.js"     // Tên file data
 //      }
+//    
+//    - ⚠️ KHÔNG cần sửa file ".html", KHÔNG thêm <script> tag!
 //
-//    BƯỚC 4: Test
-//    - Mở trình duyệt, thêm param url tương ứng. Vi dụ: ?schedule=DaLat202512
-//    - Kiểm tra timeline render OK
+//    BƯỚC 3: Test
+//    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//    - Mở trình duyệt với URL: ?schedule=DaLat202512
+//    - Hoặc: file:///path/to/index.html?schedule=DaLat202512 (work với file://)
+//    - Kiểm tra:
+//      ✓ Timeline render đúng
+//      ✓ Console không có lỗi
+//      ✓ Thông tin chuyến đi hiển thị chính xác
 //
 // 2. CHỈNH SỬA LỊCH TRÌNH HIỆN TẠI:
 //    - Tìm đến phần schedule → tìm ngày cần sửa → tìm item cần sửa
@@ -165,7 +176,7 @@
 //        └── da-lat-202512.js              ← Schedule data mới (future)
 //
 // ========================================================================
-const scheduleData_NinhBinh202511 = {
+const scheduleData = {
     "tripInfo": {
         "title": "Ninh Bình trip 2025", // Đổi tiêu đề
         "subtitle": "Hiếu & Chi | 2 Ngày 1 Đêm",
