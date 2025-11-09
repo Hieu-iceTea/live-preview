@@ -5066,8 +5066,7 @@
         updateTimeline();
     }
 
-    // --- KHỞI CHẠY ---
-    document.addEventListener('DOMContentLoaded', () => {
+    function innitVerifyAuthentication(onValidAuth) {
         // Lấy schedule key từ URL
         const scheduleKey = getScheduleKeyUrlParam();
 
@@ -5080,18 +5079,26 @@
 
             if (isAuthenticated) {
                 // Đã authenticated → khởi tạo app
-                initializeApp();
+                onValidAuth();
             } else {
                 // Chưa authenticated → hiển thị auth modal
                 initAndOpenAuthModal(scheduleKey, scheduleData.security.secretCode, () => {
                     // Callback khi auth thành công
-                    initializeApp();
+                    onValidAuth();
                 });
             }
         } else {
             // Không yêu cầu auth → khởi tạo app bình thường
-            initializeApp();
+            onValidAuth();
         }
+    }
+
+    // --- KHỞI CHẠY ---
+    document.addEventListener('DOMContentLoaded', () => {
+        innitVerifyAuthentication(() => {
+            // onValidAuth
+            initializeApp();
+        });
     });
 </script>
 </body>
