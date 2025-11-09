@@ -1192,3 +1192,6 @@ const scheduleData = {
         }
     ]
 };
+
+// Export for ES6 dynamic import
+export default scheduleData;

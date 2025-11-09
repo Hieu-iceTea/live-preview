@@ -17,30 +17,36 @@
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away-subtle.css">
 
     <!-- ========================================================================
-         LOAD SCHEDULE DATA FILES
+         LOAD SCHEDULE DATA FILES - PHASE 3: ES6 DYNAMIC IMPORT
          ========================================================================
-         Load schedule data và metadata TRƯỚC khi chạy main app logic.
-
-         ⚠️ QUAN TRỌNG: Thứ tự load
-         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         1. Load DATA files trước (schedules/*.js)
-            → Tạo các biến: scheduleData_NinhBinh202511, scheduleData_DaLat202512, ...
-
-         2. Load INDEX file sau (schedules/index.js)
-            → Tạo SCHEDULE_LIST (reference các biến ở bước 1)
-         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         Load schedule index (SCHEDULE_LIST) statically.
+         Schedule data files sẽ được load động bằng ES6 import() khi cần.
 
          🔄 Khi thêm schedule mới:
-         - Thêm file: schedules/ten-chuyen-di-YYYYMM.js
-         - Thêm dòng: <script src="schedules/ten-chuyen-di-YYYYMM.js"></script>
-         - ⚠️ Thêm TRƯỚC dòng <script src="schedules/index.js">
-         - Update schedules/index.js: Thêm entry vào SCHEDULE_LIST
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         1. Tạo file mới: schedules/ten-chuyen-di-YYYYMM.js
+            - Copy structure từ ninh-binh-202511.js
+            - Sửa data cho chuyến đi mới
+            - ⚠️ QUAN TRỌNG: Thêm "export default scheduleData;" ở cuối file
+
+         2. Update schedules/index.js:
+            - Thêm entry vào SCHEDULE_LIST:
+              {
+                  key: "TenChuyenDi202512",
+                  filePath: "ten-chuyen-di-YYYYMM.js"
+              }
+
+         3. Test với URL:
+            ?schedule=TenChuyenDi202512
+         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+         ⚠️ YÊU CẦU: Làm việc qua HTTP server (không mở file:// trực tiếp)
+         - Dùng: python3 -m http.server 8000
+         - Hoặc: npx http-server
+         - Sau đó: http://localhost:8000/NinhBinhTrip202510/v4.html?schedule=KEY
     -->
 
-    <!-- Load schedule data: load trong DOMContentLoaded -->
-    <!--<script src="schedules/ha-noi-2025.js"></script>-->
-
-    <!-- Load schedule list (index) -->
+    <!-- Load schedule list (index) - Static load -->
     <script src="schedules/index.js"></script>
 
     <style>
@@ -1089,6 +1095,8 @@
         allRows: [], // Cache of all budget rows
     };
 
+    let scheduleData = null; // Schedule data loaded dynamically (PHASE 3: ES6 import)
+
     // --- ICON SVG (Lấy từ v2.html) ---
     // ĐÃ CHỈNH SỬA: Thay đổi kích thước (width, height) thành 16
     // và màu (stroke) thành "white" để khớp với icon 24px mới
@@ -1830,42 +1838,35 @@
     }
 
     // Singleton: Chỉ load 1 schedule
+    let _scheduleData = null;
     let _loadingScheduleData = false;
 
     /**
-     * Load schedule file động (bằng script injection)
+     * Load schedule file động (ES6 dynamic import)
      * Singleton: Chỉ load 1 file, return cached nếu đã load
      */
-    function loadScheduleFile(filename) {
+    async function loadScheduleFile(filename) {
         // Đã load? → Return cached
-        if (typeof scheduleData !== 'undefined') return Promise.reject(new Error('Already loaded'));
+        if (_scheduleData) return _scheduleData;
 
         // Đang load? → Reject
-        if (_loadingScheduleData) return Promise.reject(new Error('Already loading'));
+        if (_loadingScheduleData) throw new Error('Already loading');
 
-        return new Promise((resolve, reject) => {
+        try {
             _loadingScheduleData = true;
 
-            const script = document.createElement('script');
-            script.src = `./schedules/${filename}`;
+            // ES6 dynamic import
+            const module = await import(`./schedules/${filename}`);
 
-            script.onload = () => {
-                if (typeof scheduleData !== 'undefined') {
-                    _loadingScheduleData = false;
-                    resolve(scheduleData);
-                } else {
-                    _loadingScheduleData = false;
-                    reject(new Error('File không có scheduleData'));
-                }
-            };
+            // Get default export
+            _scheduleData = module.default;
+            _loadingScheduleData = false;
 
-            script.onerror = () => {
-                _loadingScheduleData = false;
-                reject(new Error(`Không load được: ${filename}`));
-            };
-
-            document.head.appendChild(script);
-        });
+            return _scheduleData;
+        } catch (error) {
+            _loadingScheduleData = false;
+            throw new Error(`Không load được: ${filename} - ${error.message}`);
+        }
     }
 
     /**
@@ -2660,13 +2661,13 @@
                     <svg class="w-16 h-16 mx-auto mb-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                     </svg>
-                    
+
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Xác Thực</h2>
-                    
+
                     <p class="text-gray-600 text-base font-medium mb-1">
                         ${scheduleData.tripInfo?.title || scheduleKey}
                     </p>
-                    
+
                     <p class="text-gray-500 text-sm leading-normal">
                         Vui lòng nhập mã bảo mật để xem nội dung
                     </p>
@@ -3974,8 +3975,8 @@
 
     // --- KHỞI CHẠY ---
     document.addEventListener('DOMContentLoaded', async () => {
-        // Load schedule data
-        await loadScheduleData()
+        // Load schedule data và gán vào biến global
+        scheduleData = await loadScheduleData();
 
         innitVerifyAuthentication(() => {
             // onValidAuth
