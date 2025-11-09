@@ -3691,7 +3691,7 @@
     // === AUTH MODAL ===
     // ========================================================================
 
-    function renderAuthContent() {
+    function renderAuthContent(scheduleKey) {
         // Lấy hint từ scheduleData nếu có
         const hint = scheduleData.security?.hint || null;
 
@@ -3713,7 +3713,11 @@
                     
                     <h2 class="text-2xl font-bold text-gray-900 mb-2">Xác Thực</h2>
                     
-                    <p class="text-gray-500 text-base leading-normal">
+                    <p class="text-gray-600 text-base font-medium mb-1">
+                        ${scheduleData.tripInfo?.title || scheduleKey}
+                    </p>
+                    
+                    <p class="text-gray-500 text-sm leading-normal">
                         Vui lòng nhập mã bảo mật để xem nội dung
                     </p>
                 </div>
@@ -3812,7 +3816,7 @@
      * @param {Function} onSuccess - Callback khi auth thành công
      */
     function initAndOpenAuthModal(scheduleKey, correctPassword, onSuccess) {
-        const contentHTML = renderAuthContent();
+        const contentHTML = renderAuthContent(scheduleKey);
 
         const authModal = createModal({
             id: 'auth-modal',
