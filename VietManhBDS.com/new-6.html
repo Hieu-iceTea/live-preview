@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguyễn Viết Mạnh | Cố Vấn Đầu Tư Bất Động Sản Cao Cấp</title>
+    <meta name="description"
+          content="Cố vấn đầu tư bất động sản: Nguyễn Viết Mạnh. Chuyên gia tư vấn Vinhomes, dự án cao cấp. Hotline: 093.136.0768">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #D4AF37; /* Gold */
+            --primary-dark: #B59026;
+            --secondary-color: #0f172a; /* Deep Navy/Black */
+            --text-light: #f8fafc;
+            --text-dark: #334155;
+            --bg-light: #ffffff;
+            --bg-gray: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* --- Utility Classes --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gold {
+            color: var(--primary-color);
+        }
+
+        .bg-dark {
+            background-color: var(--secondary-color);
+            color: var(--text-light);
+        }
+
+        .bg-gray {
+            background-color: var(--bg-gray);
+        }
+
+        .btn-gold {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 30px;
+            border-radius: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+        }
+
+        /* --- Header / Navigation --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: background 0.3s;
+            padding: 15px 0;
+        }
+
+        header.scrolled {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4)), url('https://w.ladicdn.com/s650x800/65d32711e1e9400013ab1e1b/img_1523-20250103040448-orbij.jpg'); /* Sử dụng ảnh gốc */
+            background-size: cover;
+            background-position: center top; /* Adjusted specifically for portrait image */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding-top: 60px;
+        }
+
+        .hero-content h2 {
+            font-size: 1.2rem;
+            letter-spacing: 3px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        /* --- Social Floating Bar --- */
+        .social-float {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-size: 1.2rem;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .social-btn.fb {
+            color: #1877F2;
+        }
+
+        .social-btn.zalo {
+            color: #0068FF;
+            font-weight: bold;
+            font-family: sans-serif;
+            font-size: 0.8rem;
+        }
+
+        .social-btn.tiktok {
+            color: #000;
+        }
+
+        .social-btn.yt {
+            color: #FF0000;
+        }
+
+        .social-btn.phone {
+            background: var(--primary-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+            }
+        }
+
+        /* --- About & Philosophy Section --- */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-img {
+            border-radius: 4px;
+            box-shadow: 20px 20px 0px var(--bg-gray);
+            overflow: hidden;
+        }
+
+        .about-img img {
+            transition: transform 0.5s;
+        }
+
+        .about-img:hover img {
+            transform: scale(1.05);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+            bottom: -10px;
+            left: 0;
+        }
+
+        .center-line::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* --- Projects Section --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .project-img {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .project-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .project-card:hover .project-img img {
+            transform: scale(1.1);
+        }
+
+        .project-content {
+            padding: 20px;
+        }
+
+        .project-content h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+
+        .project-content p {
+            font-size: 0.9rem;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* --- Newest Project Highlight --- */
+        .highlight-project {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .highlight-content {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .highlight-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-item h4 {
+            font-size: 1rem;
+            color: var(--primary-dark);
+            margin-bottom: 5px;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+        }
+
+        /* --- Blog/Article --- */
+        .blog-box {
+            background: white;
+            padding: 40px;
+            border-left: 5px solid var(--primary-color);
+            margin-top: 30px;
+        }
+
+        /* --- Testimonials --- */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .testimonial-quote {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .client-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .client-name h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--primary-color);
+        }
+
+        .client-name span {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* --- Footer / Contact --- */
+        .footer {
+            background-color: #000;
+            color: #fff;
+            padding: 60px 0 20px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+        }
+
+        .contact-info p {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-info i {
+            color: var(--primary-color);
+            width: 20px;
+        }
+
+        .subscribe-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            background: #111;
+            color: white;
+            outline: none;
+        }
+
+        .subscribe-form input:focus {
+            border-color: var(--primary-color);
+        }
+
+        /* --- Mobile Responsive --- */
+        @media (max-width: 768px) {
+            .hero-content h1 {
+                font-size: 2.2rem;
+            }
+
+            .about-grid, .highlight-project, .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                display: none; /* Can add JS toggle later */
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: var(--secondary-color);
+                flex-direction: column;
+                padding: 20px;
+                text-align: center;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header id="header">
+    <div class="container nav-flex">
+        <div class="logo">VIETMANHBDS</div>
+        <nav class="nav-links">
+            <a href="#home">Trang chủ</a>
+            <a href="#about">Tiểu sử</a>
+            <a href="#projects">Dự án</a>
+            <a href="#testimonials">Khách hàng</a>
+            <a href="#contact">Liên hệ</a>
+        </nav>
+        <div class="hamburger" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </div>
+</header>
+
+<div class="social-float">
+    <a href="https://www.facebook.com/share/1BTKEtnNTv/?mibextid=wwXIfr" target="_blank" class="social-btn fb"><i
+            class="fab fa-facebook-f"></i></a>
+    <a href="tel:0931360768" class="social-btn zalo">Zalo</a>
+    <a href="https://www.tiktok.com/@thich.onha?_t=8os6fBSga4m&_r=1" target="_blank" class="social-btn tiktok"><i
+            class="fab fa-tiktok"></i></a>
+    <a href="https://www.youtube.com/channel/UCBm2cybV4FpjUil-MYn-wMw/playlists" target="_blank"
+       class="social-btn yt"><i class="fab fa-youtube"></i></a>
+    <a href="tel:0931360768" class="social-btn phone"><i class="fas fa-phone-alt"></i></a>
+</div>
+
+<section id="home" class="hero">
+    <div class="container hero-content" data-aos="fade-up">
+        <h2>CỐ VẤN ĐẦU TƯ BẤT ĐỘNG SẢN</h2>
+        <h1>NGUYỄN VIẾT MẠNH</h1>
+        <p>CONNECT - SHARE - SUCCESS</p>
+        <div style="margin-bottom: 20px;">
+            <p style="font-size: 14px; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                Chúng tôi nỗ lực mỗi ngày để mang đến cho khách hàng sản phẩm và dịch vụ tốt nhất.
+            </p>
+        </div>
+        <a href="#contact" class="btn-gold">ĐĂNG KÝ NGAY</a>
+    </div>
+</section>
+
+<section id="about" class="section-padding bg-gray">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-img" data-aos="fade-right">
+                <img src="https://w.ladicdn.com/s650x800/65d32711e1e9400013ab1e1b/img_1523-20250103040448-orbij.jpg"
+                     alt="Nguyễn Viết Mạnh">
+            </div>
+            <div class="about-content" data-aos="fade-left">
+                <h2 class="section-title">TIỂU SỬ</h2>
+                <p style="margin-bottom: 15px;">
+                    Kính chào <strong class="text-gold">nhà đầu tư và đối tác</strong>, cứ mỗi lần được giới thiệu về
+                    bản thân thì <strong>Viết Mạnh</strong> rất vui và hạnh phúc, vì công việc của mình lại góp phần
+                    giúp cho rất nhiều khách hàng giàu có và gia tăng được tài sản thông qua việc lựa chọn và đầu tư bất
+                    động sản đúng thời điểm.
+                </p>
+                <p style="margin-bottom: 15px;">
+                    Trong hành trình hơn <strong class="text-gold">7 năm kinh nghiệm</strong> kinh doanh Bất Động Sản,
+                    Viết Mạnh cảm thấy vui vì hôm nay có cơ duyên để sắp tới đây, mang đến cho Quý vị những dòng sản
+                    phẩm tiềm năng và chất lượng nhất.
+                </p>
+                <p style="font-style: italic; font-weight: bold; margin-top: 20px;">
+                    Một lần nữa xin cảm ơn và trân trọng sự lắng nghe từ Quý Vị.
+                </p>
+            </div>
+        </div>
+
+        <div style="margin: 80px 0;" data-aos="fade-up">
+            <div class="text-center">
+                <h2 class="section-title center-line">CHÂM NGÔN LÀM VIỆC</h2>
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <p>
+                        Trong gần <strong>10 năm</strong> làm việc và phát triển trong lĩnh vực bất động sản, <strong>Viết
+                        Mạnh</strong> hiểu rõ được những khó khăn và nỗi sợ hãi của khách hàng, nhà đầu tư khi lựa chọn
+                        được bất động sản phù hợp với cá nhân mình.
+                    </p>
+                    <br>
+                    <h3 class="text-gold">CONNECT - SHARE - SUCCESS</h3>
+                    <p>
+                        Viết Mạnh luôn tin và phát triển không ngừng để chia sẻ, giải quyết và đưa ra phương án hỗ trợ
+                        hiệu quả tốt nhất cho nhà đầu tư, khách hàng và quý đối tác.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="section-padding">
+    <div class="container">
+        <h2 class="section-title text-center center-line" data-aos="fade-up">DỰ ÁN NỔI BẬT</h2>
+
+        <div class="projects-grid">
+            <div class="project-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="project-img">
+                    <img src="https://w.ladicdn.com/s750x600/65d32711e1e9400013ab1e1b/15a243e1d3ad0e246bb7ee118674899a-20250103073603-pr2ak.jpg"
+                         alt="Vinhomes Global Gate">
+                </div>
+                <div class="project-content">
+                    <h3>VINHOMES GLOBAL GATE</h3>
+                    <p>Từ vùng đất linh thiêng thắng địa lịch sử Cổ Loa đến Thành phố giao thương quốc tế với những công
+                        trình biểu tượng mới của Thủ đô.</p>
+                </div>
+            </div>
+
+            <div class="project-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="project-img">
+                    <img src="https://w.ladicdn.com/s750x550/65d32711e1e9400013ab1e1b/ncdn-20240405041206-mlqgg-20240412041120-tiqyp.jpeg"
+                         alt="Solasta Mansion">
+                </div>
+                <div class="project-content">
+                    <h3>SOLASTA MANSION</h3>
+                    <p>Dự án biệt thự Solasta Mansion nằm tại trục đường hướng tâm thành phố, thuộc KĐT Dương Nội, thừa
+                        hưởng trọn vẹn mạng lưới giao thông liên hoàn.</p>
+                </div>
+            </div>
+
+            <div class="project-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="project-img">
+                    <img src="https://w.ladicdn.com/s750x500/65d32711e1e9400013ab1e1b/vi-tri-du-an-lumi-hanoi-toa-lac-tai-mat-tien-dai-lo-thang-long-giup-cu-dan-ket-noi-thuan-tien-den-khu-vuc-lan-can-20250103073822-davg9.jpg"
+                         alt="Lumi Hanoi">
+                </div>
+                <div class="project-content">
+                    <h3>LUMI HÀ NỘI</h3>
+                    <p>Căn hộ chung cư cao cấp do CapitaLand phát triển, tọa lạc tại Đại Lộ Thăng Long. Quy mô khoảng
+                        3.950 căn hộ.</p>
+                </div>
+            </div>
+
+            <div class="project-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="project-img">
+                    <img src="https://w.ladicdn.com/s750x550/65d32711e1e9400013ab1e1b/phoi-canh-tong-the-vinh-trung-tam-sungroup-cat-ba-20250103074021-gfuyv.png"
+                         alt="Sun Group Cát Bà">
+                </div>
+                <div class="project-content">
+                    <h3>SUN GROUP CÁT BÀ</h3>
+                    <p>Khu đô thị du lịch và nghỉ dưỡng biển đẳng cấp quốc tế tại Cát Bà. Quy mô 49,9 ha.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding bg-gray">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-right">DỰ ÁN MỚI NHẤT</h2>
+
+        <div class="highlight-project" data-aos="fade-up">
+            <div class="highlight-img">
+                <img src="https://w.ladicdn.com/s1000x1150/65d32711e1e9400013ab1e1b/sieu-do-thi-ket-noi1-20250103100119-jtluy.jpg"
+                     alt="Vinhomes Cổ Loa">
+            </div>
+            <div class="highlight-content">
+                <h3 style="font-size: 2rem; margin-bottom: 20px;">VINHOMES GLOBAL GATE (CỔ LOA)</h3>
+                <p style="margin-bottom: 20px;">
+                    Khu đô thị mới rộng <strong>385 ha</strong> tại Đông Anh, Hà Nội. Sở hữu vị trí <strong>"siêu kết
+                    nối"</strong> (chỉ 5-10p đến trung tâm), mô hình <strong>"đô thị EXPO"</strong> lần đầu xuất hiện.
+                    Đây là trung tâm giao thương quốc tế và tài chính mới.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <h4><i class="fas fa-chart-line text-gold"></i> Đầu tư bền vững</h4>
+                        <p>Quy hoạch bài bản, tiềm năng tăng giá vượt trội.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-map-marker-alt text-gold"></i> Vị trí chiến lược</h4>
+                        <p>Kết nối nhanh chóng đến Hồ Tây và trung tâm.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-swimming-pool text-gold"></i> Tiện ích đẳng cấp</h4>
+                        <p>Dẫn đầu thị trường phía Bắc Hà Nội.</p>
+                    </div>
+                    <div class="feature-item">
+                        <h4><i class="fas fa-globe text-gold"></i> TP Thương Mại</h4>
+                        <p>Khu đô thị triển lãm EXPO quốc tế.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <h2 class="section-title text-center center-line" data-aos="fade-up">BÀI VIẾT MỚI NHẤT</h2>
+        <div class="blog-box" data-aos="fade-up">
+            <h3 class="text-gold" style="font-size: 1.5rem;">TOP 3 YẾU TỐ QUAN TRỌNG NHẤT ĐỂ BẤT ĐỘNG SẢN TĂNG GIÁ TRONG
+                TƯƠNG LAI</h3>
+            <div style="margin-top: 20px;">
+                <img src="https://w.ladicdn.com/s1050x900/65d32711e1e9400013ab1e1b/img_5170-20250106054423-xgdqx.jpg"
+                     style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 20px;"
+                     alt="Bài viết">
+                <h4>1. Cơ sở hạ tầng - Giao thông:</h4>
+                <p>Lợi ích: Hạ tầng giao thông tốt giúp gia tăng khả năng kết nối giữa khu vực phát triển bất động sản
+                    và các trung tâm kinh tế, dịch vụ, tạo điều kiện thuận lợi cho việc di chuyển và sinh hoạt hàng ngày
+                    của cư dân. Khi giao thông thuận tiện, giá trị bất động sản sẽ tăng do nhu cầu tăng từ người dân và
+                    nhà đầu tư.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="testimonials" class="section-padding bg-dark">
+    <div class="container">
+        <h2 class="section-title text-center center-line" style="color: white;">PHẢN HỒI CỦA KHÁCH HÀNG</h2>
+        <p class="text-center" style="margin-bottom: 40px; color: #ccc;">Chúng tôi nỗ lực mỗi ngày để mang đến cho khách
+            hàng sản phẩm và dịch vụ tốt nhất</p>
+
+        <div class="testimonial-grid">
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                <p class="testimonial-quote">"An cư thì mới lạc nghiệp. Sau thời gian dài tìm kiếm, được rất nhiều bạn
+                    tư vấn nhưng tôi chọn Mạnh, em ấy nhiệt tình, chu đáo và chuyên nghiệp. Bạn ấy hỗ trợ rất nhiều cho
+                    tôi trong quá trình sau bán hàng."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x400/65d32711e1e9400013ab1e1b/41615306_1892972207417002_1158181851701968896_n-1559882137-20250106051307-oxihb.jpg"
+                         class="client-avatar" alt="Trịnh Lan">
+                    <div class="client-name">
+                        <h4>Trịnh Lan</h4>
+                        <span>Giám đốc kinh doanh - Phát triển phần mềm</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                <p class="testimonial-quote">"Tôi tin tưởng và mong chờ dự án Vinhomes Global Gate sẽ thành công trong
+                    thời gian tới, cảm ơn sự tư vấn và hỗ trợ tận tình của Cháu Mạnh, thời gian tới sẽ tiếp tục ủng
+                    hộ."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x400/65d32711e1e9400013ab1e1b/61799459_2127673584190938_2408149417967222784_n-1559882115-20250106051254-sbz-w.jpg"
+                         class="client-avatar" alt="Như Lan">
+                    <div class="client-name">
+                        <h4>Như Lan</h4>
+                        <span>Phó tổng giám đốc - Công ty xây dựng Hà Nội</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                <p class="testimonial-quote">"Tôi và gia đình rất vui khi nhận được sự hỗ trợ của Bạn Mạnh để mua được
+                    căn nhà cho con trai tại Hà Nội năm vừa rồi, nếu không có sự hỗ trợ của Mạnh, khó có thể mua được
+                    giá tốt năm 2022."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x450/65d32711e1e9400013ab1e1b/57170639_868581903504646_303399118309425152_n-1559881004-20250106051240-e9nve.jpg"
+                         class="client-avatar" alt="Hoàng Quyền">
+                    <div class="client-name">
+                        <h4>Hoàng Quyền</h4>
+                        <span>Tổng giám đốc - Công ty xây dựng Hoàng Sa</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer id="contact" class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="contact-info">
+                <h3 class="text-gold">THÔNG TIN LIÊN HỆ</h3>
+                <p><i class="fas fa-map-marker-alt"></i> Tầng 3, toà nhà Handiresco, số 31 Lê Văn Lương, Thanh Xuân, Hà
+                    Nội</p>
+                <p><i class="fas fa-user-tie"></i> Cố vấn đầu tư: Nguyễn Viết Mạnh</p>
+                <p><a href="tel:0931360768"><i class="fas fa-phone-alt"></i> Hotline: 093.136.0768</a></p>
+                <p><a href="mailto:vietmanh5858@gmail.com"><i class="fas fa-envelope"></i> Email: vietmanh5858@gmail.com</a>
+                </p>
+                <p><a href="http://www.vietmanhbds.com/" target="_blank"><i class="fas fa-globe"></i> Website:
+                    www.vietmanhbds.com</a></p>
+
+                <div style="margin-top: 20px; display: flex; gap: 15px;">
+                    <a href="https://www.facebook.com/share/1BTKEtnNTv/?mibextid=wwXIfr" target="_blank"
+                       style="color: white; font-size: 1.5rem;"><i class="fab fa-facebook"></i></a>
+                    <a href="https://www.youtube.com/channel/UCBm2cybV4FpjUil-MYn-wMw/playlists" target="_blank"
+                       style="color: white; font-size: 1.5rem;"><i class="fab fa-youtube"></i></a>
+                    <a href="https://www.tiktok.com/@thich.onha?_t=8os6fBSga4m&_r=1" target="_blank"
+                       style="color: white; font-size: 1.5rem;"><i class="fab fa-tiktok"></i></a>
+                </div>
+            </div>
+
+            <div class="subscribe-form">
+                <h3 class="text-gold">ĐĂNG KÝ NHẬN TIN</h3>
+                <p style="margin-bottom: 20px; font-size: 0.9rem;">Đăng nhập để nhận các thông tin, ưu đãi mới nhất về
+                    thị trường Bất Động Sản.</p>
+                <form autocomplete="off" method="post">
+                    <input type="email" name="email" required placeholder="Nhập địa chỉ Email của bạn...">
+                    <button type="submit" class="btn-gold" style="width: 100%;">Gửi đi</button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center" style="margin-top: 50px; font-size: 0.8rem; opacity: 0.5;">
+            <p>&copy; 2025 NGUYỄN VIẾT MẠNH. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize Animations
+    AOS.init({
+        duration: 1000,
+        once: true
+    });
+
+    // Sticky Header Effect
+    window.addEventListener("scroll", function () {
+        var header = document.querySelector("header");
+        header.classList.toggle("scrolled", window.scrollY > 50);
+    });
+
+    // Mobile Menu Toggle
+    function toggleMenu() {
+        var nav = document.querySelector(".nav-links");
+        nav.classList.toggle("active");
+    }
+
+    // Smooth Scroll for Anchors
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+            // Close mobile menu if open
+            document.querySelector(".nav-links").classList.remove("active");
+        });
+    });
+</script>
+</body>
+</html>

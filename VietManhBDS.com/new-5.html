@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CỐ VẤN ĐẦU TƯ BẤT ĐỘNG SẢN: NGUYỄN VIẾT MẠNH</title>
+
+    <meta name="description"
+          content="Trong gần 10 năm làm việc và phát triển trong lĩnh vực bất động sản, Viết Mạnh hiểu rõ được những khó khăn và nỗi sợ hãi của khách hàng.">
+    <meta name="keywords" content="Cố vấn đầu tư bất động sản, Nguyễn Viết Mạnh, Vinhomes, Bất động sản cao cấp">
+    <link rel="canonical" href="http://www.vietmanhbds.com"/>
+    <meta property="og:image"
+          content="https://static.ladipage.net/67572050ff2f0901348c57b8/img_5170-20250110042535-llvt_.jpg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+        :root {
+            --primary-gold: #C5A059;
+            --primary-gold-dark: #b08d4b;
+            --dark-navy: #0f172a;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- LUXURY ANIMATIONS --- */
+
+        /* 1. Shimmer Effect (Quét sáng qua nút - Tự động chạy) */
+        @keyframes shimmer-sweep {
+            0% {
+                transform: translateX(-150%) skewX(-15deg);
+            }
+            50%, 100% {
+                transform: translateX(150%) skewX(-15deg);
+            }
+        }
+
+        .btn-luxury {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .btn-luxury::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-150%) skewX(-15deg);
+            animation: shimmer-sweep 3s infinite; /* Chạy mỗi 3s */
+        }
+
+        /* 2. Soft Float (Trôi nhẹ nhàng cho nút nổi) */
+        @keyframes float-gentle {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+
+        .floating-group .float-item {
+            animation: float-gentle 3s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Chỉnh delay để các nút không trôi cùng lúc */
+        .floating-group .float-item:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .floating-group .float-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .floating-group .float-item:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .floating-group .float-item:nth-child(4) {
+            animation-delay: 0.6s;
+        }
+
+        .floating-group .float-item:nth-child(5) {
+            animation-delay: 0.8s;
+        }
+
+        /* 3. Soft Pulse (Nhịp thở nhẹ cho CTA chính) */
+        @keyframes pulse-soft {
+            0% {
+                box-shadow: 0 0 0 0 rgba(197, 160, 89, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(197, 160, 89, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(197, 160, 89, 0);
+            }
+        }
+
+        .btn-pulse-soft {
+            animation: pulse-soft 2s infinite;
+        }
+
+        /* --- VIDEO PLAYER FACADE --- */
+        .video-facade {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 */
+            background-color: #000;
+            cursor: pointer;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .video-facade img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s;
+            opacity: 0.8;
+        }
+
+        .video-facade:hover img {
+            opacity: 0.6;
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: rgba(197, 160, 89, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            animation: pulse-white 2s infinite;
+        }
+
+        @keyframes pulse-white {
+            0% {
+                transform: translate(-50%, -50%) scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.95);
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .video-facade iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #C5A059, #FDB931, #C5A059);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+<!-- Header -->
+<header class="fixed w-full z-50 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-sm" id="navbar">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <a href="#" class="text-2xl font-bold font-serif tracking-widest text-slate-800 flex items-center gap-2">
+            <img src="https://static.ladipage.net/67572050ff2f0901348c57b8/ban-sao-f367633cd842e5214593e17e20fa4c28-20250110042549-jgqxu.jpg"
+                 alt="Logo" class="h-10 w-10 rounded-full object-cover border border-[#C5A059]">
+            <span>VIETMANH<span class="text-[#C5A059]">BDS</span></span>
+        </a>
+
+        <nav class="hidden md:flex space-x-8 items-center font-medium text-sm">
+            <a href="#about" class="hover:text-[#C5A059] transition-colors uppercase">Tiểu sử</a>
+            <a href="#projects" class="hover:text-[#C5A059] transition-colors uppercase">Dự án Nổi bật</a>
+            <a href="#video-section" class="hover:text-[#C5A059] transition-colors uppercase">Video</a>
+            <a href="#latest" class="hover:text-[#C5A059] transition-colors uppercase">Dự án Mới</a>
+            <a href="#contact"
+               class="px-6 py-2.5 bg-[#C5A059] text-white rounded-sm hover:bg-[#b08d4b] transition-all shadow-lg btn-luxury uppercase tracking-wider text-xs font-bold">
+                Liên hệ
+            </a>
+        </nav>
+
+        <button id="mobile-menu-btn" class="md:hidden text-2xl text-slate-800 focus:outline-none">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <div id="mobile-menu"
+         class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full left-0 top-full shadow-lg h-screen">
+        <div class="flex flex-col p-6 space-y-6 font-medium text-center text-lg">
+            <a href="#about" class="block hover:text-[#C5A059]">TIỂU SỬ</a>
+            <a href="#projects" class="block hover:text-[#C5A059]">DỰ ÁN NỔI BẬT</a>
+            <a href="#video-section" class="block hover:text-[#C5A059]">VIDEO GIỚI THIỆU</a>
+            <a href="#latest" class="block hover:text-[#C5A059]">DỰ ÁN MỚI</a>
+            <a href="#contact" class="block text-[#C5A059] font-bold border border-[#C5A059] py-3 rounded-lg">LIÊN HỆ
+                NGAY</a>
+        </div>
+    </div>
+</header>
+
+<!-- Hero -->
+<section class="relative min-h-screen flex items-center pt-20 overflow-hidden bg-slate-900">
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/90 to-slate-900/30 z-10"></div>
+        <!-- Background Image -->
+        <img src="https://w.ladicdn.com/s700x850/65d32711e1e9400013ab1e1b/f367633cd842e5214593e17e20fa4c28-2-20250104054234-jjqn3.jpg"
+             alt="Background" class="w-full h-full object-cover object-center md:object-right opacity-60">
+    </div>
+
+    <div class="container mx-auto px-4 relative z-20 grid md:grid-cols-2 gap-12 items-center">
+        <div class="text-white space-y-8" data-aos="fade-right" data-aos-duration="1000">
+            <div class="inline-block px-4 py-1 border border-[#C5A059] text-[#C5A059] text-xs font-bold uppercase tracking-[0.2em] rounded-full mb-2">
+                Connect - Share - Success
+            </div>
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold font-serif leading-tight">
+                NGUYỄN <br>
+                <span class="gradient-text">VIẾT MẠNH</span>
+            </h1>
+            <p class="text-xl md:text-2xl font-light text-gray-300 italic pl-4 border-l-2 border-[#C5A059]">
+                Cố Vấn Đầu Tư <br> Bất Động Sản Cao Cấp
+            </p>
+            <div class="pt-6 flex flex-col sm:flex-row gap-4">
+                <a href="#contact"
+                   class="btn-luxury px-8 py-4 bg-[#C5A059] text-white font-bold rounded-sm hover:bg-white hover:text-[#C5A059] transition-all duration-300 uppercase tracking-wider text-sm text-center btn-pulse-soft">
+                    Đăng Ký Tư Vấn
+                </a>
+                <a href="tel:0931360768"
+                   class="px-8 py-4 border border-white/30 bg-white/5 backdrop-blur-sm text-white font-bold rounded-sm hover:bg-white hover:text-slate-900 transition-all duration-300 uppercase tracking-wider text-sm text-center flex items-center justify-center gap-2">
+                    <i class="fas fa-phone-alt"></i> 093.136.0768
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/50 animate-bounce">
+        <i class="fas fa-chevron-down text-2xl"></i>
+    </div>
+</section>
+
+<!-- About -->
+<section id="about" class="py-24 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+            <div class="relative group" data-aos="fade-up">
+                <div class="absolute inset-0 bg-[#C5A059]/20 transform translate-x-4 translate-y-4 rounded-3xl transition-transform group-hover:translate-x-2 group-hover:translate-y-2"></div>
+                <img src="https://w.ladicdn.com/s650x800/65d32711e1e9400013ab1e1b/img_1523-20250103040448-orbij.jpg"
+                     alt="Nguyễn Viết Mạnh" class="relative rounded-3xl shadow-2xl w-full object-cover aspect-[3/4]">
+                <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-xl shadow-xl max-w-xs border border-gray-100 hidden lg:block">
+                    <p class="text-5xl font-serif font-bold text-[#C5A059]">7+</p>
+                    <p class="text-slate-800 text-sm font-bold uppercase tracking-wide mt-1">Năm kinh nghiệm</p>
+                </div>
+            </div>
+
+            <div class="space-y-6" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="text-[#C5A059] font-bold uppercase tracking-widest text-sm">Về tôi</h3>
+                <h2 class="text-4xl font-serif font-bold text-slate-800">Tiểu Sử & Hành Trình</h2>
+                <div class="w-20 h-1 bg-[#C5A059]"></div>
+
+                <div class="text-gray-600 space-y-4 leading-relaxed text-justify">
+                    <p>Kính chào <strong class="text-slate-800">nhà đầu tư và đối tác</strong>, Viết Mạnh rất vinh dự
+                        được đồng hành cùng Quý vị trong hành trình gia tăng tài sản thông qua những cơ hội đầu tư Bất
+                        Động Sản giá trị thực.</p>
+
+                    <p>Trong hơn <strong class="text-[#C5A059]">7 năm kinh nghiệm</strong>, Mạnh luôn tâm niệm rằng: Sự
+                        thành công của khách hàng chính là uy tín của bản thân. Mỗi sản phẩm giới thiệu đều được thẩm
+                        định kỹ lưỡng về pháp lý, tiềm năng và thanh khoản.</p>
+
+                    <div class="bg-gray-50 p-6 rounded-lg border-l-4 border-[#C5A059] italic text-slate-700">
+                        "Kết nối cơ hội - Chia sẻ giá trị - Cùng nhau thành công"
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- VIDEO SECTION (Đã sửa lỗi hiển thị) -->
+<section id="video-section" class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12" data-aos="fade-up">
+            <h3 class="text-[#C5A059] font-bold uppercase tracking-widest text-sm mb-2">Truyền Thông</h3>
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-800">Video Giới Thiệu</h2>
+            <p class="text-gray-500 mt-4 max-w-2xl mx-auto">Khám phá hành trình và các dự án tiềm năng qua góc nhìn thực
+                tế.</p>
+        </div>
+
+        <div class="max-w-4xl mx-auto" data-aos="zoom-in">
+            <!-- Video Facade Pattern: Hiển thị ảnh trước, click mới load video -->
+            <!-- Điều này giúp sửa lỗi 153/Autoplay và load trang nhanh hơn -->
+            <div class="video-facade" id="video-wrapper">
+                <img src="https://img.youtube.com/vi/oACtoI1YQIM/maxresdefault.jpg" alt="Video Thumbnail"
+                     id="video-thumb">
+                <button class="play-button" id="play-btn" aria-label="Play Video">
+                    <i class="fas fa-play text-white text-2xl ml-1"></i>
+                </button>
+                <!-- Iframe container -->
+                <div id="video-container"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects -->
+<section id="projects" class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+            <div data-aos="fade-right">
+                <h3 class="text-[#C5A059] font-bold uppercase tracking-widest text-sm mb-2">Portfolio</h3>
+                <h2 class="text-4xl font-serif font-bold text-slate-800">Các Dự Án Nổi Bật</h2>
+            </div>
+            <div class="hidden md:block w-1/3 h-[1px] bg-gray-200 mb-4"></div>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Project Card 1 -->
+            <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="0">
+                <div class="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4]">
+                    <img src="https://w.ladicdn.com/s550x450/65d32711e1e9400013ab1e1b/15a243e1d3ad0e246bb7ee118674899a-20250103073603-pr2ak.jpg"
+                         alt="Vinhomes Global Gate"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="text-[#C5A059] text-xs font-bold uppercase tracking-wider mb-2 block">Đông Anh, Hà Nội</span>
+                        <h4 class="text-white font-serif text-xl font-bold group-hover:text-[#C5A059] transition-colors">
+                            Vinhomes Global Gate</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 2 -->
+            <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="100">
+                <div class="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4]">
+                    <img src="https://w.ladicdn.com/s550x450/65d32711e1e9400013ab1e1b/ncdn-20240405041206-mlqgg-20240412041120-tiqyp.jpeg"
+                         alt="Solasta Mansion"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="text-[#C5A059] text-xs font-bold uppercase tracking-wider mb-2 block">Dương Nội</span>
+                        <h4 class="text-white font-serif text-xl font-bold group-hover:text-[#C5A059] transition-colors">
+                            Solasta Mansion</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 3 -->
+            <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="200">
+                <div class="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4]">
+                    <img src="https://w.ladicdn.com/s550x450/65d32711e1e9400013ab1e1b/vi-tri-du-an-lumi-hanoi-toa-lac-tai-mat-tien-dai-lo-thang-long-giup-cu-dan-ket-noi-thuan-tien-den-khu-vuc-lan-can-20250103073822-davg9.jpg"
+                         alt="Lumi Hanoi"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="text-[#C5A059] text-xs font-bold uppercase tracking-wider mb-2 block">Tây Mỗ</span>
+                        <h4 class="text-white font-serif text-xl font-bold group-hover:text-[#C5A059] transition-colors">
+                            Lumi Hanoi</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Card 4 -->
+            <div class="group cursor-pointer" data-aos="fade-up" data-aos-delay="300">
+                <div class="relative overflow-hidden rounded-lg shadow-lg aspect-[3/4]">
+                    <img src="https://w.ladicdn.com/s550x450/65d32711e1e9400013ab1e1b/phoi-canh-tong-the-vinh-trung-tam-sungroup-cat-ba-20250103074021-gfuyv.png"
+                         alt="Sun Group Cát Bà"
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity"></div>
+                    <div class="absolute bottom-0 left-0 p-6 w-full">
+                        <span class="text-[#C5A059] text-xs font-bold uppercase tracking-wider mb-2 block">Hải Phòng</span>
+                        <h4 class="text-white font-serif text-xl font-bold group-hover:text-[#C5A059] transition-colors">
+                            Sun Group Cát Bà</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Project Spotlight -->
+<section id="latest" class="py-24 bg-slate-900 text-white relative">
+    <div class="absolute inset-0 bg-black/50 z-0"></div>
+    <div class="absolute inset-0 bg-[url('https://w.ladicdn.com/s1000x1150/65d32711e1e9400013ab1e1b/sieu-do-thi-ket-noi1-20250103100119-jtluy.jpg')] bg-cover bg-fixed bg-center opacity-20"></div>
+
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <div data-aos="fade-right">
+                <div class="inline-block px-4 py-2 bg-[#C5A059] text-white font-bold uppercase text-xs rounded-sm mb-6 animate-pulse">
+                    Dự án Trọng Điểm
+                </div>
+                <h2 class="text-4xl md:text-5xl font-serif font-bold leading-tight mb-6">Vinhomes Global Gate <br> <span
+                        class="text-[#C5A059]">Cổ Loa</span></h2>
+                <p class="text-gray-300 text-lg leading-relaxed mb-8 text-justify">
+                    Khu đô thị mới rộng <strong>385 ha</strong> sở hữu vị trí "siêu kết nối" chỉ mất 5 phút đến trung
+                    tâm. Đây là mô hình <span class="text-[#C5A059]">"đô thị EXPO"</span> biểu tượng mới của Đông Anh.
+                </p>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-center gap-4">
+                        <i class="fas fa-check-circle text-[#C5A059] text-xl"></i>
+                        <span class="font-medium">Trung tâm hội chợ triển lãm Quốc gia</span>
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <i class="fas fa-check-circle text-[#C5A059] text-xl"></i>
+                        <span class="font-medium">Hệ thống tiện ích đẳng cấp 5 sao</span>
+                    </li>
+                    <li class="flex items-center gap-4">
+                        <i class="fas fa-check-circle text-[#C5A059] text-xl"></i>
+                        <span class="font-medium">Tiềm năng tăng giá X2 trong 3 năm</span>
+                    </li>
+                </ul>
+
+                <a href="#contact"
+                   class="btn-luxury inline-block px-8 py-4 bg-white text-slate-900 font-bold uppercase text-sm tracking-wider hover:bg-[#C5A059] hover:text-white transition-colors">
+                    Tải Bảng Giá Mới Nhất
+                </a>
+            </div>
+
+            <div class="relative" data-aos="fade-left">
+                <div class="absolute inset-0 bg-[#C5A059] transform translate-x-6 translate-y-6 -z-10 rounded-lg"></div>
+                <img src="https://w.ladicdn.com/s1000x1150/65d32711e1e9400013ab1e1b/sieu-do-thi-ket-noi1-20250103100119-jtluy.jpg"
+                     alt="Vinhomes Cổ Loa" class="rounded-lg shadow-2xl w-full">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-20 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <h2 class="text-3xl md:text-4xl font-serif font-bold text-center text-slate-800 mb-16">Khách Hàng Nói Gì?</h2>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                 data-aos="fade-up" data-aos-delay="0">
+                <div class="flex items-center gap-4 mb-6">
+                    <img src="https://w.ladicdn.com/s450x450/65d32711e1e9400013ab1e1b/41615306_1892972207417002_1158181851701968896_n-1559882137-20250106051307-oxihb.jpg"
+                         class="w-14 h-14 rounded-full object-cover border-2 border-[#C5A059]" alt="Khách hàng">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Chị Trịnh Lan</h4>
+                        <p class="text-xs text-gray-500 uppercase">Giám đốc Kinh Doanh</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed text-sm">"Sau thời gian dài tìm kiếm, tôi chọn Mạnh. Em
+                    ấy nhiệt tình, chu đáo và chuyên nghiệp. Hỗ trợ rất nhiều thủ tục sau bán hàng."</p>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                 data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center gap-4 mb-6">
+                    <img src="https://w.ladicdn.com/s450x400/65d32711e1e9400013ab1e1b/61799459_2127673584190938_2408149417967222784_n-1559882115-20250106051254-sbz-w.jpg"
+                         class="w-14 h-14 rounded-full object-cover border-2 border-[#C5A059]" alt="Khách hàng">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Cô Như Lan</h4>
+                        <p class="text-xs text-gray-500 uppercase">Phó Tổng Giám Đốc</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed text-sm">"Tôi tin tưởng và mong chờ dự án Vinhomes Global
+                    Gate sẽ thành công. Cảm ơn sự tư vấn và hỗ trợ tận tình của Cháu Mạnh."</p>
+            </div>
+
+            <!-- Testimonial 3 -->
+            <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                 data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-center gap-4 mb-6">
+                    <img src="https://w.ladicdn.com/s450x450/65d32711e1e9400013ab1e1b/57170639_868581903504646_303399118309425152_n-1559881004-20250106051240-e9nve.jpg"
+                         class="w-14 h-14 rounded-full object-cover border-2 border-[#C5A059]" alt="Khách hàng">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Chú Hoàng Quyền</h4>
+                        <p class="text-xs text-gray-500 uppercase">Tổng Giám Đốc</p>
+                    </div>
+                </div>
+                <p class="text-gray-600 italic leading-relaxed text-sm">"Tôi và gia đình rất vui khi mua được căn nhà
+                    cho con trai tại Hà Nội với giá tốt nhờ sự hỗ trợ của Mạnh."</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Footer -->
+<section id="contact" class="bg-slate-900 text-gray-300 py-16">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-2 gap-12">
+            <!-- Info -->
+            <div class="space-y-8">
+                <div>
+                    <h2 class="text-3xl font-serif font-bold text-white mb-2">Liên Hệ Tư Vấn</h2>
+                    <div class="w-16 h-1 bg-[#C5A059]"></div>
+                </div>
+
+                <div class="space-y-6 text-sm">
+                    <p class="flex items-start gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[#C5A059] shrink-0">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <span class="pt-1">Tầng 3, toà nhà Handiresco, số 31 Lê Văn Lương, Thanh Xuân, Hà Nội</span>
+                    </p>
+                    <p class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[#C5A059] shrink-0">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <a href="tel:0931360768" class="text-white font-bold hover:text-[#C5A059] text-xl">093.136.0768</a>
+                    </p>
+                    <p class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[#C5A059] shrink-0">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <span>vietmanh5858@gmail.com</span>
+                    </p>
+                    <p class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[#C5A059] shrink-0">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <span>www.vietmanhbds.com</span>
+                    </p>
+                </div>
+
+                <!-- Social Icons -->
+                <div class="flex gap-4">
+                    <a href="#"
+                       class="w-10 h-10 bg-slate-800 hover:bg-[#1877F2] text-white rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#"
+                       class="w-10 h-10 bg-slate-800 hover:bg-black text-white rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <a href="#"
+                       class="w-10 h-10 bg-slate-800 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="#"
+                       class="w-10 h-10 bg-slate-800 hover:bg-blue-500 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:-translate-y-1">
+                        <i class="fas fa-comment-dots"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="bg-white p-8 rounded-xl shadow-2xl text-slate-800">
+                <h3 class="text-xl font-bold mb-2">Đăng ký nhận thông tin</h3>
+                <p class="text-sm text-gray-500 mb-6">Nhận bảng giá và tài liệu dự án mới nhất qua Email.</p>
+                <form class="space-y-4">
+                    <div>
+                        <input type="text" placeholder="Họ và tên"
+                               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#C5A059] transition-colors">
+                    </div>
+                    <div>
+                        <input type="text" placeholder="Số điện thoại"
+                               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#C5A059] transition-colors">
+                    </div>
+                    <div>
+                        <input type="email" placeholder="Email"
+                               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-[#C5A059] transition-colors">
+                    </div>
+                    <button type="submit"
+                            class="btn-luxury w-full py-3 bg-[#C5A059] text-white font-bold rounded-lg hover:bg-[#b08d4b] transition-colors shadow-lg uppercase tracking-wider text-sm btn-pulse-soft">
+                        Gửi Thông Tin
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-gray-800 mt-12 pt-8 text-center text-xs text-gray-600">
+            <p>&copy; 2024 Nguyễn Viết Mạnh BDS. All rights reserved.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Floating Action Buttons (Unified Style) -->
+<div class="fixed bottom-6 right-6 flex flex-col gap-3 z-50 floating-group">
+    <!-- Zalo -->
+    <a href="https://zalo.me/0931360768" target="_blank"
+       class="float-item w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform relative group">
+        <span class="font-bold text-xs">Zalo</span>
+        <span class="absolute right-full mr-3 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Chat Zalo</span>
+    </a>
+
+    <!-- Phone -->
+    <a href="tel:0931360768"
+       class="float-item w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform relative group">
+        <i class="fas fa-phone-alt"></i>
+        <span class="absolute right-full mr-3 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Gọi Ngay</span>
+    </a>
+
+    <!-- Messenger -->
+    <a href="https://m.me/nguyenvietmanh.99999" target="_blank"
+       class="float-item w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform relative group">
+        <i class="fab fa-facebook-messenger"></i>
+        <span class="absolute right-full mr-3 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Messenger</span>
+    </a>
+
+    <!-- Youtube -->
+    <a href="https://youtube.com/@nguyenvietmanhbds" target="_blank"
+       class="float-item w-12 h-12 rounded-full bg-red-600 flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform relative group">
+        <i class="fab fa-youtube"></i>
+        <span class="absolute right-full mr-3 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Youtube</span>
+    </a>
+
+    <!-- Tiktok -->
+    <a href="https://www.tiktok.com/@thich.onha" target="_blank"
+       class="float-item w-12 h-12 rounded-full bg-black flex items-center justify-center text-white shadow-lg hover:scale-110 transition-transform relative group">
+        <i class="fab fa-tiktok"></i>
+        <span class="absolute right-full mr-3 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Tiktok</span>
+    </a>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Init AOS
+    AOS.init({
+        once: true,
+        offset: 100,
+        duration: 800,
+        easing: 'ease-out-cubic',
+    });
+
+    // Mobile Menu
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            menu.classList.add('hidden');
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({behavior: 'smooth'});
+        });
+    });
+
+    // Video Facade Logic
+    const videoWrapper = document.getElementById('video-wrapper');
+    const playBtn = document.getElementById('play-btn');
+    const thumb = document.getElementById('video-thumb');
+    const videoContainer = document.getElementById('video-container');
+
+    const videoId = 'oACtoI1YQIM';
+
+    function loadVideo() {
+        // Create iframe
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+        iframe.title = "YouTube video player";
+        iframe.frameBorder = "0";
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+
+        // Clear container and append iframe
+        videoContainer.innerHTML = '';
+        videoContainer.appendChild(iframe);
+
+        // Hide thumbnail and play button
+        playBtn.style.display = 'none';
+        thumb.style.display = 'none';
+    }
+
+    if (videoWrapper) {
+        videoWrapper.addEventListener('click', loadVideo);
+    }
+
+    // Header Scroll Effect
+    window.addEventListener('scroll', () => {
+        const navbar = document.getElementById('navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('shadow-md');
+        } else {
+            navbar.classList.remove('shadow-md');
+        }
+    });
+</script>
+</body>
+</html>

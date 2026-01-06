@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nguyễn Viết Mạnh - Cố Vấn Đầu Tư Bất Động Sản</title>
+    <meta name="description"
+          content="Chuyên gia tư vấn đầu tư bất động sản Nguyễn Viết Mạnh. Connect - Share - Success.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:ital,wght@0,400;0,600;1,400&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- VARIABLES & RESET --- */
+        :root {
+            --primary-gold: #c5a059;
+            --primary-gold-hover: #b08d4a;
+            --accent-red: #d80909;
+            --text-dark: #1a1a1a;
+            --text-gray: #555555;
+            --bg-light: #f9f9f9;
+            --white: #ffffff;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease-in-out;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-color: var(--white);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        /* --- UTILITIES --- */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-gold {
+            color: var(--primary-gold);
+        }
+
+        .text-red {
+            color: var(--accent-red);
+        }
+
+        .section-padding {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-gold);
+        }
+
+        /* --- HEADER & NAV --- */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 15px 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: var(--primary-gold);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-gold);
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* --- HERO SECTION --- */
+        #home {
+            padding-top: 140px; /* Space for fixed header */
+            padding-bottom: 80px;
+            background: linear-gradient(135deg, #fdfbf7 0%, #fff 100%);
+            min-height: 100vh; /* Full screen on large devices */
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero-content h2 {
+            font-size: 1.2rem;
+            color: var(--primary-gold);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .hero-image {
+            position: relative;
+        }
+
+        .hero-image img {
+            border-radius: 20px;
+            box-shadow: 20px 20px 0 var(--primary-gold);
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        /* --- BUTTONS & ANIMATIONS --- */
+        .btn {
+            display: inline-block;
+            padding: 15px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-red), #ff4d4d);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(216, 9, 9, 0.4);
+        }
+
+        /* Effect: Pulse & Shake */
+        .effect-pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% {
+                box-shadow: 0 0 0 0 rgba(216, 9, 9, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(216, 9, 9, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(216, 9, 9, 0);
+            }
+        }
+
+        .effect-shake:hover {
+            animation: shake 0.5s;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        /* --- ABOUT SECTION --- */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .philosophy-card {
+            background: var(--bg-light);
+            padding: 30px;
+            border-left: 5px solid var(--primary-gold);
+            border-radius: 0 8px 8px 0;
+            margin-top: 30px;
+        }
+
+        /* --- PROJECTS SECTION --- */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .project-thumb {
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .project-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .project-card:hover .project-thumb img {
+            transform: scale(1.1);
+        }
+
+        .project-info {
+            padding: 20px;
+        }
+
+        .project-info h4 {
+            color: var(--primary-gold);
+            font-size: 1.2rem;
+        }
+
+        /* --- VIDEO SECTION --- */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- LATEST ARTICLE --- */
+        .article-highlight {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid #eee;
+        }
+
+        /* --- TESTIMONIALS --- */
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--bg-light);
+            padding: 30px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .testimonial-card i {
+            font-size: 2rem;
+            color: var(--primary-gold);
+            opacity: 0.3;
+            margin-bottom: 15px;
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .client-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-gold);
+        }
+
+        /* --- CERTIFICATES (Gallery) --- */
+        .gallery-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding: 20px 0;
+            scrollbar-width: none;
+        }
+
+        .gallery-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .gallery-item {
+            min-width: 200px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- CONTACT & FOOTER --- */
+        #contact {
+            background-color: #1f2129;
+            color: #ccc;
+            padding: 80px 0 40px;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+        }
+
+        .contact-info h3 {
+            color: var(--primary-gold);
+        }
+
+        .contact-list li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact-list i {
+            color: var(--primary-gold);
+            width: 25px;
+        }
+
+        .contact-form input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+
+        .contact-form input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-submit {
+            background: var(--white);
+            color: var(--text-dark);
+            width: 100%;
+            padding: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-gold);
+            color: white;
+        }
+
+        /* --- FLOATING BUTTONS --- */
+        .floating-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 9999;
+        }
+
+        .float-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .float-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .float-btn::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: 60px;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .float-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Specific Colors for Floating Icons */
+        .bg-zalo {
+            background: #0068ff;
+        }
+
+        .bg-phone {
+            background: #34bf49;
+        }
+
+        .bg-facebook {
+            background: #1877f2;
+        }
+
+        .bg-tiktok {
+            background: #000000;
+        }
+
+        .bg-youtube {
+            background: #ff0000;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 992px) {
+            .hero-wrapper, .about-grid, .contact-layout {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-image img {
+                margin-top: 30px;
+            }
+
+            .philosophy-card {
+                border-left: none;
+                border-top: 5px solid var(--primary-gold);
+            }
+
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .floating-buttons {
+                bottom: 15px;
+                right: 10px;
+                gap: 10px;
+            }
+
+            .float-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* --- ANIMATION REVEAL CLASS --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container nav-container">
+        <a href="#" class="logo">VietManh<span>BDS</span></a>
+        <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+        <ul class="nav-menu">
+            <li><a href="#about" class="nav-link">Tiểu sử</a></li>
+            <li><a href="#projects" class="nav-link">Dự án</a></li>
+            <li><a href="#videos" class="nav-link">Video</a></li>
+            <li><a href="#articles" class="nav-link">Bài viết</a></li>
+            <li><a href="#feedback" class="nav-link">Phản hồi</a></li>
+            <li><a href="#contact" class="nav-link text-gold">Liên hệ</a></li>
+        </ul>
+    </div>
+</header>
+
+<section id="home">
+    <div class="container hero-wrapper">
+        <div class="hero-content reveal">
+            <h2>CỐ VẤN ĐẦU TƯ BẤT ĐỘNG SẢN</h2>
+            <h1>NGUYỄN VIẾT MẠNH</h1>
+            <p>"Connect - Share - Success. Chúng tôi nỗ lực mỗi ngày để mang đến cho khách hàng sản phẩm và dịch vụ tốt
+                nhất."</p>
+            <a href="#contact" class="btn btn-primary effect-pulse effect-shake">ĐĂNG KÝ TƯ VẤN NGAY</a>
+        </div>
+        <div class="hero-image reveal">
+            <img src="https://w.ladicdn.com/s700x850/65d32711e1e9400013ab1e1b/f367633cd842e5214593e17e20fa4c28-2-20250104054234-jjqn3.jpg"
+                 alt="Nguyễn Viết Mạnh">
+        </div>
+    </div>
+</section>
+
+<section id="about" class="section-padding">
+    <div class="container">
+        <h2 class="section-title reveal">Về Nguyễn Viết Mạnh</h2>
+        <div class="about-grid reveal">
+            <div>
+                <img src="https://w.ladicdn.com/s650x800/65d32711e1e9400013ab1e1b/img_1523-20250103040448-orbij.jpg"
+                     alt="Tiểu sử" style="border-radius: 20px;">
+            </div>
+            <div>
+                <h3>Tiểu Sử</h3>
+                <p class="reveal">Kính chào nhà đầu tư và đối tác. Trong hành trình hơn <strong>7 năm kinh
+                    nghiệm</strong> kinh doanh Bất Động Sản, Viết Mạnh rất vui và hạnh phúc vì công việc của mình góp
+                    phần giúp khách hàng gia tăng tài sản.</p>
+                <br>
+                <div class="philosophy-card reveal">
+                    <h3><i class="fas fa-quote-left text-gold"></i> Châm Ngôn Làm Việc</h3>
+                    <p><strong>Connect - Share - Success</strong></p>
+                    <p>Viết Mạnh luôn tin và phát triển không ngừng để chia sẻ, giải quyết và đưa ra phương án hỗ trợ
+                        hiệu quả tốt nhất cho nhà đầu tư, khách hàng và quý đối tác.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="section-padding" style="background-color: var(--bg-light);">
+    <div class="container">
+        <h2 class="section-title reveal">Dự Án Nổi Bật</h2>
+        <div class="project-grid">
+            <div class="project-card reveal">
+                <div class="project-thumb">
+                    <img src="https://w.ladicdn.com/s750x600/65d32711e1e9400013ab1e1b/15a243e1d3ad0e246bb7ee118674899a-20250103073603-pr2ak.jpg"
+                         alt="Vinhomes Global Gate">
+                </div>
+                <div class="project-info">
+                    <h4>VINHOMES GLOBAL GATE</h4>
+                    <p>Thành phố giao thương quốc tế với những công trình biểu tượng mới của Thủ đô tại Cổ Loa.</p>
+                </div>
+            </div>
+            <div class="project-card reveal">
+                <div class="project-thumb">
+                    <img src="https://w.ladicdn.com/s750x550/65d32711e1e9400013ab1e1b/ncdn-20240405041206-mlqgg-20240412041120-tiqyp.jpeg"
+                         alt="Solasta Mansion">
+                </div>
+                <div class="project-info">
+                    <h4>SOLASTA MANSION</h4>
+                    <p>Biệt thự nằm tại trục đường hướng tâm thành phố, KĐT Dương Nội, hạ tầng đồng bộ.</p>
+                </div>
+            </div>
+            <div class="project-card reveal">
+                <div class="project-thumb">
+                    <img src="https://w.ladicdn.com/s750x500/65d32711e1e9400013ab1e1b/vi-tri-du-an-lumi-hanoi-toa-lac-tai-mat-tien-dai-lo-thang-long-giup-cu-dan-ket-noi-thuan-tien-den-khu-vuc-lan-can-20250103073822-davg9.jpg"
+                         alt="Lumi Hanoi">
+                </div>
+                <div class="project-info">
+                    <h4>LUMI HÀ NỘI</h4>
+                    <p>Căn hộ chung cư cao cấp do CapitaLand phát triển tại Đại Lộ Thăng Long.</p>
+                </div>
+            </div>
+            <div class="project-card reveal">
+                <div class="project-thumb">
+                    <img src="https://w.ladicdn.com/s750x550/65d32711e1e9400013ab1e1b/phoi-canh-tong-the-vinh-trung-tam-sungroup-cat-ba-20250103074021-gfuyv.png"
+                         alt="Sun Group Cát Bà">
+                </div>
+                <div class="project-info">
+                    <h4>SUN GROUP CÁT BÀ</h4>
+                    <p>Khu đô thị du lịch và nghỉ dưỡng biển đẳng cấp quốc tế 49.9ha.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <h2 class="section-title reveal">Tiêu Điểm: Vinhomes Cổ Loa</h2>
+        <div class="about-grid reveal">
+            <div class="hero-content">
+                <h3>Vị Trí Chiến Lược & Siêu Kết Nối</h3>
+                <ul style="list-style: none; margin-bottom: 20px;">
+                    <li style="margin-bottom: 15px;"><i class="fas fa-check-circle text-red"></i> <strong>Quy
+                        mô:</strong> 385 ha tại Đông Anh, Hà Nội.
+                    </li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-check-circle text-red"></i> <strong>Kết
+                        nối:</strong> Chỉ 5-10 phút vào trung tâm thủ đô.
+                    </li>
+                    <li style="margin-bottom: 15px;"><i class="fas fa-check-circle text-red"></i> <strong>Mô
+                        hình:</strong> Đô thị EXPO lần đầu xuất hiện tại VN.
+                    </li>
+                </ul>
+                <p>Các sản phẩm biệt thự, liền kề, căn hộ hạng sang tại đây tiếp tục mở ra cơ hội an cư lạc nghiệp cũng
+                    như là kênh đầu tư giá trị bền vững.</p>
+            </div>
+            <div>
+                <img src="https://w.ladicdn.com/s1000x1150/65d32711e1e9400013ab1e1b/sieu-do-thi-ket-noi1-20250103100119-jtluy.jpg"
+                     alt="Vinhomes Cổ Loa Map" style="border-radius: 12px; box-shadow: var(--shadow-card);">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="videos" class="section-padding" style="background-color: var(--text-dark);">
+    <div class="container">
+        <h2 class="section-title reveal" style="color: white;">Video Giới Thiệu</h2>
+        <div class="video-wrapper reveal">
+            <iframe src="https://www.youtube.com/embed/oACtoI1YQIM" title="YouTube video player" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+</section>
+
+<section id="articles" class="section-padding">
+    <div class="container">
+        <h2 class="section-title reveal">Bài Viết Mới Nhất</h2>
+        <div class="article-highlight reveal">
+            <div class="about-grid">
+                <div>
+                    <img src="https://w.ladicdn.com/s1050x900/65d32711e1e9400013ab1e1b/img_5170-20250106054423-xgdqx.jpg"
+                         alt="Article Image">
+                </div>
+                <div>
+                    <h3 class="text-red">TOP 3 YẾU TỐ ĐỂ BĐS TĂNG GIÁ</h3>
+                    <p><strong>1. Cơ sở hạ tầng - Giao thông:</strong></p>
+                    <p>Lợi ích: Hạ tầng giao thông tốt giúp gia tăng khả năng kết nối giữa khu vực phát triển bất động
+                        sản và các trung tâm kinh tế, dịch vụ, tạo điều kiện thuận lợi cho việc di chuyển và sinh hoạt
+                        hàng ngày.</p>
+                    <br>
+                    <button class="btn btn-primary effect-shake">Xem chi tiết</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="feedback" class="section-padding" style="background-color: var(--bg-light);">
+    <div class="container">
+        <h2 class="section-title reveal">Khách Hàng Nói Về Chúng Tôi</h2>
+        <div class="testimonial-grid">
+            <div class="testimonial-card reveal">
+                <i class="fas fa-quote-left"></i>
+                <p>"An cư thì mới lạc nghiệp. Tôi chọn Mạnh vì em ấy nhiệt tình, chu đáo và chuyên nghiệp. Hỗ trợ rất
+                    nhiều sau bán hàng."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x400/65d32711e1e9400013ab1e1b/41615306_1892972207417002_1158181851701968896_n-1559882137-20250106051307-oxihb.jpg"
+                         alt="Client" class="client-avatar">
+                    <div>
+                        <h4>Trịnh Lan</h4>
+                        <small>Giám đốc kinh doanh</small>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <i class="fas fa-quote-left"></i>
+                <p>"Tôi tin tưởng và mong chờ dự án Vinhomes Global Gate sẽ thành công. Cảm ơn sự tư vấn và hỗ trợ tận
+                    tình của cháu Mạnh."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x400/65d32711e1e9400013ab1e1b/61799459_2127673584190938_2408149417967222784_n-1559882115-20250106051254-sbz-w.jpg"
+                         alt="Client" class="client-avatar">
+                    <div>
+                        <h4>Như Lan</h4>
+                        <small>Phó tổng giám đốc</small>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <i class="fas fa-quote-left"></i>
+                <p>"Rất vui khi mua được căn nhà cho con trai tại Hà Nội nhờ Mạnh. Nếu không có Mạnh, khó có thể mua
+                    được giá tốt năm 2022."</p>
+                <div class="client-info">
+                    <img src="https://w.ladicdn.com/s400x400/65d32711e1e9400013ab1e1b/57170639_868581903504646_303399118309425152_n-1559881004-20250106051240-e9nve.jpg"
+                         alt="Client" class="client-avatar">
+                    <div>
+                        <h4>Hoàng Quyền</h4>
+                        <small>Tổng giám đốc</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container text-center">
+        <h4 class="reveal">HOẠT ĐỘNG & CHỨNG NHẬN</h4>
+        <div class="gallery-scroll reveal">
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s450x450/65d32711e1e9400013ab1e1b/tai-xuong-1-20250103101125-rnmaj.jpeg"
+                    alt="Cert 1"></div>
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s550x550/65d32711e1e9400013ab1e1b/tai-xuong-20250103101125-gj-sj.png"
+                    alt="Cert 2"></div>
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s500x500/65d32711e1e9400013ab1e1b/tai-xuong-5-20250103101252-zkcjo.jpeg"
+                    alt="Cert 3"></div>
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s550x500/65d32711e1e9400013ab1e1b/tai-xuong-1-20250103101125-vp7lr.png"
+                    alt="Cert 4"></div>
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s500x450/65d32711e1e9400013ab1e1b/tai-xuong-6-20250103104256-r7mm1.jpeg"
+                    alt="Cert 5"></div>
+            <div class="gallery-item"><img
+                    src="https://w.ladicdn.com/s450x450/65d32711e1e9400013ab1e1b/tai-xuong-2-20250103104345-pumra.png"
+                    alt="Cert 6"></div>
+        </div>
+    </div>
+</section>
+
+<footer id="contact">
+    <div class="container">
+        <div class="contact-layout reveal">
+            <div class="contact-info">
+                <h3>THÔNG TIN LIÊN HỆ</h3>
+                <p style="margin-bottom: 20px;">Tầng 3, toà nhà Handiresco, số 31 Lê Văn Lương, Thanh Xuân, Hà Nội</p>
+                <ul class="contact-list">
+                    <li><i class="fas fa-user"></i> Cố vấn: <strong>Nguyễn Viết Mạnh</strong></li>
+                    <li><i class="fas fa-phone-alt"></i> Hotline: <a href="tel:0931360768" class="text-gold">093.136.0768</a>
+                    </li>
+                    <li><i class="fas fa-envelope"></i> Email: vietmanh5858@gmail.com</li>
+                    <li><i class="fas fa-globe"></i> Website: www.vietmanhbds.com</li>
+                </ul>
+            </div>
+            <div class="contact-form-wrapper">
+                <h3 class="text-center" style="color:white; margin-bottom: 20px;">Đăng ký nhận thông tin ưu đãi</h3>
+                <form class="contact-form"
+                      onsubmit="event.preventDefault(); alert('Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ sớm.');">
+                    <input type="text" placeholder="Họ và tên" required>
+                    <input type="text" placeholder="Số điện thoại" required>
+                    <input type="email" placeholder="Email" required>
+                    <button type="submit" class="btn-submit effect-pulse">GỬI ĐI</button>
+                </form>
+            </div>
+        </div>
+        <div class="text-center" style="margin-top: 50px; opacity: 0.5; font-size: 0.8rem;">
+            <p>&copy; 2026 Nguyễn Viết Mạnh BDS. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<div class="floating-buttons">
+    <a href="https://www.facebook.com/share/1BTKEtnNTv/?mibextid=wwXIfr" target="_blank"
+       class="float-btn bg-facebook effect-pulse" data-tooltip="Facebook">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+    <a href="tel:0931360768" class="float-btn bg-zalo effect-shake" data-tooltip="Chat Zalo">
+        <i class="fas fa-comment-dots"></i>
+    </a>
+    <a href="tel:0931360768" class="float-btn bg-phone effect-pulse" data-tooltip="Gọi ngay">
+        <i class="fas fa-phone"></i>
+    </a>
+    <a href="https://www.tiktok.com/@thich.onha?_t=8os6fBSga4m&_r=1" target="_blank" class="float-btn bg-tiktok"
+       data-tooltip="TikTok">
+        <i class="fab fa-tiktok"></i>
+    </a>
+    <a href="https://www.youtube.com/channel/UCBm2cybV4FpjUil-MYn-wMw/playlists" target="_blank"
+       class="float-btn bg-youtube" data-tooltip="YouTube">
+        <i class="fab fa-youtube"></i>
+    </a>
+</div>
+
+<script>
+    // Toggle Mobile Menu
+    function toggleMenu() {
+        const nav = document.querySelector('.nav-menu');
+        nav.classList.toggle('active');
+    }
+
+    // Close menu when clicking a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            document.querySelector('.nav-menu').classList.remove('active');
+        });
+    });
+
+    // Scroll Reveal Animation using Intersection Observer
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target); // Only animate once
+            }
+        });
+    }, {
+        root: null,
+        threshold: 0.15, // Trigger when 15% of element is visible
+        rootMargin: "0px"
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+</script>
+</body>
+</html>
