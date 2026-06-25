@@ -128,6 +128,14 @@
             animation: pulse 2s infinite;
             z-index: 20;
         }
+        /* Enlarge touch target to ~44px while keeping the 20px visible dot */
+        .hotspot::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 44px; height: 44px;
+            transform: translate(-50%, -50%);
+        }
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(0, 255, 255, 0); }
@@ -143,13 +151,15 @@
             border: 1px solid var(--neon-cyan);
             padding: 10px;
             border-radius: 6px;
-            width: 250px;
+            width: min(250px, 80vw);
+            max-width: 90vw;
             pointer-events: none;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             z-index: 30;
         }
-        .hotspot:hover .tooltip-content {
+        .hotspot:hover .tooltip-content,
+        .hotspot.active .tooltip-content {
             visibility: visible;
             opacity: 1;
             bottom: 140%;
@@ -192,8 +202,8 @@
                     Hệ Thống Âm Thanh
                 </h2>
                 <!-- Decorative lines -->
-                <div class="absolute -left-10 top-1/2 w-8 h-[2px] bg-cyan-400 shadow-[0_0_10px_#00FFFF]"></div>
-                <div class="absolute -right-10 top-1/2 w-8 h-[2px] bg-cyan-400 shadow-[0_0_10px_#00FFFF]"></div>
+                <div class="hidden md:block absolute -left-10 top-1/2 w-8 h-[2px] bg-cyan-400 shadow-[0_0_10px_#00FFFF]"></div>
+                <div class="hidden md:block absolute -right-10 top-1/2 w-8 h-[2px] bg-cyan-400 shadow-[0_0_10px_#00FFFF]"></div>
             </div>
             <p class="mt-4 text-gray-400 max-w-2xl mx-auto text-sm">Bảng điều khiển tương tác (Interactive Panel). Vui lòng tương tác với các công cụ bên dưới để quan sát sự thay đổi của sóng âm trong không gian thời gian thực.</p>
         </header>
@@ -293,13 +303,13 @@
                         </svg>
 
                         <!-- HOTSPOTS (Hover for info) -->
-                        <div class="hotspot top-[15%] left-[25%]">
+                        <div class="hotspot top-[15%] left-[25%]" tabindex="0">
                             <div class="tooltip-content font-sans text-sm">
                                 <strong class="text-cyan-400 font-tech">Đường Phase Trace</strong><br>
                                 Hiển thị góc pha (từ 180° đến -180°) theo tần số. Đường dốc thẳng đứng báo hiệu có sự sai lệch về thời gian (Delay).
                             </div>
                         </div>
-                        <div class="hotspot bottom-[30%] right-[30%]">
+                        <div class="hotspot bottom-[30%] right-[30%]" tabindex="0">
                             <div class="tooltip-content font-sans text-sm">
                                 <strong class="text-yellow-400 font-tech">Biểu đồ Magnitude (RTA)</strong><br>
                                 Hiển thị mức cường độ âm thanh (dB) ở từng dải tần số thực tế mà micro đo được.
@@ -651,6 +661,24 @@
 
         // Trigger click on first step by default
         setTimeout(() => flowchartContainer.children[0].click(), 500);
+
+        // ----------------------------------------------------
+        // 5. HOTSPOT TOOLTIP — TAP/TOUCH SUPPORT (mobile)
+        // Hover vẫn hoạt động trên desktop qua CSS; đây chỉ thêm toggle .active khi chạm.
+        // ----------------------------------------------------
+        const hotspots = document.querySelectorAll('.hotspot');
+        hotspots.forEach((hs) => {
+            hs.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const wasActive = hs.classList.contains('active');
+                hotspots.forEach(h => h.classList.remove('active'));
+                if (!wasActive) hs.classList.add('active');
+            });
+        });
+        // Tap ra ngoài để đóng tooltip
+        document.addEventListener('click', () => {
+            hotspots.forEach(h => h.classList.remove('active'));
+        });
 
     </script>
 </body>

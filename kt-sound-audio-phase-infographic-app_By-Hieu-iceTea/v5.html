@@ -160,9 +160,11 @@
         }
         .animate-glow { animation: pulse-glow 2s infinite; }
         
-        .flow-step:hover .step-detail {
+        .flow-step:hover .step-detail,
+        .flow-step.active .step-detail {
             max-height: 200px;
             opacity: 1;
+            visibility: visible;
             padding-top: 1rem;
         }
     </style>
@@ -172,7 +174,7 @@
     <div class="scanline"></div>
     <div class="bg-line-array"></div>
 
-    <header class="max-w-7xl mx-auto mb-8 relative z-10 flex flex-col md:flex-row justify-between items-end border-b border-cyan-500/30 pb-4">
+    <header class="max-w-7xl mx-auto mb-8 relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-cyan-500/30 pb-4">
         <div>
             <h2 class="text-neon-cyan font-orbitron tracking-widest text-sm font-bold uppercase">System Architecture</h2>
             <h1 class="text-4xl md:text-6xl font-orbitron font-black text-neon-yellow drop-shadow-[0_0_15px_rgba(255,215,0,0.4)] mt-2">
@@ -199,13 +201,13 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-                <div class="col-span-2 relative bg-black/50 rounded border border-cyan-500/20 p-2">
+                <div class="md:col-span-2 relative bg-black/50 rounded border border-cyan-500/20 p-2">
                     <!-- Oscilloscope Screen -->
-                    <canvas id="waveCanvas" width="800" height="300" class="w-full h-[300px] rounded"></canvas>
-                    <div class="absolute top-4 left-4 text-xs font-orbitron text-cyan-400/50">CH A: Tín hiệu 1 | CH B: Tín hiệu 2 | SUM: Tổng hợp</div>
+                    <canvas id="waveCanvas" width="800" height="300" class="w-full h-[200px] md:h-[300px] rounded"></canvas>
+                    <div class="absolute top-4 left-4 text-[10px] md:text-xs font-orbitron text-cyan-400/50 max-w-[90%]">CH A: Tín hiệu 1 | CH B: Tín hiệu 2 | SUM: Tổng hợp</div>
                 </div>
                 
-                <div class="col-span-1 flex flex-col gap-6 p-4">
+                <div class="md:col-span-1 flex flex-col gap-6 p-4">
                     <div class="text-sm text-gray-300">
                         <p class="mb-2"><strong class="text-white">Giao thoa đồng pha (In-Phase):</strong> Khi hai sóng cùng chu kỳ chồng lên nhau ở góc lệch 0°, biên độ tổng hợp tăng gấp đôi (+6dB).</p>
                         <p><strong class="text-white">Giao thoa triệt tiêu (Out-of-Phase):</strong> Khi một sóng bị trễ hoặc đảo cực 180°, phần đỉnh của sóng này gặp phần đáy của sóng kia, dẫn đến triệt tiêu âm thanh sâu (Comb filtering).</p>
@@ -370,7 +372,7 @@
                                 <h4 class="mt-4 font-orbitron text-sm font-bold text-center text-gray-200 group-hover:text-neon-cyan">${step.title}</h4>
                                 
                                 <!-- Nội dung mở rộng khi Hover -->
-                                <div class="step-detail overflow-hidden max-h-0 opacity-0 transition-all duration-500 ease-in-out absolute top-full mt-2 w-48 text-center">
+                                <div class="step-detail overflow-hidden max-h-0 opacity-0 transition-all duration-500 ease-in-out absolute top-full mt-2 w-48 max-w-[80vw] text-center">
                                     <div class="bg-black/80 border border-cyan-500/50 p-3 rounded text-xs text-gray-300 shadow-xl backdrop-blur-sm">
                                         ${step.desc}
                                     </div>
@@ -637,6 +639,20 @@
             }
             
             drawRta();
+
+
+            /* ========================================================
+               PHẦN 4: FLOWCHART - Toggle mô tả bằng chạm (mobile)
+               Giữ nguyên hover trên desktop, thêm tap để xem mô tả.
+               ======================================================== */
+            const flowSteps = document.querySelectorAll('.flow-step');
+            flowSteps.forEach((step) => {
+                step.addEventListener('click', () => {
+                    const wasActive = step.classList.contains('active');
+                    flowSteps.forEach(s => s.classList.remove('active'));
+                    if (!wasActive) step.classList.add('active');
+                });
+            });
         });
     </script>
 </body>
