@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Engineering: Đồng Bộ Phase 🍀 Hiếu iceTea</title>
+    <!-- ===== SEO / Open Graph · 🍀 Tạo & tối ưu bởi Hiếu iceTea ===== -->
+    <meta name="author" content="Hiếu iceTea">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2674/2674498.png">
+    <meta name="description" content="Kỹ thuật âm thanh: hiểu & đồng bộ Phase để âm trầm chắc, âm hình rõ. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="KT SOUND — Audio Engineering: Đồng Bộ Phase 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:description" content="Kỹ thuật âm thanh: hiểu & đồng bộ Phase để âm trầm chắc, âm hình rõ. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: {
+                            900: '#060B19', // Darkest background
+                            800: '#0A132B', // Panel background
+                        },
+                        neon: {
+                            cyan: '#00F0FF',
+                            blue: '#0055FF',
+                            green: '#00FF66',
+                            red: '#FF003C',
+                            yellow: '#FFD700'
+                        }
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1)',
+                        'neon-blue': '0 0 15px rgba(0, 85, 255, 0.5)',
+                        'neon-yellow': '0 0 10px rgba(255, 215, 0, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #060B19;
+            color: #e2e8f0;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
+        }
+
+        /* Scanline effect */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.3;
+        }
+
+        /* Line Array Background Decoration */
+        .bg-line-array {
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 500px;
+            height: 800px;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='200' viewBox='0 0 100 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 h80 v30 h-80 z' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Ccircle cx='30' cy='25' r='8' fill='%2300F0FF'/%3E%3Ccircle cx='70' cy='25' r='8' fill='%2300F0FF'/%3E%3Cpath d='M10 45 h80 v30 h-80 z' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Ccircle cx='30' cy='60' r='8' fill='%2300F0FF'/%3E%3Ccircle cx='70' cy='60' r='8' fill='%2300F0FF'/%3E%3Cpath d='M10 80 h80 v30 h-80 z' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Ccircle cx='30' cy='95' r='8' fill='%2300F0FF'/%3E%3Ccircle cx='70' cy='95' r='8' fill='%2300F0FF'/%3E%3Cpath d='M10 115 h80 v30 h-80 z' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Ccircle cx='30' cy='130' r='8' fill='%2300F0FF'/%3E%3Ccircle cx='70' cy='130' r='8' fill='%2300F0FF'/%3E%3Cpath d='M10 150 h80 v30 h-80 z' fill='none' stroke='%2300F0FF' stroke-width='2'/%3E%3Ccircle cx='30' cy='165' r='8' fill='%2300F0FF'/%3E%3Ccircle cx='70' cy='165' r='8' fill='%2300F0FF'/%3E%3C/svg%3E");
+            background-repeat: repeat-y;
+            transform: rotate(15deg);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Panel */
+        .hi-tech-panel {
+            background: rgba(10, 19, 43, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .hi-tech-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 10px; height: 10px;
+            border-top: 2px solid #00F0FF;
+            border-left: 2px solid #00F0FF;
+        }
+        .hi-tech-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0; width: 10px; height: 10px;
+            border-bottom: 2px solid #00F0FF;
+            border-right: 2px solid #00F0FF;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #060B19; }
+        ::-webkit-scrollbar-thumb { background: #00F0FF; border-radius: 4px; }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #00F0FF;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px #00F0FF;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1C2541;
+            border-radius: 2px;
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #00F0FF;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #0055FF;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 5px #00F0FF); }
+            50% { filter: drop-shadow(0 0 15px #00F0FF); }
+        }
+        .animate-glow { animation: pulse-glow 2s infinite; }
+        
+        .flow-step:hover .step-detail {
+            max-height: 200px;
+            opacity: 1;
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body class="font-inter antialiased min-h-screen relative p-4 md:p-8">
+
+    <div class="scanline"></div>
+    <div class="bg-line-array"></div>
+
+    <header class="max-w-7xl mx-auto mb-8 relative z-10 flex flex-col md:flex-row justify-between items-end border-b border-cyan-500/30 pb-4">
+        <div>
+            <h2 class="text-neon-cyan font-orbitron tracking-widest text-sm font-bold uppercase">System Architecture</h2>
+            <h1 class="text-4xl md:text-6xl font-orbitron font-black text-neon-yellow drop-shadow-[0_0_15px_rgba(255,215,0,0.4)] mt-2">
+                ĐỒNG BỘ PHASE
+            </h1>
+            <p class="text-gray-400 mt-2 text-lg">Phân tích & Tối ưu hóa hệ thống âm thanh (Audio Alignment)</p>
+        </div>
+        <div class="text-right mt-4 md:mt-0 font-orbitron text-sm text-neon-cyan/70">
+            [ RTA / SMAART / DELAY MATRIX ]<br>
+            STATUS: <span class="text-neon-green animate-pulse">ONLINE</span>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+
+        <!-- ================= PHẦN 1: TƯƠNG TÁC SÓNG ÂM ================= -->
+        <section class="hi-tech-panel col-span-1 md:col-span-12 p-6 rounded-lg shadow-neon-cyan">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-orbitron font-bold text-neon-blue">1. PHÂN TÍCH GIAO THOA SÓNG (WAVE INTERFERENCE)</h3>
+                <div class="flex gap-4 text-sm font-orbitron bg-navy-900 px-4 py-2 rounded border border-cyan-500/20">
+                    <span class="text-neon-green flex items-center gap-2"><div class="w-3 h-3 bg-neon-green rounded-full"></div> In-Phase</span>
+                    <span class="text-neon-red flex items-center gap-2"><div class="w-3 h-3 bg-neon-red rounded-full"></div> Out-of-Phase</span>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                <div class="col-span-2 relative bg-black/50 rounded border border-cyan-500/20 p-2">
+                    <!-- Oscilloscope Screen -->
+                    <canvas id="waveCanvas" width="800" height="300" class="w-full h-[300px] rounded"></canvas>
+                    <div class="absolute top-4 left-4 text-xs font-orbitron text-cyan-400/50">CH A: Tín hiệu 1 | CH B: Tín hiệu 2 | SUM: Tổng hợp</div>
+                </div>
+                
+                <div class="col-span-1 flex flex-col gap-6 p-4">
+                    <div class="text-sm text-gray-300">
+                        <p class="mb-2"><strong class="text-white">Giao thoa đồng pha (In-Phase):</strong> Khi hai sóng cùng chu kỳ chồng lên nhau ở góc lệch 0°, biên độ tổng hợp tăng gấp đôi (+6dB).</p>
+                        <p><strong class="text-white">Giao thoa triệt tiêu (Out-of-Phase):</strong> Khi một sóng bị trễ hoặc đảo cực 180°, phần đỉnh của sóng này gặp phần đáy của sóng kia, dẫn đến triệt tiêu âm thanh sâu (Comb filtering).</p>
+                    </div>
+
+                    <div class="bg-navy-900 p-4 rounded border border-cyan-500/30">
+                        <label class="block text-neon-cyan font-orbitron text-sm mb-2 flex justify-between">
+                            <span>Góc lệch Pha (Phase Shift)</span>
+                            <span id="phaseValue">0°</span>
+                        </label>
+                        <input type="range" id="phaseSlider" min="0" max="180" value="0" class="w-full">
+                        <div class="flex justify-between text-xs text-gray-500 mt-2">
+                            <span>0° (Cộng hưởng)</span>
+                            <span>180° (Triệt tiêu)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PHẦN 2 & 3 CONTAINER ================= -->
+        <div class="col-span-1 md:col-span-12 grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+            <!-- ================= PHẦN 2: LAPTOP RTA & TAI NGHE ================= -->
+            <section class="hi-tech-panel lg:col-span-2 p-6 rounded-lg shadow-neon-cyan flex flex-col justify-between relative overflow-hidden">
+                <!-- Watermark icon -->
+                <i class="ph ph-headphones absolute -bottom-10 -right-10 text-[200px] text-cyan-500/5 rotate-[-15deg]"></i>
+                
+                <h3 class="text-xl font-orbitron font-bold text-neon-yellow mb-4">2. HỆ THỐNG ĐO LƯỜNG (RTA / SMAART)</h3>
+                <p class="text-sm text-gray-400 mb-6 relative z-10">Sử dụng Micro RTA và phần mềm chuyên dụng để phân tích đáp tuyến tần số (Magnitude) và đáp tuyến pha (Phase) theo thời gian thực.</p>
+                
+                <!-- Vector Laptop UI -->
+                <div class="relative mx-auto w-full max-w-sm mt-auto z-10 group cursor-pointer" id="laptop-container">
+                    <div class="bg-gray-800 rounded-t-xl border-4 border-gray-700 p-2 relative h-48">
+                        <!-- Camera dot -->
+                        <div class="w-1.5 h-1.5 bg-gray-500 rounded-full mx-auto mb-1"></div>
+                        <!-- Screen -->
+                        <div class="bg-navy-900 w-full h-full rounded border border-cyan-500/30 relative overflow-hidden">
+                            <!-- Overlay Graph Grid -->
+                            <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTE5IDBMMTkgMjBMMCAyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJyZ2JhKDAsIDI0MCwgMjU1LCAwLjEpIiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=')]"></div>
+                            <!-- RTA Canvas -->
+                            <canvas id="rtaCanvas" class="w-full h-full relative z-10"></canvas>
+                            <!-- Phase Trace Decoration -->
+                            <svg class="absolute inset-0 w-full h-full z-20 pointer-events-none" preserveAspectRatio="none">
+                                <path id="phaseTrace" d="M0 60 Q 50 10, 100 60 T 200 60 T 300 60 T 400 120" fill="none" stroke="#FF003C" stroke-width="2" opacity="0.8"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- Laptop Base -->
+                    <div class="bg-gray-400 h-3 rounded-b-xl relative w-[110%] -left-[5%] flex justify-center shadow-lg">
+                        <div class="w-20 h-1 bg-gray-600 rounded-b mt-0.5"></div>
+                    </div>
+                    
+                    <!-- Tooltip on hover -->
+                    <div class="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-navy-900 border border-cyan-500 text-xs p-2 rounded shadow-neon-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-48 text-center pointer-events-none">
+                        <span class="text-neon-cyan">Biểu đồ Magnitude:</span> Xanh lá<br>
+                        <span class="text-neon-red">Biểu đồ Phase:</span> Đỏ
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= PHẦN 3: ĐIỀU KHIỂN & TÍNH TOÁN ================= -->
+            <section class="hi-tech-panel lg:col-span-3 p-6 rounded-lg shadow-neon-cyan flex flex-col">
+                <h3 class="text-xl font-orbitron font-bold text-neon-blue mb-4">3. CÔNG CỤ HIỆU CHỈNH (ALIGNMENT TOOLS)</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
+                    
+                    <!-- Cột 1: Toggle Switch -->
+                    <div class="bg-black/30 p-4 rounded border border-cyan-500/20 flex flex-col items-center justify-center relative overflow-hidden">
+                        <div class="absolute top-2 left-2 text-[10px] text-gray-500 font-orbitron">PHASE SHIFT</div>
+                        <i class="ph ph-sliders-horizontal text-4xl text-cyan-500/30 mb-4 animate-glow"></i>
+                        
+                        <div class="relative inline-block w-20 h-10 align-middle select-none transition duration-200 ease-in mt-4">
+                            <input type="checkbox" name="toggle" id="phaseToggleBtn" class="toggle-checkbox absolute block w-10 h-10 rounded-full bg-white border-4 border-gray-700 appearance-none cursor-pointer z-10 transition-transform duration-300"/>
+                            <label for="phaseToggleBtn" class="toggle-label block overflow-hidden h-10 rounded-full bg-gray-700 cursor-pointer"></label>
+                        </div>
+                        <div class="flex justify-between w-24 mt-2 text-sm font-bold font-orbitron">
+                            <span class="text-neon-cyan" id="lbl-0">0°</span>
+                            <span class="text-gray-500" id="lbl-180">180°</span>
+                        </div>
+                        <p class="text-xs text-center text-gray-400 mt-4">Công tắc đảo cực điện tử nhanh (Polarity Reversal).</p>
+                    </div>
+
+                    <!-- Cột 2: Máy tính Delay -->
+                    <div class="bg-black/30 p-4 rounded border border-cyan-500/20 col-span-1 flex flex-col justify-between">
+                        <div class="text-[10px] text-gray-500 font-orbitron mb-2">TIME ALIGNMENT CALCULATOR</div>
+                        
+                        <div class="flex items-center justify-between bg-navy-900 p-2 rounded border border-cyan-500/30 mb-3">
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-speaker-hifi text-neon-cyan text-xl"></i>
+                                <span class="text-[10px] mt-1 text-gray-300">MAIN</span>
+                            </div>
+                            <div class="flex-1 px-3">
+                                <input type="range" id="distMain" min="1" max="30" value="15" step="0.5">
+                                <div class="text-center text-xs mt-1"><span id="valMain" class="text-neon-yellow font-bold">15</span> m</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-navy-900 p-2 rounded border border-cyan-500/30 mb-3">
+                            <div class="flex flex-col items-center">
+                                <i class="ph ph-speaker-low text-neon-red text-xl"></i>
+                                <span class="text-[10px] mt-1 text-gray-300">SUB</span>
+                            </div>
+                            <div class="flex-1 px-3">
+                                <input type="range" id="distSub" min="1" max="30" value="12" step="0.5">
+                                <div class="text-center text-xs mt-1"><span id="valSub" class="text-neon-yellow font-bold">12</span> m</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-cyan-900/40 border border-cyan-500/50 p-2 rounded text-center">
+                            <div class="text-[10px] text-cyan-300 mb-1">ĐỘ TRỄ CẦN THIẾT (DELAY)</div>
+                            <div class="text-xl font-orbitron font-bold text-white flex justify-center items-end gap-1">
+                                <span id="delayResult">8.74</span> <span class="text-xs text-neon-cyan mb-1">ms</span>
+                            </div>
+                            <div class="text-[9px] text-gray-400 mt-1">Vận tốc âm thanh: v ≈ 343 m/s <br> Δt = (d_main - d_sub) / v</div>
+                        </div>
+                    </div>
+
+                    <!-- Cột 3: Mixer Button -->
+                    <div class="bg-black/30 p-4 rounded border border-cyan-500/20 flex flex-col items-center justify-center relative shadow-[inset_0_0_20px_rgba(0,0,0,0.8)]">
+                        <div class="absolute top-2 left-2 text-[10px] text-gray-500 font-orbitron">MIXER CHANNEL</div>
+                        
+                        <!-- Physical Button CSS -->
+                        <button id="polarityBtn" class="relative w-16 h-16 rounded bg-gray-800 border-b-4 border-gray-900 shadow-[0_5px_15px_rgba(0,0,0,0.5),inset_0_2px_2px_rgba(255,255,255,0.1)] active:border-b-0 active:translate-y-1 transition-all duration-100 flex items-center justify-center group mb-4">
+                            <span class="text-2xl text-gray-300 font-bold group-active:text-neon-red transition-colors duration-200">Ø</span>
+                            <div id="btnLed" class="absolute top-1 right-1 w-2 h-2 rounded-full bg-gray-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)]"></div>
+                        </button>
+                        
+                        <h4 class="text-neon-yellow font-orbitron text-sm font-bold text-center">POLARITY<br>REVERSE</h4>
+                        <p class="text-[10px] text-center text-gray-400 mt-3 border-t border-gray-700 pt-2 w-full">Đảo ngược cực tính tín hiệu trên bàn trộn (Mixer) trước khi xuất ra DSP.</p>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= PHẦN 4: QUY TRÌNH FLOWCHART ================= -->
+        <section class="hi-tech-panel col-span-1 md:col-span-12 p-6 rounded-lg shadow-neon-cyan">
+            <h3 class="text-xl font-orbitron font-bold text-neon-cyan mb-6">4. QUY TRÌNH ĐỒNG BỘ CHUẨN (STANDARD WORKFLOW)</h3>
+            
+            <div class="flex flex-col md:flex-row justify-between relative">
+                <!-- Đường nối ngang nền -->
+                <div class="hidden md:block absolute top-10 left-10 right-10 h-0.5 bg-gradient-to-r from-cyan-500/20 via-cyan-500 to-cyan-500/20 z-0"></div>
+
+                <!-- Các bước -->
+                <script>
+                    const steps = [
+                        { icon: "ph-microphone-stage", title: "1. Đặt Mic RTA", desc: "Đặt mic đo lường tại điểm giao thoa (Crossover zone) giữa Loa Main và Loa Sub." },
+                        { icon: "ph-speaker-high", title: "2. Đo Loa Main", desc: "Phát Pink Noise, lưu lại đường cong Magnitude và Phase (Trace) của Loa Full/Main." },
+                        { icon: "ph-speaker-low", title: "3. Đo Loa Sub", desc: "Tắt Main, bật Sub. Chỉnh Level sao cho cường độ bằng với Main tại điểm cắt tần." },
+                        { icon: "ph-clock-countdown", title: "4. Căn chỉnh Delay", desc: "Thêm Delay vào hệ thống loa đến trước sao cho 2 đường Phase trùng khớp nhau." },
+                        { icon: "ph-check-circle", title: "5. Kiểm tra", desc: "Bật cả 2 loa. Vùng giao thoa phải tăng +6dB. Nếu bị lõm sâu, thử đảo cực (Reverse Polarity)." }
+                    ];
+
+                    steps.forEach((step, index) => {
+                        document.write(`
+                            <div class="flow-step flex-1 relative z-10 flex flex-col items-center group cursor-crosshair mb-8 md:mb-0">
+                                <div class="w-20 h-20 rounded-full bg-navy-900 border-2 border-cyan-500 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.3)] group-hover:scale-110 group-hover:bg-cyan-900 transition-all duration-300 relative">
+                                    <i class="ph ${step.icon} text-3xl text-white group-hover:text-neon-yellow"></i>
+                                    ${index < steps.length - 1 ? '<i class="ph ph-caret-right absolute -right-8 text-2xl text-cyan-500/50 hidden md:block group-hover:text-cyan-400 group-hover:translate-x-2 transition-all"></i>' : ''}
+                                </div>
+                                <h4 class="mt-4 font-orbitron text-sm font-bold text-center text-gray-200 group-hover:text-neon-cyan">${step.title}</h4>
+                                
+                                <!-- Nội dung mở rộng khi Hover -->
+                                <div class="step-detail overflow-hidden max-h-0 opacity-0 transition-all duration-500 ease-in-out absolute top-full mt-2 w-48 text-center">
+                                    <div class="bg-black/80 border border-cyan-500/50 p-3 rounded text-xs text-gray-300 shadow-xl backdrop-blur-sm">
+                                        ${step.desc}
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+                </script>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-7xl mx-auto mt-8 text-center text-xs text-gray-600 font-orbitron pb-8">
+        &copy; 2026 AUDIO ENGINEERING VISUALIZER | DESIGNED FOR TECHNICAL PROFESSIONALS | 8K RESOLUTION UI
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            /* ========================================================
+               PHẦN 1: TƯƠNG TÁC SÓNG ÂM (Oscilloscope Simulator)
+               ======================================================== */
+            const waveCanvas = document.getElementById('waveCanvas');
+            const waveCtx = waveCanvas.getContext('2d');
+            const phaseSlider = document.getElementById('phaseSlider');
+            const phaseValueDisplay = document.getElementById('phaseValue');
+            const toggleBtn = document.getElementById('phaseToggleBtn');
+            const polarityBtn = document.getElementById('polarityBtn');
+            const btnLed = document.getElementById('btnLed');
+            
+            let phaseShiftDeg = 0;
+            let time = 0;
+            let isPolarityReversed = false;
+
+            // Handle High DPI displays
+            function resizeCanvas(canvas, ctx) {
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * window.devicePixelRatio;
+                canvas.height = rect.height * window.devicePixelRatio;
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+                return rect;
+            }
+
+            let rect = resizeCanvas(waveCanvas, waveCtx);
+            window.addEventListener('resize', () => { rect = resizeCanvas(waveCanvas, waveCtx); });
+
+            function drawWaves() {
+                const width = rect.width;
+                const height = rect.height;
+                const centerY = height / 2;
+                const amplitude = height / 4;
+                const frequency = 0.02; // Wavelength factor
+                
+                waveCtx.clearRect(0, 0, width, height);
+                
+                // Draw grid
+                waveCtx.strokeStyle = 'rgba(0, 240, 255, 0.1)';
+                waveCtx.lineWidth = 1;
+                waveCtx.beginPath();
+                for(let i=0; i<height; i+=20) { waveCtx.moveTo(0, i); waveCtx.lineTo(width, i); }
+                for(let i=0; i<width; i+=40) { waveCtx.moveTo(i, 0); waveCtx.lineTo(i, height); }
+                waveCtx.stroke();
+
+                // Draw Center Line
+                waveCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                waveCtx.beginPath();
+                waveCtx.moveTo(0, centerY);
+                waveCtx.lineTo(width, centerY);
+                waveCtx.stroke();
+
+                const phaseShiftRad = (phaseShiftDeg * Math.PI) / 180;
+                const polarityMultiplier = isPolarityReversed ? -1 : 1;
+
+                // Signal A (Reference - Cyan)
+                waveCtx.beginPath();
+                waveCtx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+                waveCtx.lineWidth = 2;
+                for(let x=0; x<width; x++) {
+                    let y = centerY + Math.sin(x * frequency + time) * amplitude;
+                    x === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
+                }
+                waveCtx.stroke();
+
+                // Signal B (Shifted/Reversed - Yellow)
+                waveCtx.beginPath();
+                waveCtx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+                waveCtx.lineWidth = 2;
+                for(let x=0; x<width; x++) {
+                    let y = centerY + (Math.sin(x * frequency + time + phaseShiftRad) * amplitude * polarityMultiplier);
+                    x === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
+                }
+                waveCtx.stroke();
+
+                // Sum Signal (Result - Green or Red based on amplitude)
+                waveCtx.beginPath();
+                waveCtx.lineWidth = 3;
+                
+                // Determine color based on phase relationship
+                // If closely in phase, Green. If out of phase, Red.
+                let effectivePhase = phaseShiftDeg;
+                if(isPolarityReversed) effectivePhase = (effectivePhase + 180) % 360;
+                
+                if (effectivePhase < 90 || effectivePhase > 270) {
+                    waveCtx.strokeStyle = '#00FF66'; // Green
+                    waveCtx.shadowColor = '#00FF66';
+                } else {
+                    waveCtx.strokeStyle = '#FF003C'; // Red
+                    waveCtx.shadowColor = '#FF003C';
+                }
+                waveCtx.shadowBlur = 10;
+
+                for(let x=0; x<width; x++) {
+                    let valA = Math.sin(x * frequency + time);
+                    let valB = Math.sin(x * frequency + time + phaseShiftRad) * polarityMultiplier;
+                    let y = centerY + (valA + valB) * amplitude;
+                    x === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
+                }
+                waveCtx.stroke();
+                waveCtx.shadowBlur = 0; // Reset
+
+                time -= 0.05; // Animation speed
+                requestAnimationFrame(drawWaves);
+            }
+
+            drawWaves();
+
+            // Link Controls
+            phaseSlider.addEventListener('input', (e) => {
+                phaseShiftDeg = parseInt(e.target.value);
+                phaseValueDisplay.innerText = phaseShiftDeg + '°';
+                
+                // Sync physical toggle visually if slider hits 0 or 180
+                if(phaseShiftDeg === 180) {
+                    toggleBtn.checked = true;
+                    updateToggleUI(true);
+                } else if(phaseShiftDeg === 0) {
+                    toggleBtn.checked = false;
+                    updateToggleUI(false);
+                }
+            });
+
+            function updateToggleUI(isChecked) {
+                if(isChecked) {
+                    document.getElementById('lbl-180').classList.replace('text-gray-500', 'text-neon-red');
+                    document.getElementById('lbl-0').classList.replace('text-neon-cyan', 'text-gray-500');
+                } else {
+                    document.getElementById('lbl-0').classList.replace('text-gray-500', 'text-neon-cyan');
+                    document.getElementById('lbl-180').classList.replace('text-neon-red', 'text-gray-500');
+                }
+            }
+
+            toggleBtn.addEventListener('change', (e) => {
+                const isChecked = e.target.checked;
+                updateToggleUI(isChecked);
+                // Animate slider to position
+                phaseSlider.value = isChecked ? 180 : 0;
+                phaseShiftDeg = isChecked ? 180 : 0;
+                phaseValueDisplay.innerText = phaseShiftDeg + '°';
+            });
+
+            polarityBtn.addEventListener('click', () => {
+                isPolarityReversed = !isPolarityReversed;
+                if(isPolarityReversed) {
+                    btnLed.classList.replace('bg-gray-600', 'bg-neon-red');
+                    btnLed.classList.add('shadow-[0_0_8px_#FF003C]');
+                } else {
+                    btnLed.classList.replace('bg-neon-red', 'bg-gray-600');
+                    btnLed.classList.remove('shadow-[0_0_8px_#FF003C]');
+                }
+            });
+
+
+            /* ========================================================
+               PHẦN 2: MÁY TÍNH DELAY TIME (Tốc độ âm thanh)
+               ======================================================== */
+            const distMain = document.getElementById('distMain');
+            const distSub = document.getElementById('distSub');
+            const valMain = document.getElementById('valMain');
+            const valSub = document.getElementById('valSub');
+            const delayResult = document.getElementById('delayResult');
+            const vSound = 343; // m/s ở 20 độ C
+
+            function calculateDelay() {
+                const d1 = parseFloat(distMain.value);
+                const d2 = parseFloat(distSub.value);
+                valMain.innerText = d1;
+                valSub.innerText = d2;
+                
+                // Thời gian âm thanh truyền từ loa đến điểm đo (giây) = Khoảng cách / Vận tốc
+                // Chênh lệch thời gian (ms) = |t1 - t2| * 1000
+                let t1 = d1 / vSound;
+                let t2 = d2 / vSound;
+                let delayMs = Math.abs(t1 - t2) * 1000;
+                
+                delayResult.innerText = delayMs.toFixed(2);
+                
+                // Add minor glow effect when calculated
+                delayResult.classList.remove('text-white');
+                delayResult.classList.add('text-neon-yellow');
+                setTimeout(() => {
+                    delayResult.classList.remove('text-neon-yellow');
+                    delayResult.classList.add('text-white');
+                }, 300);
+            }
+
+            distMain.addEventListener('input', calculateDelay);
+            distSub.addEventListener('input', calculateDelay);
+
+
+            /* ========================================================
+               PHẦN 3: RTA SOFTWARE SIMULATION (Laptop Screen)
+               ======================================================== */
+            const rtaCanvas = document.getElementById('rtaCanvas');
+            const rtaCtx = rtaCanvas.getContext('2d');
+            const bars = 32;
+            let barData = new Array(bars).fill(0);
+
+            function resizeRta() {
+                rtaCanvas.width = rtaCanvas.offsetWidth;
+                rtaCanvas.height = rtaCanvas.offsetHeight;
+            }
+            resizeRta();
+            window.addEventListener('resize', resizeRta);
+
+            function drawRta() {
+                rtaCtx.clearRect(0, 0, rtaCanvas.width, rtaCanvas.height);
+                const barWidth = (rtaCanvas.width / bars) - 2;
+                
+                for(let i = 0; i < bars; i++) {
+                    // Generate pseudo-random realistic noise data (Pink noise shape)
+                    let target = Math.random() * (rtaCanvas.height * 0.7);
+                    // Apply low pass shape logic for realism
+                    if(i < 5) target *= 0.6; // Roll off lows
+                    if(i > 25) target *= 0.5; // Roll off highs
+                    
+                    // Smooth transition
+                    barData[i] += (target - barData[i]) * 0.1;
+                    
+                    const x = i * (barWidth + 2);
+                    const y = rtaCanvas.height - barData[i];
+                    
+                    // Draw Bars (Magnitude)
+                    let gradient = rtaCtx.createLinearGradient(0, rtaCanvas.height, 0, 0);
+                    gradient.addColorStop(0, "rgba(0, 255, 102, 0.2)"); // Neon green bottom
+                    gradient.addColorStop(1, "rgba(0, 255, 102, 0.8)"); // Solid top
+                    
+                    rtaCtx.fillStyle = gradient;
+                    rtaCtx.fillRect(x, y, barWidth, barData[i]);
+                    
+                    // Cap line
+                    rtaCtx.fillStyle = '#FFFFFF';
+                    rtaCtx.fillRect(x, y - 2, barWidth, 2);
+                }
+
+                // Animate SVG Phase Trace slightly
+                const phasePath = document.getElementById('phaseTrace');
+                const p1 = 60 + Math.sin(time*2) * 10;
+                const p2 = 60 + Math.cos(time*2) * 15;
+                phasePath.setAttribute('d', `M0 ${p1} Q 50 10, 100 ${p2} T 200 60 T 300 ${p1} T 400 120`);
+
+                requestAnimationFrame(drawRta);
+            }
+            
+            drawRta();
+        });
+    </script>
+</body>
+</html>

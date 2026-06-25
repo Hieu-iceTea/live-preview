@@ -1,0 +1,174 @@
+<!doctype html>
+<!-- index.html — trang chuyển hướng có đếm ngược. Tạo bởi Claude (Claude Code · Claude Opus 4.8) -->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Đang mở…</title>
+
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/6187/6187712.png">
+<meta property="og:title" content="Hiếu iceTea Web Studio - Giải Pháp Web & Landing Page Tối Ưu">
+<meta property="og:description" content="Biến ý tưởng thành trải nghiệm số mượt mà. Web tải nhanh, bảo mật, chi phí thấp. Giải pháp tối ưu cho cá nhân và doanh nghiệp.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80">
+
+<style>
+  :root{
+    --accent:#6366f1; --accent2:#14b8a6;
+    --bg1:#eef2ff; --bg2:#e0f7f4;
+    --card:#ffffff; --text:#0f172a; --muted:#64748b; --track:#e6e9f2; --border:#e8ecf4;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg1:#0b1220; --bg2:#0a2128; --card:#161f2e; --text:#e9eef7; --muted:#93a1b5; --track:#2a3650; --border:#26314a; }
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--text);
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    display:flex;align-items:center;justify-content:center;min-height:100%;padding:24px;
+  }
+  .card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:24px;box-shadow:0 24px 60px rgba(2,6,23,.18);
+    width:100%;max-width:430px;padding:38px 30px 30px;text-align:center;
+    animation:rise .5s cubic-bezier(.21,1,.35,1) both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  .logo{
+    width:60px;height:60px;border-radius:18px;margin:0 auto 16px;
+    display:flex;align-items:center;justify-content:center;font-size:30px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    box-shadow:0 8px 20px rgba(99,102,241,.35);
+  }
+  h1{font-size:21px;line-height:1.3;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 26px}
+  .sub b{color:var(--accent)}
+  .ring{position:relative;width:148px;height:148px;margin:0 auto 18px}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .num{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:52px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;
+  }
+  .ring .num.tick{animation:pop .5s ease}
+  @keyframes pop{0%{transform:scale(1.4);opacity:.35}60%{transform:scale(.96)}100%{transform:scale(1);opacity:1}}
+  .progress{transition:stroke-dashoffset .25s linear}
+  .status{color:var(--muted);font-size:13.5px;margin:0 0 24px;min-height:1.2em}
+  .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    appearance:none;cursor:pointer;font:inherit;font-weight:600;font-size:14.5px;
+    padding:12px 20px;border-radius:12px;border:1px solid transparent;text-decoration:none;
+    transition:transform .12s ease, box-shadow .2s ease, background .2s ease;display:inline-flex;align-items:center;gap:7px;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--accent);color:#fff;box-shadow:0 8px 18px rgba(99,102,241,.32)}
+  .btn.primary:hover{box-shadow:0 10px 24px rgba(99,102,241,.45)}
+  .btn.ghost{background:transparent;color:var(--text);border-color:var(--border)}
+  .btn.ghost:hover{background:var(--track)}
+  .foot{margin-top:22px;font-size:12px;color:var(--muted)}
+  .foot a{color:var(--accent);text-decoration:none}
+  noscript p{color:var(--muted);font-size:14px}
+  @media (prefers-reduced-motion:reduce){
+    .card{animation:none}
+    .ring .num.tick{animation:none}
+    .progress{transition:none}
+  }
+</style>
+</head>
+<body>
+  <main class="card" role="main">
+    <div class="logo" aria-hidden="true">🏡</div>
+    <h1>Đang tìm phiên bản mới nhất cho bạn</h1>
+    <p class="sub">Trang của <b>Hiếu iceTea</b> 🍀 · đang mở</p>
+
+    <div class="ring" aria-hidden="true">
+      <svg width="148" height="148" viewBox="0 0 148 148">
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#6366f1"/>
+            <stop offset="1" stop-color="#14b8a6"/>
+          </linearGradient>
+        </defs>
+        <circle cx="74" cy="74" r="60" fill="none" stroke="var(--track)" stroke-width="9"/>
+        <circle class="progress" cx="74" cy="74" r="60" fill="none" stroke="url(#grad)" stroke-width="9" stroke-linecap="round"/>
+      </svg>
+      <div class="num" id="num">5</div>
+    </div>
+
+    <p class="status" id="status" aria-live="polite" role="status">Tự động mở trong 5 giây…</p>
+
+    <div class="actions">
+      <a class="btn primary" id="goNow" href="#">Xem ngay <span aria-hidden="true">→</span></a>
+      <button class="btn ghost" id="stay" type="button">Ở lại trang này</button>
+    </div>
+
+    <p class="foot">Nếu không tự chuyển, bấm <a id="fallbackLink" href="#">vào đây</a>.</p>
+    <!-- Link trong <noscript> chỉ dùng khi TẮT JavaScript (JS không gán được) — nếu đổi PAGE, sửa cả ở đây -->
+    <noscript><p>Trình duyệt đang tắt JavaScript — bấm <a href="kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/album.html">vào đây</a> để mở bản thiết kế.</p></noscript>
+  </main>
+
+  <script>
+    (function(){
+      var PAGE = 'kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/album';   // ← Đổi tên file Ở ĐÂY (1 chỗ duy nhất)
+      // Chọn đích chuyển hướng tuỳ môi trường:
+      //   • file:// hoặc localhost      → GIỮ ".html"  (không có clean URL)
+      //   • tên miền thật (GitHub Pages) → BỎ ".html"   (clean URL)
+      // Cách viết gọn hơn (đảo lại): (location.protocol.indexOf('http')===0 ? '' : '.html')
+      //   → ngắn hơn, NHƯNG server local "localhost" sẽ 404 (vẫn là http nhưng không hỗ trợ clean URL).
+      var isLocal = location.protocol === 'file:' ||
+        ['localhost', '127.0.0.1', '[::1]'].indexOf(location.hostname) !== -1;
+      var target = './' + PAGE + (isLocal ? '.html' : '');   // server thật (domain) → bỏ .html
+      var DURATION = 5000;
+      var r = 60, C = 2 * Math.PI * r;
+      var prog = document.querySelector('.progress');
+      var numEl = document.getElementById('num');
+      var statusEl = document.getElementById('status');
+      var stayBtn = document.getElementById('stay');
+      var goBtn = document.getElementById('goNow');
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var stopped = false, start = null, lastSec = null;
+
+      prog.style.strokeDasharray = C;
+      prog.style.strokeDashoffset = 0;
+
+      goBtn.href = target;
+      var fb = document.getElementById('fallbackLink');
+      if (fb) fb.href = target;
+
+      function go(){ stopped = true; window.location.replace(target); }
+
+      function frame(t){
+        if (stopped) return;
+        if (start === null) start = t;
+        var elapsed = Math.min(t - start, DURATION);
+        var remain = DURATION - elapsed;
+        if (!reduce) prog.style.strokeDashoffset = C * (elapsed / DURATION);
+        var sec = Math.max(Math.ceil(remain / 1000), 0);
+        if (sec !== lastSec){
+          lastSec = sec;
+          numEl.textContent = sec;
+          statusEl.textContent = 'Tự động mở trong ' + sec + ' giây…';
+          if (!reduce){ numEl.classList.remove('tick'); void numEl.offsetWidth; numEl.classList.add('tick'); }
+        }
+        if (elapsed >= DURATION){ go(); return; }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+
+      goBtn.addEventListener('click', function(e){ e.preventDefault(); go(); });
+      stayBtn.addEventListener('click', function(){
+        stopped = true;
+        if (!reduce) prog.style.strokeDashoffset = 0;
+        numEl.textContent = '❚❚';
+        numEl.style.fontSize = '34px';
+        statusEl.textContent = 'Đã tạm dừng. Bấm “Xem ngay” khi bạn sẵn sàng.';
+        stayBtn.disabled = true;
+        stayBtn.style.opacity = .5;
+        stayBtn.style.cursor = 'default';
+        goBtn.focus();
+      });
+    })();
+  </script>
+</body>
+</html>

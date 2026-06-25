@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đồng Bộ Phase Trong Âm Thanh 🍀 Hiếu iceTea</title>
+    <!-- ===== SEO / Open Graph · 🍀 Tạo & tối ưu bởi Hiếu iceTea ===== -->
+    <meta name="author" content="Hiếu iceTea">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2674/2674498.png">
+    <meta name="description" content="Hướng dẫn đồng bộ Phase trong âm thanh — tinh gọn, trực quan, dễ áp dụng. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="KT SOUND — Đồng Bộ Phase Trong Âm Thanh 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:description" content="Hướng dẫn đồng bộ Phase trong âm thanh — tinh gọn, trực quan, dễ áp dụng. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS cho một số keyframes phức tạp (nếu có) -->
+    <style>
+        .glow-text {
+            text-shadow: 0 0 10px currentColor;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans selection:bg-cyan-500 selection:text-white overflow-x-hidden relative">
+
+    <!-- Background Effects -->
+    <div class="fixed inset-0 z-0 pointer-events-none opacity-20"
+         style="background-image: radial-gradient(circle at 50% 0%, #0284c7 0%, transparent 50%), linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px); background-size: 100% 100%, 40px 40px, 40px 40px;">
+    </div>
+    
+    <div class="fixed top-0 right-0 z-0 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+        <svg width="400" height="800" viewBox="0 0 200 400" class="text-cyan-500 fill-current">
+            <rect x="50" y="0" width="100" height="40" rx="4" opacity="1" class="animate-pulse" style="animation-delay: 0s"/>
+            <rect x="50" y="45" width="100" height="40" rx="4" opacity="0.9" class="animate-pulse" style="animation-delay: 0.2s"/>
+            <rect x="50" y="90" width="100" height="40" rx="4" opacity="0.8" class="animate-pulse" style="animation-delay: 0.4s"/>
+            <rect x="50" y="135" width="100" height="40" rx="4" opacity="0.7" class="animate-pulse" style="animation-delay: 0.6s"/>
+            <rect x="50" y="180" width="100" height="40" rx="4" opacity="0.6" class="animate-pulse" style="animation-delay: 0.8s"/>
+            <rect x="50" y="225" width="100" height="40" rx="4" opacity="0.5" class="animate-pulse" style="animation-delay: 1.0s"/>
+            <rect x="50" y="270" width="100" height="40" rx="4" opacity="0.4" class="animate-pulse" style="animation-delay: 1.2s"/>
+            <rect x="50" y="315" width="100" height="40" rx="4" opacity="0.3" class="animate-pulse" style="animation-delay: 1.4s"/>
+        </svg>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 py-8 space-y-8">
+        
+        <!-- HEADER -->
+        <header class="text-center space-y-2 mb-12 border-b border-cyan-800/50 pb-8">
+            <h1 class="text-5xl md:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]">
+                ĐỒNG BỘ PHASE TRONG ÂM THANH
+            </h1>
+            <p class="text-xl text-cyan-300 font-medium tracking-widest uppercase">
+                Hệ thống Tương tác Kỹ thuật Âm thanh Chuyên nghiệp
+            </p>
+        </header>
+
+        <!-- PHẦN 1: SIMULATOR -->
+        <section class="bg-slate-900/80 border border-cyan-800 rounded-2xl p-6 backdrop-blur-sm shadow-[0_0_30px_rgba(6,182,212,0.1)] transition-all hover:border-cyan-500">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-yellow-400 flex items-center gap-2">
+                    <i data-lucide="activity" class="text-cyan-400 animate-pulse"></i> 1. TRÌNH MÔ PHỎNG PHASE (REAL-TIME)
+                </h2>
+                <div id="status-badge" class="px-4 py-1 rounded-full font-bold border text-green-400 border-current shadow-[0_0_15px_#4ade80] transition-colors duration-300">
+                    CỘNG HƯỞNG (IN-PHASE)
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                <!-- Controller -->
+                <div class="bg-slate-950 rounded-xl p-6 border border-slate-800 shadow-inner">
+                    <label class="block text-cyan-400 font-semibold mb-4 text-lg">
+                        Độ lệch Phase (Phase Shift): <span id="phase-value-text" class="text-white font-mono text-xl">0°</span>
+                    </label>
+                    <input 
+                        id="phase-slider"
+                        type="range" min="0" max="360" value="0" 
+                        class="w-full h-3 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400 hover:accent-cyan-300 transition-all"
+                    />
+                    <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+                        <span>0° (Đồng pha)</span>
+                        <span>180° (Ngược pha)</span>
+                        <span>360°</span>
+                    </div>
+                    
+                    <div class="mt-8 space-y-4 text-sm text-slate-400">
+                        <p class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_5px_cyan]"></span> Sóng A (Tham chiếu)</p>
+                        <p class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 shadow-[0_0_5px_blue]"></span> Sóng B (Dịch chuyển)</p>
+                        <p class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400 shadow-[0_0_5px_yellow]"></span> Kết quả (Tổng hợp)</p>
+                    </div>
+                </div>
+
+                <!-- Oscilloscope View -->
+                <div class="col-span-1 lg:col-span-2 relative h-64 bg-slate-950 rounded-xl border border-slate-800 overflow-hidden flex items-center justify-center">
+                    <!-- Grid Background -->
+                    <div class="absolute inset-0 opacity-20" 
+                         style="background-image: linear-gradient(#334155 1px, transparent 1px), linear-gradient(90deg, #334155 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="w-full h-full relative z-10 px-4 overflow-visible">
+                        <!-- Trục X -->
+                        <line x1="0" y1="50" x2="100" y2="50" stroke="#334155" stroke-width="0.5" stroke-dasharray="2" />
+                        
+                        <!-- Sóng A -->
+                        <path id="wave-a" d="" fill="none" stroke="#06b6d4" stroke-width="1" class="opacity-70" />
+                        
+                        <!-- Sóng B -->
+                        <path id="wave-b" d="" fill="none" stroke="#3b82f6" stroke-width="1" class="opacity-70" />
+                        
+                        <!-- Sóng Result -->
+                        <path id="wave-result" d="" fill="none" stroke="#4ade80" stroke-width="2.5" style="filter: drop-shadow(0 0 4px currentColor)" class="transition-all duration-100" />
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHẦN 2 & 3: GRID LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- PHẦN 2: CÔNG CỤ -->
+            <section class="bg-slate-900/80 border border-cyan-800 rounded-2xl p-6 backdrop-blur-sm shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:border-cyan-500 transition-all">
+                <h2 class="text-2xl font-bold text-yellow-400 flex items-center gap-2 mb-6">
+                    <i data-lucide="laptop" class="text-cyan-400"></i> 2. CÔNG CỤ ĐO LƯỜNG & KIỂM ÂM
+                </h2>
+                
+                <div class="flex gap-4 mb-4">
+                    <button id="tab-btn-smaart" onclick="setToolTab('smaart')" class="flex-1 py-3 rounded-lg font-bold transition-all bg-cyan-900 text-cyan-300 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                        Phần mềm RTA/SMAART
+                    </button>
+                    <button id="tab-btn-headphone" onclick="setToolTab('headphone')" class="flex-1 py-3 rounded-lg font-bold transition-all bg-slate-800 text-slate-400 hover:bg-slate-700">
+                        Tai nghe Chuyên nghiệp
+                    </button>
+                </div>
+
+                <div class="bg-slate-950 rounded-xl p-6 border border-slate-800 h-64 flex flex-col items-center justify-center relative overflow-hidden group">
+                    
+                    <!-- Content Smaart -->
+                    <div id="content-smaart" class="flex flex-col items-center w-full">
+                        <i data-lucide="activity" class="w-20 h-20 text-cyan-500 mb-4 group-hover:scale-110 transition-transform duration-500"></i>
+                        <h3 class="text-xl font-bold text-white text-center mb-2">Phân tích Phổ & Thời gian thực</h3>
+                        <p class="text-slate-400 text-center text-sm px-4">Sử dụng phần mềm Smaart V8 hoặc RTA để xem chính xác độ lệch pha (Phase Graph) và đáp tuyến tần số (Magnitude). Mức độ chính xác tuyệt đối.</p>
+                        
+                        <!-- Fake UI bars -->
+                        <div class="absolute bottom-0 left-0 w-full flex items-end justify-center gap-1 opacity-20 px-4 h-16" id="fake-bars">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Content Headphone -->
+                    <div id="content-headphone" class="hidden flex-col items-center w-full">
+                        <i data-lucide="headphones" class="w-20 h-20 text-blue-500 mb-4 group-hover:scale-110 transition-transform duration-500"></i>
+                        <h3 class="text-xl font-bold text-white text-center mb-2">Kiểm tra âm thanh (Phase Check)</h3>
+                        <p class="text-slate-400 text-center text-sm px-4">Sử dụng tai nghe Studio để nghe kiểm tra bằng tai. Nếu âm thanh nghe "mỏng", "rỗng" ở giữa đầu hoặc mất Bass trầm trọng, rất có thể hệ thống đang bị ngược pha.</p>
+                        <div class="absolute inset-0 border-[4px] border-blue-500/10 rounded-xl scale-95 group-hover:scale-100 transition-transform"></div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- PHẦN 3: PHƯƠNG PHÁP XỬ LÝ -->
+            <section class="bg-slate-900/80 border border-cyan-800 rounded-2xl p-6 backdrop-blur-sm shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:border-cyan-500 transition-all flex flex-col">
+                <h2 class="text-2xl font-bold text-yellow-400 flex items-center gap-2 mb-6">
+                    <i data-lucide="settings-2" class="text-cyan-400"></i> 3. PHƯƠNG PHÁP XỬ LÝ PHASE
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
+                    
+                    <!-- Box 1: Mixer Polarity -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col items-center justify-center relative group">
+                        <h3 class="text-cyan-400 font-bold mb-4 text-center">Đảo cực trên Mixer (Ø)</h3>
+                        <button 
+                            id="btn-polarity"
+                            onclick="togglePolarity()"
+                            class="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold transition-all duration-300 shadow-lg bg-slate-800 text-slate-500 border-2 border-slate-700 hover:border-cyan-500 hover:text-cyan-400"
+                        >
+                            Ø
+                        </button>
+                        <p id="polarity-status" class="mt-4 text-sm font-bold text-slate-500">
+                            TẮT (0°)
+                        </p>
+                        <p class="text-xs text-slate-500 text-center mt-2">Tác động trực tiếp lên Biểu đồ phía trên!</p>
+                    </div>
+
+                    <!-- Box 2: Calculator -->
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col justify-center">
+                        <h3 class="text-cyan-400 font-bold mb-4 text-center text-sm">Khoảng cách & Bù Trễ (Delay)</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-800">
+                                <span class="text-xs text-slate-400">Loa Main (m):</span>
+                                <input id="input-main" type="number" min="0" value="0" class="w-16 bg-slate-800 text-cyan-300 text-center rounded border-none focus:ring-1 focus:ring-cyan-500 outline-none" />
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-900 p-2 rounded border border-slate-800">
+                                <span class="text-xs text-slate-400">Loa Sub (m):</span>
+                                <input id="input-sub" type="number" min="0" value="0" class="w-16 bg-slate-800 text-cyan-300 text-center rounded border-none focus:ring-1 focus:ring-cyan-500 outline-none" />
+                            </div>
+                            <div class="pt-2 border-t border-slate-800 flex justify-between items-center">
+                                <span class="text-xs font-bold text-yellow-400">Cần bù Delay:</span>
+                                <span class="text-lg font-mono font-bold text-green-400 glow-text" id="delay-result">0.00 ms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!-- PHẦN 4: QUY TRÌNH (FLOWCHART) -->
+        <section class="bg-slate-900/80 border border-cyan-800 rounded-2xl p-6 backdrop-blur-sm shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:border-cyan-500 transition-all">
+            <h2 class="text-2xl font-bold text-yellow-400 flex items-center gap-2 mb-8">
+                <i data-lucide="fast-forward" class="text-cyan-400"></i> 4. QUY TRÌNH THỰC HIỆN ĐỒNG BỘ PHASE
+            </h2>
+
+            <div class="relative">
+                <!-- Connecting Line -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-slate-800 -translate-y-1/2 z-0 hidden md:block">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500 shadow-[0_0_10px_cyan]" style="width: 0%;"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 relative z-10" id="steps-container">
+                    <!-- Steps will be injected by JS to keep HTML clean -->
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button 
+                    onclick="nextStep()"
+                    class="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-full flex items-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all transform hover:scale-105"
+                >
+                    <span id="btn-next-text">Tiếp tục quy trình</span> <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- SCRIPT CHỨA TOÀN BỘ LOGIC -->
+    <script>
+        // --- 1. STATE MANAGEMENT ---
+        const state = {
+            phaseShift: 0,
+            polarityReverse: false,
+            distanceMain: 0,
+            distanceSub: 0,
+            activeToolTab: 'smaart',
+            activeStep: 1
+        };
+
+        const SPEED_OF_SOUND = 343; // m/s
+
+        // --- 2. SELECTORS ---
+        const sliderEl = document.getElementById('phase-slider');
+        const phaseValueTextEl = document.getElementById('phase-value-text');
+        const waveA = document.getElementById('wave-a');
+        const waveB = document.getElementById('wave-b');
+        const waveResult = document.getElementById('wave-result');
+        const statusBadge = document.getElementById('status-badge');
+        
+        const inputMain = document.getElementById('input-main');
+        const inputSub = document.getElementById('input-sub');
+        const delayResult = document.getElementById('delay-result');
+
+        const btnPolarity = document.getElementById('btn-polarity');
+        const polarityStatusText = document.getElementById('polarity-status');
+
+        const progressBar = document.getElementById('progress-bar');
+        const stepsContainer = document.getElementById('steps-container');
+        const btnNextText = document.getElementById('btn-next-text');
+
+        // Khởi tạo các Step Data
+        const stepsData = [
+            { id: 1, icon: 'mic', title: "CHUẨN BỊ (SETUP)", desc: "Vị trí đặt loa & Micro đo lường tối ưu" },
+            { id: 2, icon: 'activity', title: "ĐO LƯỜNG (MEASURE)", desc: "Phát Pink Noise, dùng RTA thu thập dữ liệu" },
+            { id: 3, icon: 'sliders', title: "PHÂN TÍCH (ANALYZE)", desc: "So sánh dữ liệu pha, xác định nguyên nhân lệch" },
+            { id: 4, icon: 'settings-2', title: "ĐIỀU CHỈNH (ADJUST)", desc: "Áp dụng Polarity Reverse hoặc Time Delay" },
+            { id: 5, icon: 'check-circle', title: "KIỂM TRA (VERIFY)", desc: "Nghe thử & kiểm tra lại kết quả với RTA" },
+        ];
+
+
+        // --- 3. LOGIC FUNCTIONS ---
+
+        // Cập nhật biểu đồ sóng
+        function updateWaves() {
+            let pathA = `M 0 50 `;
+            let pathB = `M 0 50 `;
+            let pathResult = `M 0 50 `;
+            
+            const phaseRad = (state.phaseShift * Math.PI) / 180;
+            const currentPolarity = state.polarityReverse ? Math.PI : 0;
+            
+            for (let x = 0; x <= 100; x += 1) {
+                const rad = (x / 100) * 4 * Math.PI; // 2 chu kỳ sóng
+                const yA = Math.sin(rad);
+                const yB = Math.sin(rad + phaseRad + currentPolarity);
+                const yResult = (yA + yB) / 2; // Trung bình biên độ
+
+                pathA += `L ${x} ${50 - yA * 30} `;
+                pathB += `L ${x} ${50 - yB * 30} `;
+                pathResult += `L ${x} ${50 - yResult * 40} `;
+            }
+
+            waveA.setAttribute('d', pathA);
+            waveB.setAttribute('d', pathB);
+            waveResult.setAttribute('d', pathResult);
+
+            updatePhaseStatusBadge();
+        }
+
+        // Cập nhật Badge Trạng thái
+        function updatePhaseStatusBadge() {
+            let totalShift = state.phaseShift;
+            if (state.polarityReverse) totalShift += 180;
+            totalShift = totalShift % 360;
+
+            let text, colorClass, glowClass, strokeColor;
+
+            if (totalShift < 30 || totalShift > 330) {
+                text = 'CỘNG HƯỞNG (IN-PHASE)';
+                colorClass = 'text-green-400';
+                glowClass = 'shadow-[0_0_15px_#4ade80]';
+                strokeColor = '#4ade80';
+            } else if (totalShift > 150 && totalShift < 210) {
+                text = 'TRIỆT TIÊU (OUT-OF-PHASE)';
+                colorClass = 'text-red-500';
+                glowClass = 'shadow-[0_0_15px_#ef4444]';
+                strokeColor = '#ef4444';
+            } else {
+                text = 'LỆCH PHA (PHASE SHIFTED)';
+                colorClass = 'text-yellow-400';
+                glowClass = 'shadow-[0_0_15px_#facc15]';
+                strokeColor = '#facc15';
+            }
+
+            statusBadge.textContent = text;
+            statusBadge.className = `px-4 py-1 rounded-full font-bold border border-current transition-colors duration-300 ${colorClass} ${glowClass}`;
+            waveResult.setAttribute('stroke', strokeColor);
+        }
+
+        // Cập nhật tính toán Delay
+        function updateDelayCalculator() {
+            const diff = Math.abs(state.distanceMain - state.distanceSub);
+            const delayMs = (diff / SPEED_OF_SOUND) * 1000;
+            delayResult.textContent = delayMs.toFixed(2) + ' ms';
+        }
+
+        // Chuyển Tab Công cụ
+        function setToolTab(tab) {
+            state.activeToolTab = tab;
+            const btnSmaart = document.getElementById('tab-btn-smaart');
+            const btnHeadphone = document.getElementById('tab-btn-headphone');
+            const contentSmaart = document.getElementById('content-smaart');
+            const contentHeadphone = document.getElementById('content-headphone');
+
+            if (tab === 'smaart') {
+                btnSmaart.className = "flex-1 py-3 rounded-lg font-bold transition-all bg-cyan-900 text-cyan-300 border border-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]";
+                btnHeadphone.className = "flex-1 py-3 rounded-lg font-bold transition-all bg-slate-800 text-slate-400 hover:bg-slate-700";
+                contentSmaart.classList.remove('hidden');
+                contentSmaart.classList.add('flex');
+                contentHeadphone.classList.add('hidden');
+                contentHeadphone.classList.remove('flex');
+            } else {
+                btnHeadphone.className = "flex-1 py-3 rounded-lg font-bold transition-all bg-blue-900 text-blue-300 border border-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.3)]";
+                btnSmaart.className = "flex-1 py-3 rounded-lg font-bold transition-all bg-slate-800 text-slate-400 hover:bg-slate-700";
+                contentHeadphone.classList.remove('hidden');
+                contentHeadphone.classList.add('flex');
+                contentSmaart.classList.add('hidden');
+                contentSmaart.classList.remove('flex');
+            }
+        }
+
+        // Đảo cực Mixer
+        function togglePolarity() {
+            state.polarityReverse = !state.polarityReverse;
+            if (state.polarityReverse) {
+                btnPolarity.className = "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold transition-all duration-300 shadow-lg bg-red-500/20 text-red-500 border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)] scale-95";
+                polarityStatusText.className = "mt-4 text-sm font-bold text-red-400";
+                polarityStatusText.textContent = "ĐÃ KÍCH HOẠT (180°)";
+            } else {
+                btnPolarity.className = "w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold transition-all duration-300 shadow-lg bg-slate-800 text-slate-500 border-2 border-slate-700 hover:border-cyan-500 hover:text-cyan-400";
+                polarityStatusText.className = "mt-4 text-sm font-bold text-slate-500";
+                polarityStatusText.textContent = "TẮT (0°)";
+            }
+            updateWaves(); // Cập nhật lại biểu đồ sóng
+        }
+
+        // Render & Cập nhật Step Quy trình
+        function renderSteps() {
+            stepsContainer.innerHTML = ''; // Clear cũ
+            
+            stepsData.forEach(step => {
+                const isActive = step.id === state.activeStep;
+                const isPassed = step.id < state.activeStep;
+                
+                // Base classes
+                let containerClass = "flex flex-col items-center text-center p-4 rounded-xl cursor-pointer transition-all duration-300 ";
+                let iconWrapperClass = "w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-all duration-500 ";
+                let numberClass = "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mb-2 absolute -top-3 ";
+                let titleClass = "font-bold text-sm mb-2 ";
+                let descClass = "text-xs ";
+
+                if (isActive) {
+                    containerClass += 'bg-cyan-900/50 border-2 border-cyan-400 shadow-[0_0_20px_rgba(6,182,212,0.4)] scale-105';
+                    iconWrapperClass += 'bg-cyan-500 text-slate-900 shadow-[0_0_15px_cyan]';
+                    numberClass += 'bg-cyan-400 text-slate-900';
+                    titleClass += 'text-yellow-400';
+                    descClass += 'text-cyan-200';
+                } else if (isPassed) {
+                    containerClass += 'bg-slate-800/80 border border-cyan-700 opacity-80';
+                    iconWrapperClass += 'bg-cyan-800 text-cyan-300';
+                    numberClass += 'bg-cyan-400 text-slate-900';
+                    titleClass += 'text-cyan-100';
+                    descClass += 'text-slate-400';
+                } else {
+                    containerClass += 'bg-slate-900 border border-slate-700 hover:border-cyan-800 opacity-50 hover:opacity-100';
+                    iconWrapperClass += 'bg-slate-800 text-slate-500';
+                    numberClass += 'bg-slate-700 text-slate-400';
+                    titleClass += 'text-cyan-100';
+                    descClass += 'text-slate-400';
+                }
+
+                const stepHTML = `
+                    <div onclick="goToStep(${step.id})" class="${containerClass}">
+                        <div class="${iconWrapperClass}">
+                            <i data-lucide="${step.icon}" class="w-8 h-8"></i>
+                        </div>
+                        <div class="${numberClass}">${step.id}</div>
+                        <h4 class="${titleClass}">${step.title}</h4>
+                        <p class="${descClass}">${step.desc}</p>
+                    </div>
+                `;
+                stepsContainer.innerHTML += stepHTML;
+            });
+
+            // Cập nhật thanh line nối
+            progressBar.style.width = `${(state.activeStep - 1) * 25}%`;
+            btnNextText.textContent = state.activeStep < 5 ? 'Tiếp tục quy trình' : 'Bắt đầu lại';
+            
+            // Re-init lucide icons cho các icon vừa được inject
+            lucide.createIcons();
+        }
+
+        function goToStep(id) {
+            state.activeStep = id;
+            renderSteps();
+        }
+
+        function nextStep() {
+            if (state.activeStep < 5) {
+                state.activeStep += 1;
+            } else {
+                state.activeStep = 1; // Reset
+            }
+            renderSteps();
+        }
+
+        // Tạo hiệu ứng vạch nhảy (Fake UI bars) cho phần Smaart
+        function createFakeBars() {
+            const container = document.getElementById('fake-bars');
+            let html = '';
+            for(let i=0; i<30; i++) {
+                const height = Math.random() * 100;
+                const duration = Math.random() * 1 + 0.5;
+                html += `<div class="w-full bg-cyan-500 rounded-t-sm animate-pulse" style="height: ${height}%; animation-duration: ${duration}s"></div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        // --- 4. EVENT LISTENERS & INIT ---
+        
+        // Bắt sự kiện thanh trượt Phase
+        sliderEl.addEventListener('input', (e) => {
+            state.phaseShift = Number(e.target.value);
+            phaseValueTextEl.textContent = `${state.phaseShift}°`;
+            updateWaves();
+        });
+
+        // Bắt sự kiện Input Delay Main/Sub
+        inputMain.addEventListener('input', (e) => {
+            state.distanceMain = Number(e.target.value);
+            updateDelayCalculator();
+        });
+        
+        inputSub.addEventListener('input', (e) => {
+            state.distanceSub = Number(e.target.value);
+            updateDelayCalculator();
+        });
+
+        // Khởi chạy khi tải trang
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updateWaves();
+            createFakeBars();
+            renderSteps();
+        });
+
+    </script>
+</body>
+</html>

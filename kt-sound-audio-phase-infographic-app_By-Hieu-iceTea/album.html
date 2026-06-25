@@ -1,0 +1,699 @@
+<!doctype html>
+<!-- album.html — Album ảnh tương tác cho dự án KT SOUND · Phase Audio. Tạo bởi Claude (Claude Code · Claude Opus 4.8) -->
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album · KT SOUND — Đồng Bộ Phase Trong Âm Thanh 🍀 Hiếu iceTea</title>
+<meta name="description" content="Bộ sưu tập các phiên bản infographic tương tác 'Đồng bộ Phase trong âm thanh' của KT SOUND. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+<link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2674/2674498.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hiếu iceTea Web Studio">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:url" content="https://preview.web-studio.hieu-icetea.io.vn/kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/album.html">
+<meta property="og:title" content="Album · KT SOUND — Đồng Bộ Phase Trong Âm Thanh 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+<meta property="og:description" content="Bộ sưu tập các phiên bản infographic tương tác về đồng bộ Phase 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+<!-- Ảnh thumbnail khi chia sẻ (Facebook / Messenger / Zalo). BẮT BUỘC là URL tuyệt đối tới ảnh đã deploy. -->
+<meta property="og:image" content="https://preview.web-studio.hieu-icetea.io.vn/kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/og-image.jpg">
+<meta property="og:image:secure_url" content="https://preview.web-studio.hieu-icetea.io.vn/kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/og-image.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="KT SOUND — Cách xử lý & đồng bộ Phase trong âm thanh 🍀 Hiếu iceTea">
+<!-- Twitter / X card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="KT SOUND — Đồng Bộ Phase Trong Âm Thanh 🍀 Hiếu iceTea">
+<meta name="twitter:description" content="Bộ sưu tập các phiên bản infographic tương tác về đồng bộ Phase 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+<meta name="twitter:image" content="https://preview.web-studio.hieu-icetea.io.vn/kt-sound-audio-phase-infographic-app_By-Hieu-iceTea/og-image.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#050810;
+    --bg-2:#0a0f1a;
+    --panel:#111827;
+    --cyan:#00f3ff;
+    --blue:#0070f3;
+    --red:#ff3366;
+    --green:#00ff66;
+    --text:#e2e8f0;
+    --muted:#8b9bb4;
+    --line:rgba(0,243,255,.18);
+    --line-strong:rgba(0,243,255,.5);
+    --shadow:0 18px 50px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Rajdhani',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    color:var(--text);
+    background-color:var(--bg);
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(0,112,243,.10), transparent 30%),
+      radial-gradient(circle at 88% 12%, rgba(0,243,255,.08), transparent 32%),
+      radial-gradient(circle at 70% 90%, rgba(0,112,243,.07), transparent 35%);
+    overflow-x:hidden;
+    /* ===== Chống chọn / sao chép / long-press lưu ảnh ===== */
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none;
+    -webkit-touch-callout:none;
+  }
+  /* Cho phép chọn lại văn bản ở phần mô tả nếu muốn? -> không, giữ khoá toàn trang */
+
+  /* ===== Nền động: lưới + sóng âm ===== */
+  .bg-grid{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(0,243,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,243,255,.05) 1px, transparent 1px);
+    background-size:46px 46px;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 80%);
+    -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 80%);
+  }
+  .bg-orb{ position:fixed; z-index:0; border-radius:50%; filter:blur(90px); opacity:.5; pointer-events:none; animation:float 18s ease-in-out infinite; }
+  .orb-a{ width:420px;height:420px; top:-120px; left:-80px; background:radial-gradient(circle,#0070f3,transparent 70%); }
+  .orb-b{ width:380px;height:380px; bottom:-120px; right:-60px; background:radial-gradient(circle,#00f3ff,transparent 70%); animation-delay:-6s; }
+  @keyframes float{ 0%,100%{transform:translate(0,0)} 50%{transform:translate(30px,40px)} }
+
+  /* ===== Spotlight theo con trỏ (toàn trang) ===== */
+  #spotlight{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(360px circle at var(--x,-999px) var(--y,-999px), rgba(0,243,255,.10), transparent 65%);
+    transition:background .08s linear;
+  }
+
+  /* ===== Header / Nav ===== */
+  header{
+    position:sticky; top:0; z-index:30;
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    background:rgba(5,8,16,.72);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{
+    max-width:1280px; margin:0 auto; padding:12px 22px;
+    display:flex; align-items:center; gap:18px;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; text-decoration:none; flex-shrink:0; }
+  .logo{
+    width:42px;height:42px;border-radius:11px;display:grid;place-items:center;
+    font-family:'Orbitron';font-weight:900;font-size:18px;letter-spacing:-1px;color:#031018;
+    background:linear-gradient(135deg,var(--cyan),var(--blue));
+    box-shadow:0 0 18px rgba(0,243,255,.45);
+  }
+  .brand .bn{ font-family:'Orbitron'; font-weight:700; font-size:15px; line-height:1; color:#fff; letter-spacing:1px; }
+  .brand .bs{ font-size:12px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+
+  .nav-links{
+    margin-left:auto; display:flex; align-items:center; gap:8px;
+    overflow-x:auto; padding:4px; scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{ display:none; }
+  .nav-links .label{ font-size:12px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-right:4px; white-space:nowrap; }
+  .pill{
+    position:relative; flex-shrink:0;
+    font-family:'Orbitron'; font-weight:500; font-size:12px; letter-spacing:.5px;
+    text-decoration:none; color:var(--text);
+    padding:8px 13px; border-radius:9px;
+    border:1px solid var(--line);
+    background:rgba(17,24,39,.6);
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
+    white-space:nowrap; display:inline-flex; align-items:center; gap:6px;
+  }
+  .pill::after{ content:'↗'; font-size:11px; opacity:.5; }
+  .pill:hover{
+    color:var(--cyan); border-color:var(--line-strong);
+    box-shadow:0 0 16px rgba(0,243,255,.25);
+    transform:translateY(-2px);
+  }
+  .pill:hover::after{ opacity:1; }
+
+  /* ===== Hero ===== */
+  main{ position:relative; z-index:2; max-width:1280px; margin:0 auto; padding:54px 22px 90px; }
+  .hero{ text-align:center; margin-bottom:50px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Orbitron'; font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--cyan); padding:7px 16px; border:1px solid var(--line);
+    border-radius:30px; background:rgba(0,243,255,.05); margin-bottom:22px;
+  }
+  .eyebrow .dot{ width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan); animation:pulse 1.6s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+  .hero h1{
+    font-family:'Orbitron'; font-weight:900; margin:0 0 14px;
+    font-size:clamp(30px,5.4vw,58px); line-height:1.05; letter-spacing:-1px; color:#fff;
+    text-shadow:0 0 22px rgba(0,243,255,.35);
+  }
+  .hero h1 .accent{ background:linear-gradient(90deg,var(--cyan),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .hero p{ max-width:620px; margin:0 auto; color:var(--muted); font-size:clamp(15px,2vw,18px); line-height:1.6; }
+  .hero .note{ margin-top:14px; font-size:12.5px; color:var(--muted); opacity:.8; display:inline-flex; align-items:center; gap:7px; }
+  .hero .note svg{ width:15px;height:15px; color:var(--cyan); }
+
+  /* Equalizer trang trí trong hero */
+  .eq{ display:flex; align-items:flex-end; justify-content:center; gap:5px; height:46px; margin:26px auto 0; }
+  .eq span{ width:5px; border-radius:3px; background:linear-gradient(to top,var(--blue),var(--cyan)); animation:bounce 1.1s ease-in-out infinite; box-shadow:0 0 8px rgba(0,243,255,.4); }
+  .eq span:nth-child(1){ animation-delay:-.9s } .eq span:nth-child(2){ animation-delay:-.7s }
+  .eq span:nth-child(3){ animation-delay:-.5s } .eq span:nth-child(4){ animation-delay:-.3s }
+  .eq span:nth-child(5){ animation-delay:-.6s } .eq span:nth-child(6){ animation-delay:-.2s }
+  .eq span:nth-child(7){ animation-delay:-.8s } .eq span:nth-child(8){ animation-delay:-.4s }
+  @keyframes bounce{ 0%,100%{height:10px} 50%{height:44px} }
+
+  /* ===== Gallery (lưới dọc các thẻ card) ===== */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(440px, 1fr));
+    gap:30px;
+  }
+  @media (max-width:980px){ .gallery{ grid-template-columns:1fr; } }
+
+  .card{
+    --mx:50%; --my:50%;
+    position:relative; display:flex; flex-direction:column;
+    text-align:left; cursor:pointer; font:inherit; color:inherit;
+    padding:0; border:1px solid var(--line); border-radius:18px;
+    background:rgba(17,24,39,.55);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    transition:border-color .25s ease, box-shadow .25s ease;
+    transform-style:preserve-3d; will-change:transform;
+  }
+  .card:hover{ border-color:var(--line-strong); box-shadow:0 22px 60px rgba(0,0,0,.6), 0 0 30px rgba(0,243,255,.18); }
+  .card:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; }
+
+  .card-media{ position:relative; aspect-ratio:16/10; overflow:hidden; background:#02060e; }
+  /* Ảnh vẽ bằng background-image -> KHÔNG có thẻ <img> để "Save image as" */
+  .media-bg{
+    position:absolute; inset:0;
+    background-size:cover; background-position:center; background-repeat:no-repeat;
+    transition:transform .55s cubic-bezier(.2,.8,.25,1), filter .35s ease, opacity .5s ease;
+    filter:saturate(1.05); opacity:0;
+  }
+  .media-bg.loaded{ opacity:1; }
+  .card:hover .media-bg{ transform:scale(1.07); }
+
+  /* Lớp phủ vô hình chặn tương tác trực tiếp lên ảnh (kéo-thả, long-press, chuột phải) */
+  .shield{ position:absolute; inset:0; z-index:5; background:transparent; }
+
+  /* Ánh sáng đi theo con trỏ trong từng card */
+  .card-glow{
+    position:absolute; inset:0; pointer-events:none; opacity:0; z-index:2;
+    background:radial-gradient(220px circle at var(--mx) var(--my), rgba(0,243,255,.28), transparent 60%);
+    transition:opacity .3s ease; mix-blend-mode:screen;
+  }
+  .card:hover .card-glow{ opacity:1; }
+
+  /* Lớp phủ gradient + nhãn "nhấn để xem" */
+  .card-media::after{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
+    background:linear-gradient(to top, rgba(5,8,16,.85) 0%, rgba(5,8,16,.05) 45%, transparent 70%);
+  }
+  .badge{
+    position:absolute; top:14px; left:14px; z-index:6;
+    font-family:'Orbitron'; font-weight:700; font-size:12px; letter-spacing:1px;
+    padding:5px 11px; border-radius:8px; color:#031018;
+    background:linear-gradient(135deg,var(--cyan),var(--blue));
+    box-shadow:0 0 14px rgba(0,243,255,.5);
+  }
+  .badge.orig{ background:linear-gradient(135deg,#ffd23f,#ff8a00); box-shadow:0 0 14px rgba(255,180,0,.55); }
+  .view-cta{
+    position:absolute; z-index:6; left:50%; top:50%;
+    transform:translate(-50%,-50%) scale(.85);
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:'Orbitron'; font-weight:500; font-size:13px; letter-spacing:1px;
+    color:#fff; padding:11px 20px; border-radius:40px;
+    background:rgba(5,8,16,.55); border:1px solid var(--line-strong);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    opacity:0; transition:opacity .3s ease, transform .3s ease; pointer-events:none;
+  }
+  .view-cta svg{ width:16px;height:16px; }
+  .card:hover .view-cta{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+
+  .card-body{ position:relative; z-index:6; padding:18px 20px 20px; }
+  .card-title{ font-family:'Orbitron'; font-weight:700; font-size:17px; margin:0 0 5px; color:#fff; letter-spacing:.3px; }
+  .card-sub{ margin:0 0 12px; font-size:14.5px; color:var(--muted); line-height:1.45; }
+  .card-meta{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); }
+  .chip{ display:inline-flex; align-items:center; gap:5px; padding:4px 9px; border:1px solid var(--line); border-radius:7px; background:rgba(0,243,255,.04); letter-spacing:.5px; }
+  .card-meta a{
+    margin-left:auto; color:var(--cyan); text-decoration:none; font-weight:600;
+    display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:8px;
+    border:1px solid var(--line); transition:background .2s, box-shadow .2s;
+  }
+  .card-meta a:hover{ background:rgba(0,243,255,.1); box-shadow:0 0 14px rgba(0,243,255,.25); }
+
+  /* Hiệu ứng gợn sóng khi nhấn */
+  .ripple{ position:absolute; border-radius:50%; transform:translate(-50%,-50%) scale(0); background:radial-gradient(circle, rgba(0,243,255,.55), transparent 65%); pointer-events:none; z-index:7; animation:ripple .6s ease-out forwards; }
+  @keyframes ripple{ to{ transform:translate(-50%,-50%) scale(1); opacity:0; } }
+
+  /* Reveal on scroll */
+  .reveal{ opacity:0; transform:translateY(26px); transition:opacity .6s ease, transform .6s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* ===== Lightbox ===== */
+  .lb{
+    position:fixed; inset:0; z-index:100; display:none;
+    align-items:center; justify-content:center;
+    background:rgba(3,5,12,.92); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+    opacity:0; transition:opacity .3s ease;
+  }
+  .lb.open{ display:flex; opacity:1; }
+  .lb-stage{ position:relative; max-width:94vw; display:flex; flex-direction:column; align-items:center; gap:14px; animation:lbin .35s cubic-bezier(.2,.9,.3,1); }
+  @keyframes lbin{ from{ transform:scale(.94); opacity:0 } to{ transform:none; opacity:1 } }
+  /* Ảnh trong lightbox vẽ bằng background-image (không thể "Save image as").
+     Hai lớp chồng nhau (lb-layer) để cross-fade nhanh & mượt giữa các ảnh. */
+  .lb-media{
+    position:relative; overflow:hidden;
+    width:min(94vw, 1180px); height:74vh;
+    border-radius:12px; border:1px solid var(--line-strong);
+    box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 40px rgba(0,243,255,.12);
+    background-color:#02060e; cursor:zoom-in;
+  }
+  .lb-layer{
+    position:absolute; inset:0; opacity:0;
+    background-size:contain; background-repeat:no-repeat; background-position:center;
+    transition:background-size .15s ease;
+    will-change:transform, opacity, filter; backface-visibility:hidden;
+  }
+  .lb-layer.zoom{ background-size:230%; }
+  .lb-media.zooming{ cursor:zoom-out; }
+  .lb-caption{
+    text-align:center; background:rgba(17,24,39,.7); border:1px solid var(--line);
+    padding:12px 22px; border-radius:12px; backdrop-filter:blur(8px); max-width:92vw;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  .lb-caption.swap{ opacity:0; transform:translateY(8px); }
+  .lb-caption h3{ font-family:'Orbitron'; font-weight:700; margin:0 0 4px; font-size:16px; color:#fff; }
+  .lb-caption p{ margin:0; font-size:13.5px; color:var(--muted); }
+  .lb-caption .open-live{ display:inline-flex; align-items:center; gap:6px; margin-top:9px; color:var(--cyan); text-decoration:none; font-weight:600; font-size:13.5px; padding:6px 14px; border:1px solid var(--line-strong); border-radius:9px; transition:background .2s, box-shadow .2s; }
+  .lb-caption .open-live:hover{ background:rgba(0,243,255,.12); box-shadow:0 0 16px rgba(0,243,255,.3); }
+
+  .lb-btn{
+    position:absolute; z-index:5; display:grid; place-items:center;
+    width:50px; height:50px; border-radius:50%; cursor:pointer;
+    background:rgba(17,24,39,.7); border:1px solid var(--line); color:#fff;
+    transition:transform .2s, background .2s, border-color .2s, box-shadow .2s;
+  }
+  .lb-btn:hover{ background:rgba(0,243,255,.15); border-color:var(--line-strong); box-shadow:0 0 18px rgba(0,243,255,.3); transform:scale(1.08); }
+  .lb-btn svg{ width:22px;height:22px; }
+  .lb-close{ top:-66px; right:0; }
+  .lb-prev{ left:-72px; top:35%; }
+  .lb-next{ right:-72px; top:35%; }
+  .lb-counter{ position:absolute; top:-58px; left:0; font-family:'Orbitron'; font-size:13px; letter-spacing:2px; color:var(--cyan); }
+  @media (max-width:900px){
+    .lb-prev{ left:8px; top:auto; bottom:-66px; } .lb-next{ right:8px; top:auto; bottom:-66px; }
+    .lb-close{ top:-58px; } .lb-media{ height:60vh; }
+  }
+
+  footer{ position:relative; z-index:2; text-align:center; padding:36px 22px 50px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); }
+  footer b{ color:var(--cyan); }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto; }
+    .reveal{ opacity:1; transform:none; }
+    .media-bg{ opacity:1; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div id="spotlight"></div>
+
+  <!-- ===== Thanh điều hướng ===== -->
+  <header>
+    <nav class="nav">
+      <a class="brand" href="#top">
+        <span class="logo">KT</span>
+        <span>
+          <span class="bn">KT SOUND</span><br>
+          <span class="bs">Phase Audio</span>
+        </span>
+      </a>
+      <div class="nav-links">
+        <span class="label">Các phiên bản:</span>
+        <a class="pill" href="v1.html" target="_blank" rel="noopener noreferrer" title="Trình Mô Phỏng & Phân Tích Âm Thanh (Hi-Tech UI)">V1 · Hi-Tech UI</a>
+        <a class="pill" href="v2.html" target="_blank" rel="noopener noreferrer" title="Interactive Audio Phase Alignment">V2 · Alignment</a>
+        <a class="pill" href="v3.html" target="_blank" rel="noopener noreferrer" title="Audio Phase Interactive Infographic">V3 · Infographic</a>
+        <a class="pill" href="v4.html" target="_blank" rel="noopener noreferrer" title="KT SOUND - Mô Phỏng Đồng Bộ Phase">V4 · KT Sound</a>
+        <a class="pill" href="v5.html" target="_blank" rel="noopener noreferrer" title="Audio Engineering: Đồng Bộ Phase">V5 · Engineering</a>
+        <a class="pill" href="v6.html" target="_blank" rel="noopener noreferrer" title="Đồng Bộ Phase Trong Âm Thanh">V6 · Đồng Bộ</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <span class="eyebrow"><span class="dot"></span> Bộ sưu tập hình ảnh</span>
+      <h1>Album <span class="accent">Đồng Bộ Phase</span><br>Trong Âm Thanh</h1>
+      <p>Tổng hợp các phiên bản infographic tương tác của KT SOUND. Nhấn vào từng thẻ để xem ảnh chi tiết, hoặc mở bản tương tác trực tiếp từ thanh điều hướng.</p>
+      <div class="note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Hình ảnh được bảo vệ 🍀 Tạo & tối ưu bởi Hiếu iceTea</div>
+      <div class="eq" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </section>
+
+    <!-- ===== Lưới ảnh ===== -->
+    <section class="gallery" id="gallery">
+
+      <button class="card reveal" data-index="0" aria-label="Xem ảnh: Bản gốc Infographic">
+        <div class="card-media">
+          <div class="media-bg" data-src="v0-original.jpeg" role="img" aria-label="Infographic gốc KT SOUND về đồng bộ Phase"></div>
+          <span class="badge orig">BẢN GỐC</span>
+          <div class="card-glow"></div>
+          <span class="view-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Nhấn để xem</span>
+          <div class="shield"></div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Infographic Gốc</h3>
+          <p class="card-sub">Cách xử lý & đồng bộ Phase đơn giản trong âm thanh — bản thiết kế gốc của KT SOUND.</p>
+          <div class="card-meta"><span class="chip">JPEG · 1024×1536</span></div>
+        </div>
+      </button>
+
+      <button class="card reveal" data-index="1" aria-label="Xem ảnh: Phiên bản 1 Hi-Tech UI">
+        <div class="card-media">
+          <div class="media-bg" data-src="v1.png" role="img" aria-label="Phiên bản 1 — Trình mô phỏng & phân tích âm thanh Hi-Tech UI"></div>
+          <span class="badge">V1</span>
+          <div class="card-glow"></div>
+          <span class="view-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Nhấn để xem</span>
+          <div class="shield"></div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Phiên Bản 1 — Hi-Tech UI</h3>
+          <p class="card-sub">Trình mô phỏng & phân tích âm thanh với giao diện công nghệ cao.</p>
+          <div class="card-meta"><span class="chip">PNG · 2816×1536</span><a href="v1.html" target="_blank" rel="noopener noreferrer">Mở bản tương tác ↗</a></div>
+        </div>
+      </button>
+
+      <button class="card reveal" data-index="2" aria-label="Xem ảnh: Phiên bản 2 Phase Alignment">
+        <div class="card-media">
+          <div class="media-bg" data-src="v2.png" role="img" aria-label="Phiên bản 2 — Interactive Audio Phase Alignment"></div>
+          <span class="badge">V2</span>
+          <div class="card-glow"></div>
+          <span class="view-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Nhấn để xem</span>
+          <div class="shield"></div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Phiên Bản 2 — Phase Alignment</h3>
+          <p class="card-sub">Interactive Audio Phase Alignment — minh hoạ cộng hưởng & triệt tiêu.</p>
+          <div class="card-meta"><span class="chip">PNG · 1408×768</span><a href="v2.html" target="_blank" rel="noopener noreferrer">Mở bản tương tác ↗</a></div>
+        </div>
+      </button>
+
+      <button class="card reveal" data-index="3" aria-label="Xem ảnh: Phiên bản 4 KT SOUND">
+        <div class="card-media">
+          <div class="media-bg" data-src="v4.png" role="img" aria-label="Phiên bản 4 — KT SOUND Mô phỏng đồng bộ Phase"></div>
+          <span class="badge">V4</span>
+          <div class="card-glow"></div>
+          <span class="view-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Nhấn để xem</span>
+          <div class="shield"></div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Phiên Bản 4 — KT SOUND</h3>
+          <p class="card-sub">Mô phỏng đồng bộ Phase mang nhận diện thương hiệu KT SOUND.</p>
+          <div class="card-meta"><span class="chip">PNG · 2816×1536</span><a href="v4.html" target="_blank" rel="noopener noreferrer">Mở bản tương tác ↗</a></div>
+        </div>
+      </button>
+
+      <button class="card reveal" data-index="4" aria-label="Xem ảnh: Phiên bản 6 Đồng Bộ Phase">
+        <div class="card-media">
+          <div class="media-bg" data-src="v6.png" role="img" aria-label="Phiên bản 6 — Đồng bộ Phase trong âm thanh"></div>
+          <span class="badge">V6</span>
+          <div class="card-glow"></div>
+          <span class="view-cta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Nhấn để xem</span>
+          <div class="shield"></div>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">Phiên Bản 6 — Đồng Bộ Phase</h3>
+          <p class="card-sub">Đồng bộ Phase trong âm thanh — bố cục tinh gọn, trực quan.</p>
+          <div class="card-meta"><span class="chip">PNG · 2816×1536</span><a href="v6.html" target="_blank" rel="noopener noreferrer">Mở bản tương tác ↗</a></div>
+        </div>
+      </button>
+
+    </section>
+  </main>
+
+  <footer>
+    Album ảnh dự án <b>KT SOUND · Đồng Bộ Phase Trong Âm Thanh</b> — by Hiếu iceTea 🍀
+  </footer>
+
+  <!-- ===== Lightbox ===== -->
+  <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Trình xem ảnh">
+    <button class="lb-btn lb-close" id="lbClose" aria-label="Đóng (Esc)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <div class="lb-stage">
+      <span class="lb-counter" id="lbCounter">1 / 5</span>
+      <button class="lb-btn lb-prev" id="lbPrev" aria-label="Ảnh trước (←)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="lb-media" id="lbMedia" role="img" aria-label="">
+        <div class="lb-layer" id="lbA"></div>
+        <div class="lb-layer" id="lbB"></div>
+      </div>
+      <button class="lb-btn lb-next" id="lbNext" aria-label="Ảnh sau (→)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+      <div class="lb-caption" id="lbCaption">
+        <h3 id="lbTitle"></h3>
+        <p id="lbSub"></p>
+        <a class="open-live" id="lbLive" target="_blank" rel="noopener noreferrer" style="display:none">Mở bản tương tác ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    'use strict';
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var IMAGES = [
+      { src:'v0-original.jpeg', title:'Infographic Gốc', sub:'Cách xử lý & đồng bộ Phase đơn giản — bản thiết kế gốc KT SOUND.', live:null },
+      { src:'v1.png', title:'Phiên Bản 1 — Hi-Tech UI', sub:'Trình mô phỏng & phân tích âm thanh.', live:'v1.html' },
+      { src:'v2.png', title:'Phiên Bản 2 — Phase Alignment', sub:'Interactive Audio Phase Alignment.', live:'v2.html' },
+      { src:'v4.png', title:'Phiên Bản 4 — KT SOUND', sub:'Mô phỏng đồng bộ Phase.', live:'v4.html' },
+      { src:'v6.png', title:'Phiên Bản 6 — Đồng Bộ Phase', sub:'Đồng bộ Phase trong âm thanh.', live:'v6.html' }
+    ];
+
+    /* ================= BẢO VỆ ẢNH (chống tải/sao chép cơ bản) ================= */
+    // 1) Chặn menu chuột phải toàn trang -> không còn "Lưu hình ảnh / Sao chép hình ảnh"
+    document.addEventListener('contextmenu', function(e){ e.preventDefault(); }, true);
+    // 2) Chặn kéo-thả (kéo ảnh ra desktop/tab khác)
+    document.addEventListener('dragstart', function(e){ e.preventDefault(); }, true);
+    // 3) Chặn copy / cut / paste
+    ['copy','cut'].forEach(function(ev){ document.addEventListener(ev, function(e){ e.preventDefault(); }); });
+    // 4) Chặn các phím tắt lưu/xem nguồn/in/devtools
+    document.addEventListener('keydown', function(e){
+      var k = (e.key || '').toLowerCase();
+      var ctrl = e.ctrlKey || e.metaKey;
+      if(e.key === 'F12'){ e.preventDefault(); return; }
+      if(ctrl && e.shiftKey && (k==='i' || k==='j' || k==='c')){ e.preventDefault(); return; } // DevTools
+      if(ctrl && (k==='s' || k==='u' || k==='p' || k==='c')){ e.preventDefault(); return; }     // Save / Source / Print / Copy
+    }, true);
+    // 5) Cố gắng xoá clipboard khi bấm PrintScreen (chỉ giảm thiểu, không chặn được chụp màn hình)
+    document.addEventListener('keyup', function(e){
+      if(e.key === 'PrintScreen' && navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText('').catch(function(){});
+      }
+    });
+
+    /* ---- Spotlight toàn trang ---- */
+    var spot = document.getElementById('spotlight');
+    if(!reduce){
+      window.addEventListener('pointermove', function(e){
+        spot.style.setProperty('--x', e.clientX + 'px');
+        spot.style.setProperty('--y', e.clientY + 'px');
+      });
+    }
+
+    /* ---- Card: ánh sáng theo con trỏ + nghiêng 3D + gợn sóng + mở lightbox ---- */
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+    var MAX = 9; // độ nghiêng tối đa (độ) — tăng để nghiêng sâu hơn
+
+    cards.forEach(function(card){
+      if(!reduce){
+        // Vào thẻ: lưu khung gốc (chưa biến dạng) + tắt transition để bám con trỏ TỨC THÌ
+        card.addEventListener('pointerenter', function(){
+          card._rect = card.getBoundingClientRect();
+          card.style.transition = 'border-color .25s ease, box-shadow .25s ease';
+        });
+        card.addEventListener('pointermove', function(e){
+          var r = card._rect || (card._rect = card.getBoundingClientRect());
+          var px = (e.clientX - r.left) / r.width;
+          var py = (e.clientY - r.top) / r.height;
+          card.style.setProperty('--mx', (px*100) + '%');  // ánh sáng bám con trỏ tức thì
+          card.style.setProperty('--my', (py*100) + '%');
+          // Gán góc nghiêng TRỰC TIẾP, không transition transform -> đến đâu nghiêng ngay đến đó
+          card.style.transform = 'perspective(900px) rotateX(' + ((0.5 - py) * MAX).toFixed(2) + 'deg) rotateY(' + ((px - 0.5) * MAX).toFixed(2) + 'deg) translateY(-6px)';
+        });
+        card.addEventListener('pointerleave', function(){
+          card._rect = null;
+          // Chỉ khi RỜI chuột mới mượt mà trả thẻ về phẳng
+          card.style.transition = 'transform .3s ease, border-color .25s ease, box-shadow .25s ease';
+          card.style.transform = '';
+        });
+      }
+      // Gợn sóng khi nhấn
+      card.addEventListener('pointerdown', function(e){
+        if(reduce) return;
+        var r = card.getBoundingClientRect();
+        var rip = document.createElement('span');
+        rip.className = 'ripple';
+        var size = Math.max(r.width, r.height) * 1.4;
+        rip.style.width = rip.style.height = size + 'px';
+        rip.style.left = (e.clientX - r.left) + 'px';
+        rip.style.top = (e.clientY - r.top) + 'px';
+        card.appendChild(rip);
+        setTimeout(function(){ rip.remove(); }, 650);
+      });
+      // Mở lightbox (bỏ qua khi bấm link "mở bản tương tác")
+      card.addEventListener('click', function(e){
+        if(e.target.closest('a')) return;
+        openLightbox(parseInt(card.getAttribute('data-index'), 10));
+      });
+    });
+
+    /* ---- Lazy-load ảnh nền + reveal khi cuộn ---- */
+    function loadBg(card){
+      var bg = card.querySelector('.media-bg');
+      if(bg && bg.dataset.src && !bg.style.backgroundImage){
+        bg.style.backgroundImage = "url('" + bg.dataset.src + "')";
+        bg.classList.add('loaded');
+      }
+    }
+    if('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(en){
+          if(en.isIntersecting){
+            if(!reduce) en.target.classList.add('in');
+            loadBg(en.target);
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold:.12, rootMargin:'200px' });
+      cards.forEach(function(c, i){ if(!reduce) c.style.transitionDelay = (i*60) + 'ms'; io.observe(c); });
+    } else {
+      cards.forEach(function(c){ c.classList.add('in'); loadBg(c); });
+    }
+
+    /* ---- Lightbox ---- */
+    var lb = document.getElementById('lb');
+    var lbMedia = document.getElementById('lbMedia');
+    var lbCaption = document.getElementById('lbCaption');
+    var lbTitle = document.getElementById('lbTitle');
+    var lbSub = document.getElementById('lbSub');
+    var lbLive = document.getElementById('lbLive');
+    var lbCounter = document.getElementById('lbCounter');
+    var layers = [document.getElementById('lbA'), document.getElementById('lbB')];
+    var act = 0;                 // chỉ số lớp đang hiển thị (0 / 1)
+    var current = 0, lastFocus = null, swapping = false, preloaded = false;
+    var SLIDE = 38;              // độ trượt nhẹ (px)
+    var DUR = 0.26;              // thời lượng cross-fade (giây) — giảm để nhanh hơn
+
+    // Tải sẵn mọi ảnh -> chuyển ảnh tức thì, không khựng
+    function preload(){ if(preloaded) return; preloaded = true; IMAGES.forEach(function(d){ var im = new Image(); im.src = d.src; }); }
+
+    function applyMeta(d){
+      lbMedia.setAttribute('aria-label', d.title);
+      lbTitle.textContent = d.title;
+      lbSub.textContent = d.sub;
+      lbCounter.textContent = (current+1) + ' / ' + IMAGES.length;
+      if(d.live){ lbLive.href = d.live; lbLive.style.display = 'inline-flex'; }
+      else{ lbLive.style.display = 'none'; }
+    }
+    function loadLayer(el, d){
+      el.classList.remove('zoom');
+      el.style.backgroundPosition = 'center';
+      el.style.backgroundImage = "url('" + d.src + "')";
+    }
+    // Sau khi chuyển xong: rút gọn transition để zoom mượt, không vướng transform cũ
+    function settle(el){ setTimeout(function(){ el.style.transition = 'background-size .15s ease'; }, (DUR*1000)+90); }
+
+    // Mở ảnh đầu tiên: fade + zoom nhẹ vào
+    function showCurrent(){
+      var d = IMAGES[current];
+      var front = layers[act], back = layers[act^1];
+      back.style.opacity = '0';
+      loadLayer(front, d); applyMeta(d);
+      lbMedia.classList.remove('zooming');
+      if(reduce){ front.style.transition='none'; front.style.opacity='1'; front.style.transform='none'; front.style.filter='none'; return; }
+      front.style.transition = 'none';
+      front.style.opacity = '0'; front.style.transform = 'scale(.96)'; front.style.filter = 'blur(8px)';
+      void front.offsetWidth;
+      front.style.transition = 'opacity '+DUR+'s ease, transform '+(DUR+0.06)+'s cubic-bezier(.2,.8,.25,1), filter '+DUR+'s ease';
+      front.style.opacity = '1'; front.style.transform = 'scale(1)'; front.style.filter = 'blur(0)';
+      settle(front);
+    }
+
+    // Chuyển ảnh: CROSS-FADE — ảnh cũ mờ/trượt ra, ảnh mới ĐỒNG THỜI rõ/trượt vào (không chờ)
+    function step(dir){
+      if(swapping) return;
+      swapping = true;
+      current = (current + dir + IMAGES.length) % IMAGES.length;
+      var d = IMAGES[current];
+      var front = layers[act], back = layers[act^1];
+      loadLayer(back, d); applyMeta(d);
+      lbMedia.classList.remove('zooming');
+      if(reduce){ front.style.opacity='0'; back.style.transition='none'; back.style.opacity='1'; back.style.transform='none'; back.style.filter='none'; act ^= 1; swapping = false; return; }
+      lbCaption.classList.add('swap');
+      // Đặt lớp mới ở phía vào, đang ẩn (không transition)
+      back.style.transition = 'none';
+      back.style.opacity = '0'; back.style.transform = 'translateX('+(dir*SLIDE)+'px) scale(.97)'; back.style.filter = 'blur(6px)';
+      void back.offsetWidth;
+      // Hai lớp animate CÙNG LÚC
+      var t = 'opacity '+DUR+'s ease, transform '+(DUR+0.06)+'s cubic-bezier(.2,.8,.25,1), filter '+DUR+'s ease';
+      front.style.transition = t; back.style.transition = t;
+      front.style.opacity = '0'; front.style.transform = 'translateX('+(-dir*SLIDE)+'px) scale(.97)'; front.style.filter = 'blur(6px)';
+      back.style.opacity = '1'; back.style.transform = 'translateX(0) scale(1)'; back.style.filter = 'blur(0)';
+      act ^= 1;
+      lbCaption.classList.remove('swap');
+      settle(layers[act]);
+      setTimeout(function(){ swapping = false; }, (DUR*1000)+70);
+    }
+
+    function openLightbox(i){
+      current = i; lastFocus = document.activeElement;
+      preload();
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      showCurrent();
+      document.getElementById('lbClose').focus();
+    }
+    function closeLightbox(){
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      swapping = false;
+      if(lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    document.getElementById('lbClose').addEventListener('click', closeLightbox);
+    document.getElementById('lbPrev').addEventListener('click', function(){ step(-1); });
+    document.getElementById('lbNext').addEventListener('click', function(){ step(1); });
+    lb.addEventListener('click', function(e){ if(e.target === lb) closeLightbox(); });
+
+    // Phóng to / thu nhỏ + rê để xem chi tiết (trên lớp đang hiển thị)
+    lbMedia.addEventListener('click', function(){
+      if(swapping) return;
+      var el = layers[act];
+      var z = el.classList.toggle('zoom');
+      lbMedia.classList.toggle('zooming', z);
+      if(!z) el.style.backgroundPosition = 'center';
+    });
+    lbMedia.addEventListener('pointermove', function(e){
+      var el = layers[act];
+      if(!el.classList.contains('zoom')) return;
+      var r = lbMedia.getBoundingClientRect();
+      var px = ((e.clientX - r.left) / r.width) * 100;
+      var py = ((e.clientY - r.top) / r.height) * 100;
+      el.style.backgroundPosition = px + '% ' + py + '%';
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(!lb.classList.contains('open')) return;
+      if(e.key === 'Escape') closeLightbox();
+      else if(e.key === 'ArrowLeft') step(-1);
+      else if(e.key === 'ArrowRight') step(1);
+    });
+  })();
+  </script>
+</body>
+</html>

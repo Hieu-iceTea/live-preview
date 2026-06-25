@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Phase Interactive Infographic 🍀 Hiếu iceTea</title>
+    <!-- ===== SEO / Open Graph · 🍀 Tạo & tối ưu bởi Hiếu iceTea ===== -->
+    <meta name="author" content="Hiếu iceTea">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2674/2674498.png">
+    <meta name="description" content="Infographic tương tác: cách xử lý & đồng bộ Phase trong âm thanh. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="KT SOUND — Audio Phase Interactive Infographic 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:description" content="Infographic tương tác: cách xử lý & đồng bộ Phase trong âm thanh. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(14, 38, 86, 0.4), transparent 35%),
+                radial-gradient(circle at 85% 30%, rgba(15, 45, 90, 0.4), transparent 35%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, .oswald { font-family: 'Oswald', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Glassmorphism & Panels */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Glowing text */
+        .glow-text { text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
+        .glow-text-blue { text-shadow: 0 0 15px rgba(96, 165, 250, 0.6); }
+        .glow-text-green { text-shadow: 0 0 15px rgba(16, 185, 129, 0.6); }
+        .glow-text-red { text-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+
+        .tech-line {
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.8), transparent);
+            height: 1px;
+            width: 100%;
+            position: relative;
+        }
+        .tech-line::after {
+            content: '';
+            position: absolute;
+            left: 50%; top: -2px;
+            transform: translateX(-50%);
+            width: 50px; height: 5px;
+            background: rgba(96, 165, 250, 0.8);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+        }
+
+        /* Interactive Elements */
+        .interactive-btn {
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .interactive-btn:active { transform: scale(0.95); }
+
+        /* Custom Range Slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 3px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 20px; width: 20px;
+            border-radius: 50%;
+            background: #60a5fa;
+            box-shadow: 0 0 10px #60a5fa;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            border: 2px solid #fff;
+            transition: background 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover { background: #3b82f6; }
+        
+        input[type=range].slider-amber::-webkit-slider-thumb { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; }
+        input[type=range].slider-amber::-webkit-slider-thumb:hover { background: #f59e0b; }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Tooltip */
+        .has-tooltip { position: relative; cursor: help; border-bottom: 1px dotted rgba(255,255,255,0.5); }
+        .tooltip {
+            visibility: hidden;
+            background-color: rgba(15, 23, 42, 0.95);
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px 12px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            width: 250px;
+            font-size: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%; left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: rgba(59, 130, 246, 0.5) transparent transparent transparent;
+        }
+        .has-tooltip:hover .tooltip { visibility: visible; opacity: 1; }
+
+        /* Grid Background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-2 md:p-6 lg:p-8 flex justify-center items-center">
+
+    <div class="max-w-[1400px] w-full grid-bg rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(15,35,80,0.9)] border border-blue-900/60 relative">
+        
+        <!-- Header Section -->
+        <header class="p-6 md:p-10 pb-6 relative z-10 reveal active">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8">
+                
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-4 group cursor-pointer">
+                    <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-600 to-blue-900 border-2 border-blue-400/40 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:shadow-blue-400/50 transition-all duration-300 transform group-hover:scale-105">
+                        <span class="text-5xl font-bold text-white oswald">K</span>
+                    </div>
+                    <div class="flex flex-col justify-center">
+                        <span class="text-3xl font-bold tracking-widest text-blue-100 oswald glow-text-blue">SOUND</span>
+                        <div class="h-0.5 w-full bg-blue-500 mt-1 transform origin-left transition-transform duration-500 group-hover:scale-x-125"></div>
+                    </div>
+                </div>
+
+                <!-- Main Title Area -->
+                <div class="flex-1 text-center lg:text-left flex flex-col items-center lg:items-start">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold uppercase tracking-wide text-white leading-tight">
+                        CÁCH XỬ LÝ, ĐỒNG BỘ <br/>
+                        <span class="text-amber-400 glow-text inline-block transform hover:scale-105 transition-transform cursor-default">PHASE ĐƠN GIẢN</span>
+                    </h1>
+                    
+                    <div class="flex items-center gap-4 mt-3 mb-5">
+                        <h2 class="text-2xl md:text-3xl lg:text-4xl tracking-widest text-blue-200 glow-text-blue">TRONG ÂM THANH</h2>
+                        <!-- Animated Waveform Graphic -->
+                        <svg class="h-10 w-40 text-blue-400" viewBox="0 0 100 30" fill="none" stroke="currentColor">
+                            <path d="M0,15 C10,15 15,5 25,5 C35,5 40,25 50,25 C60,25 65,5 75,5 C85,5 90,15 100,15" stroke-width="2" stroke-linecap="round">
+                                <animate attributeName="stroke-dashoffset" from="100" to="0" dur="2s" repeatCount="indefinite" stroke-dasharray="100"/>
+                            </path>
+                        </svg>
+                    </div>
+
+                    <p class="text-slate-300 text-base md:text-lg max-w-4xl border-l-4 border-blue-500 pl-5 bg-gradient-to-r from-blue-900/30 to-transparent py-3 pr-4 rounded-r-lg">
+                        Phase đúng giúp các tín hiệu cộng hưởng, tăng hiệu suất, âm trầm chắc khỏe, âm hình rõ ràng.<br/>
+                        <span class="text-amber-300/90 font-medium">Phase sai gây triệt tiêu, mất bass, âm mỏng, thiếu lực. Bảng tương tác này giúp bạn hiểu rõ nguyên lý!</span>
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <div class="tech-line mb-8"></div>
+
+        <!-- Main Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 p-4 md:p-8 pt-0 relative z-10">
+            
+            <!-- Panel 1: TRÌNH GIẢ LẬP PHASE (Interactive Simulator) -->
+            <section class="glass-panel rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/50 transition-colors reveal">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-blue-500/10 rounded-bl-full -z-10 transition-transform duration-500 group-hover:scale-110"></div>
+                
+                <div class="flex justify-between items-start mb-6">
+                    <h3 class="text-2xl text-amber-400 flex items-center gap-3 font-bold">
+                        <span class="bg-amber-500/20 text-amber-300 w-8 h-8 flex items-center justify-center rounded text-lg shadow-[0_0_10px_rgba(251,191,36,0.3)]">1</span>
+                        TRÌNH GIẢ LẬP PHASE
+                    </h3>
+                    <div id="phase-status-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-green-900/50 text-green-400 border border-green-500/50 transition-all duration-300">
+                        CÙNG PHA (0°)
+                    </div>
+                </div>
+                
+                <div class="bg-black/40 p-5 rounded-xl border border-white/10 relative shadow-inner">
+                    <!-- Dashboard Indicators -->
+                    <div class="flex justify-between text-xs font-mono text-slate-400 mb-2">
+                        <span><span class="inline-block w-3 h-3 bg-blue-500 rounded-full align-middle mr-1"></span>Sóng 1 (Main)</span>
+                        <span><span class="inline-block w-3 h-3 bg-emerald-500 rounded-full align-middle mr-1"></span>Sóng 2 (Sub)</span>
+                        <span><span id="sum-legend-color" class="inline-block w-3 h-3 bg-amber-400 rounded-full align-middle mr-1"></span>Tổng (Sum)</span>
+                    </div>
+
+                    <!-- Interactive Wave Canvas -->
+                    <div class="relative w-full h-32 bg-slate-900/50 rounded-lg border border-slate-700/50 overflow-hidden" id="wave-container">
+                        <svg viewBox="0 0 400 100" class="w-full h-full" preserveAspectRatio="none">
+                            <line x1="0" y1="50" x2="400" y2="50" stroke="rgba(255,255,255,0.15)" stroke-dasharray="4" stroke-width="1"/>
+                            <polyline id="wave1" fill="none" stroke="#3B82F6" stroke-width="2" opacity="0.6"></polyline>
+                            <polyline id="wave2" fill="none" stroke="#10B981" stroke-width="2" opacity="0.8"></polyline>
+                            <polyline id="waveSum" fill="none" stroke="#FBBF24" stroke-width="3" filter="drop-shadow(0 0 3px rgba(251,191,36,0.5))"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Interactive Controls -->
+                    <div class="mt-6">
+                        <div class="flex justify-between items-end mb-2">
+                            <label for="phase-slider" class="text-sm font-semibold text-slate-300">
+                                Kéo để chỉnh Độ lệch pha (<span class="has-tooltip text-blue-300 border-b border-dashed border-blue-400/50">Phase Shift<span class="tooltip">Sự chênh lệch về chu kỳ thời gian giữa 2 sóng âm, tính bằng độ (°). 0° là đồng bộ, 180° là ngược pha hoàn toàn.</span></span>)
+                            </label>
+                            <div class="text-2xl font-mono font-bold text-white w-16 text-right"><span id="phase-val-display">0</span>°</div>
+                        </div>
+                        <input type="range" id="phase-slider" class="slider-amber" min="0" max="180" value="0" step="1">
+                        <div class="flex justify-between text-xs text-slate-500 mt-1 font-mono">
+                            <span>0° (Cộng Hưởng)</span>
+                            <span>90°</span>
+                            <span>180° (Triệt Tiêu)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="phase-message" class="mt-4 text-center bg-green-900/20 border border-green-500/30 rounded py-2 px-4 text-green-200 text-sm transition-colors duration-300">
+                    <i class="fa-solid fa-check-circle mr-2"></i>Hai sóng đồng pha, biên độ tổng tăng gấp đôi. Âm thanh uy lực nhất!
+                </div>
+            </section>
+
+            <!-- Panel 2: KIỂM TRA PHASE (Interactive Tabs) -->
+            <section class="glass-panel rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/50 transition-colors reveal">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-bl-full -z-10"></div>
+                <h3 class="text-2xl text-blue-300 mb-6 flex items-center gap-3 font-bold">
+                    <span class="bg-blue-500/20 text-blue-300 w-8 h-8 flex items-center justify-center rounded text-lg">2</span>
+                    KIỂM TRA PHASE TẠI HIỆN TRƯỜNG
+                </h3>
+
+                <div class="flex flex-col gap-4">
+                    <!-- Clickable Steps -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="step-tabs">
+                        <!-- Step 1 -->
+                        <div class="bg-blue-900/30 hover:bg-blue-800/50 border border-blue-500/30 rounded-lg p-3 cursor-pointer transition-all interactive-btn step-tab active-tab" data-step="1">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 shadow-[0_0_10px_rgba(59,130,246,0.6)] step-num">1</div>
+                                <p class="text-slate-200 text-sm font-medium">Phát <span class="text-amber-300 has-tooltip">Pink Noise<span class="tooltip">Tín hiệu nhiễu hồng, chứa tất cả các dải tần số với năng lượng bằng nhau trên mỗi quãng tám. Rất chuẩn để test hệ thống.</span></span> hoặc Sine 60-100Hz qua hệ thống.</p>
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="bg-slate-900/50 hover:bg-blue-900/30 border border-white/10 rounded-lg p-3 cursor-pointer transition-all interactive-btn step-tab" data-step="2">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-slate-700 text-slate-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 step-num">2</div>
+                                <p class="text-slate-300 text-sm font-medium">Nghe tại vị trí trung tâm (Sweet spot) giữa các cụm loa.</p>
+                            </div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="bg-slate-900/50 hover:bg-blue-900/30 border border-white/10 rounded-lg p-3 cursor-pointer transition-all interactive-btn step-tab" data-step="3">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-slate-700 text-slate-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 step-num">3</div>
+                                <p class="text-slate-300 text-sm font-medium">Thử đảo cực (Polarity 180°) trên loa Sub để so sánh.</p>
+                            </div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="bg-slate-900/50 hover:bg-blue-900/30 border border-white/10 rounded-lg p-3 cursor-pointer transition-all interactive-btn step-tab" data-step="4">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-slate-700 text-slate-300 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 step-num">4</div>
+                                <p class="text-slate-300 text-sm font-medium">Dùng phần mềm đo lường <span class="text-blue-300 has-tooltip">SMAART<span class="tooltip">Phần mềm phân tích âm thanh chuyên nghiệp chuẩn ngành, giúp đo đạc Phase, EQ, Time Alignment bằng micro RTA.</span></span> để tinh chỉnh.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Details Panel -->
+                    <div class="bg-[#0b132b] border border-blue-500/40 rounded-xl p-4 mt-2 relative overflow-hidden min-h-[110px] flex items-center shadow-lg">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-blue-500" id="detail-indicator"></div>
+                        <i class="fa-solid fa-lightbulb text-3xl text-amber-400 opacity-20 absolute right-4 top-4"></i>
+                        <div id="step-detail-content" class="text-slate-300 text-sm leading-relaxed pl-3">
+                            <!-- Injected by JS -->
+                            <strong class="text-blue-300 block mb-1">MẸO CHUYÊN GIA (BƯỚC 1):</strong>
+                            Pink Noise giúp bạn đánh giá toàn dải, nhưng nếu chỉ muốn căn phase giữa Sub và Main (điểm Crossover), hãy dùng sóng Sine ở tần số cắt (ví dụ: 80Hz hoặc 100Hz) sẽ dễ nghe thấy sự triệt tiêu nhất.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Panel 3: CÁC CÁCH ĐỒNG BỘ PHASE ĐƠN GIẢN (Interactive Hardware) -->
+            <section class="glass-panel rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/50 transition-colors reveal">
+                <h3 class="text-2xl text-blue-300 mb-6 flex items-center gap-3 font-bold">
+                    <span class="bg-blue-500/20 text-blue-300 w-8 h-8 flex items-center justify-center rounded text-lg">3</span>
+                    CÔNG CỤ ĐỒNG BỘ (Bấm để thử)
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 h-[calc(100%-4rem)]">
+                    
+                    <!-- Hardware A: Sub Switch -->
+                    <div class="bg-black/40 border border-white/5 hover:border-amber-500/30 transition-colors rounded-xl p-4 flex flex-col items-center text-center justify-between interactive-btn shadow-md" id="sub-switch-btn">
+                        <div class="text-sm font-bold text-slate-200 mb-3 h-10 flex items-center">A. GẠT PHASE (SUB)</div>
+                        <div class="flex-1 flex items-center justify-center w-full">
+                            <div class="relative w-24 h-12 bg-slate-900 rounded-full border-2 border-slate-700 shadow-inner flex items-center p-1 pointer-events-none">
+                                <div class="absolute left-3 text-xs font-bold text-slate-400" id="switch-lbl-0">0°</div>
+                                <div class="absolute right-2 text-xs font-bold text-slate-600" id="switch-lbl-180">180°</div>
+                                <div id="sub-switch-knob" class="w-9 h-9 bg-gradient-to-br from-slate-300 to-slate-500 rounded-full shadow-md transform translate-x-0 transition-transform duration-300 border border-slate-200"></div>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-4 border-t border-white/10 pt-2 w-full font-mono">Trạng thái: <span id="switch-status" class="text-slate-300">Normal (0°)</span></div>
+                    </div>
+
+                    <!-- Hardware B: Delay Slider -->
+                    <div class="bg-black/40 border border-white/5 hover:border-blue-500/30 transition-colors rounded-xl p-4 flex flex-col items-center text-center justify-between shadow-md">
+                        <div class="text-sm font-bold text-slate-200 mb-2 h-10 flex items-center">B. BÙ DELAY (DSP)</div>
+                        <div class="flex-1 flex flex-col items-center justify-center w-full relative w-full">
+                            
+                            <div class="flex justify-between w-full px-2 text-[10px] text-slate-500 font-mono mb-1">
+                                <span>Main</span>
+                                <span id="distance-display" class="text-blue-300 font-bold">0.0m</span>
+                                <span>Sub</span>
+                            </div>
+                            
+                            <!-- Slider mimicking distance -->
+                            <input type="range" id="delay-slider" class="w-full mb-3" min="0" max="100" value="0">
+                            
+                            <div class="bg-slate-900 border border-slate-700 rounded px-3 py-1.5 w-full flex justify-between items-center">
+                                <i class="fa-regular fa-clock text-blue-400 text-xs"></i>
+                                <span class="font-mono font-bold text-green-400 text-sm" id="time-display">0.00 ms</span>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-2 border-t border-white/10 pt-2 w-full font-mono">1ms ≈ 0.34m (20°C)</div>
+                    </div>
+
+                    <!-- Hardware C: Polarity Button -->
+                    <div class="bg-black/40 border border-white/5 hover:border-red-500/30 transition-colors rounded-xl p-4 flex flex-col items-center text-center justify-between interactive-btn shadow-md" id="polarity-btn">
+                        <div class="text-sm font-bold text-slate-200 mb-3 h-10 flex items-center">C. ĐẢO CỰC (MIXER)</div>
+                        <div class="flex-1 flex items-center justify-center w-full">
+                            <div id="polarity-hardware" class="w-16 h-16 bg-slate-800 rounded-lg border-2 border-slate-600 shadow-[0_5px_15px_rgba(0,0,0,0.5)] flex items-center justify-center transition-all relative pointer-events-none active:shadow-inner active:mt-1">
+                                <div id="polarity-led" class="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-slate-600 shadow-inner"></div>
+                                <span id="polarity-icon" class="text-3xl font-bold text-slate-400">Ø</span>
+                            </div>
+                        </div>
+                        <div class="text-[11px] text-slate-400 mt-4 border-t border-white/10 pt-2 w-full font-mono">Nhấn nút để lật ngược pha tín hiệu điện.</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Panel 4: QUY TRÌNH THỰC HÀNH NHANH (Interactive Flow) -->
+            <section class="glass-panel rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/50 transition-colors reveal">
+                <h3 class="text-2xl text-amber-400 mb-6 flex items-center gap-3 font-bold">
+                    <span class="bg-amber-500/20 text-amber-300 w-8 h-8 flex items-center justify-center rounded text-lg">4</span>
+                    QUY TRÌNH TỐI ƯU HỆ THỐNG
+                </h3>
+
+                <div class="relative h-[calc(100%-4rem)] flex items-center justify-center">
+                    <!-- Connecting line -->
+                    <div class="absolute top-1/2 left-10 right-10 h-1 bg-slate-800 -translate-y-1/2 z-0 rounded">
+                        <div id="progress-line" class="h-full bg-blue-500 w-0 transition-all duration-700 ease-in-out shadow-[0_0_10px_rgba(59,130,246,0.8)]"></div>
+                    </div>
+
+                    <div class="flex w-full justify-between items-center z-10 relative px-2">
+                        <!-- Workflow Steps -->
+                        <div class="workflow-step cursor-pointer group flex flex-col items-center" data-wf="1" onclick="updateWorkflow(1)">
+                            <div class="wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-lg relative bg-[#030712]">
+                                <i class="fa-solid fa-wave-square text-lg text-slate-400"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-center text-slate-400 font-bold mt-2 wf-text">1. PHÁT SINE</span>
+                        </div>
+
+                        <div class="workflow-step cursor-pointer group flex flex-col items-center" data-wf="2" onclick="updateWorkflow(2)">
+                            <div class="wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-lg relative bg-[#030712]">
+                                <i class="fa-solid fa-microphone-lines text-lg text-slate-400"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-center text-slate-400 font-bold mt-2 wf-text">2. ĐO RTA</span>
+                        </div>
+
+                        <div class="workflow-step cursor-pointer group flex flex-col items-center" data-wf="3" onclick="updateWorkflow(3)">
+                            <div class="wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-lg relative bg-[#030712]">
+                                <i class="fa-solid fa-clock-rotate-left text-lg text-slate-400"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-center text-slate-400 font-bold mt-2 wf-text">3. TÌM DELAY</span>
+                        </div>
+
+                        <div class="workflow-step cursor-pointer group flex flex-col items-center" data-wf="4" onclick="updateWorkflow(4)">
+                            <div class="wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-lg relative bg-[#030712]">
+                                <i class="fa-solid fa-sliders text-lg text-slate-400"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-center text-slate-400 font-bold mt-2 wf-text">4. CĂN CHỈNH</span>
+                        </div>
+
+                        <div class="workflow-step cursor-pointer group flex flex-col items-center" data-wf="5" onclick="updateWorkflow(5)">
+                            <div class="wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-slate-800 border-2 border-slate-600 flex items-center justify-center transition-all duration-300 group-hover:scale-110 shadow-lg relative bg-[#030712]">
+                                <i class="fa-solid fa-check-double text-lg text-slate-400"></i>
+                            </div>
+                            <span class="text-[10px] md:text-xs text-center text-slate-400 font-bold mt-2 wf-text">5. HOÀN TẤT</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mini instruction -->
+                <div class="text-center mt-2 text-[10px] text-slate-500 italic">Bấm vào từng bước để theo dõi tiến trình.</div>
+            </section>
+
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="mt-6 p-6 md:p-10 pt-0 relative z-10 reveal">
+            <div class="tech-line mb-10"></div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center mb-10">
+                
+                <!-- Brand -->
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-600 to-blue-900 border border-blue-400/40 flex items-center justify-center shadow-lg">
+                        <span class="text-4xl font-bold text-white oswald">K</span>
+                    </div>
+                    <div>
+                        <h4 class="text-2xl font-bold tracking-wider text-white oswald glow-text-blue">K SOUND</h4>
+                        <p class="text-xs text-blue-300 tracking-widest mt-1 uppercase font-semibold">Giải Pháp Âm Thanh Chuyên Nghiệp</p>
+                    </div>
+                </div>
+
+                <!-- Quote -->
+                <div class="text-center">
+                    <p class="text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-white to-amber-300 italic font-serif leading-relaxed">
+                        "Phase đúng – Âm thanh uy lực.<br/>Đồng bộ chuẩn – Hệ thống tỏa sáng."
+                    </p>
+                </div>
+
+                <!-- Warning Box -->
+                <div class="bg-slate-900/80 border border-amber-500/30 rounded-xl p-5 text-sm relative shadow-lg hover:border-amber-400/60 transition-colors">
+                    <div class="absolute -top-3 left-4 bg-amber-500 px-3 py-0.5 rounded text-black flex items-center gap-2 font-bold text-xs">
+                        <i class="fa-solid fa-triangle-exclamation"></i> LƯU Ý KỸ THUẬT
+                    </div>
+                    <ul class="text-slate-300 space-y-2 mt-2 list-none pl-1 text-xs md:text-sm">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-angle-right text-amber-500 mt-1"></i> Nút đảo cực (Polarity) chỉ lật pha điện 180°, <strong class="text-white">không bù được thời gian trễ vật lý.</strong></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-angle-right text-amber-500 mt-1"></i> Chỉnh Delay (DSP) giải quyết triệt để sự lệch pha do khoảng cách không gian.</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Services & Contacts -->
+            <div class="flex flex-wrap justify-center gap-3 md:gap-6 text-xs md:text-sm text-slate-300 mb-8 font-medium">
+                <a href="tel:0989004670" class="flex items-center gap-2 bg-blue-900/30 hover:bg-blue-600/50 px-4 py-2 rounded-full border border-blue-500/30 transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] group">
+                    <i class="fa-solid fa-phone text-blue-400 group-hover:animate-bounce"></i> <span class="group-hover:text-white">0989.004.670</span>
+                </a>
+                <a href="https://fb.com/ktsound.vn" target="_blank" class="flex items-center gap-2 bg-blue-900/30 hover:bg-blue-600/50 px-4 py-2 rounded-full border border-blue-500/30 transition-all cursor-pointer hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] group">
+                    <i class="fa-brands fa-facebook-f text-blue-400 group-hover:text-white"></i> <span class="group-hover:text-white">fb.com/ktsound.vn</span>
+                </a>
+                <div class="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+                    <i class="fa-solid fa-headset text-slate-400"></i> <span>TƯ VẤN GIẢI PHÁP</span>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+                    <i class="fa-solid fa-sliders text-slate-400"></i> <span>SETUP & TUNING</span>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700">
+                    <i class="fa-solid fa-screwdriver-wrench text-slate-400"></i> <span>BẢO TRÌ & HẬU MÃI</span>
+                </div>
+            </div>
+
+            <!-- Bottom Line -->
+            <div class="text-center border-t border-slate-800 pt-5">
+                <p class="text-slate-500 text-[11px] md:text-xs tracking-widest uppercase font-mono">
+                    KT SOUND – NÂNG TẦM TRẢI NGHIỆM ÂM THANH SỰ KIỆN, SÂN KHẤU & LIVE BAND
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JavaScript Interactive Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- 1. TRÌNH GIẢ LẬP PHASE (WAVE SIMULATOR) --- */
+            const phaseSlider = document.getElementById('phase-slider');
+            const phaseValDisplay = document.getElementById('phase-val-display');
+            const wave2 = document.getElementById('wave2');
+            const waveSum = document.getElementById('waveSum');
+            const statusBadge = document.getElementById('phase-status-badge');
+            const phaseMessage = document.getElementById('phase-message');
+            const sumLegendColor = document.getElementById('sum-legend-color');
+
+            function drawWaves(phaseShiftDeg) {
+                const width = 400;
+                const height = 100;
+                const midY = height / 2;
+                const amplitude = 22;
+                const period = 200; // pixels for one full wave (360 deg)
+                
+                const phaseShiftRad = phaseShiftDeg * (Math.PI / 180);
+                
+                let pts2 = [];
+                let ptsSum = [];
+
+                for (let x = 0; x <= width; x += 2) {
+                    // Base wave 1 is at 0 phase
+                    let v1 = Math.sin((x / period) * 2 * Math.PI); 
+                    // Wave 2 is shifted
+                    let v2 = Math.sin(((x / period) * 2 * Math.PI) + phaseShiftRad);
+                    
+                    let y2 = midY - v2 * amplitude;
+                    let sum = v1 + v2;
+                    let ySum = midY - sum * amplitude;
+
+                    pts2.push(`${x},${y2.toFixed(1)}`);
+                    ptsSum.push(`${x},${ySum.toFixed(1)}`);
+                }
+
+                // Wave 1 is static, generated once in HTML or implicitly understood.
+                // We actually need to draw wave1 once accurately so it matches.
+                let pts1 = [];
+                for(let x=0; x<=width; x+=2){
+                    let v1 = Math.sin((x / period) * 2 * Math.PI);
+                    pts1.push(`${x},${(midY - v1 * amplitude).toFixed(1)}`);
+                }
+                document.getElementById('wave1').setAttribute('points', pts1.join(' '));
+
+                wave2.setAttribute('points', pts2.join(' '));
+                waveSum.setAttribute('points', ptsSum.join(' '));
+
+                // Update UI Colors and Texts based on phase
+                phaseValDisplay.textContent = phaseShiftDeg;
+                
+                if (phaseShiftDeg == 0) {
+                    statusBadge.textContent = "CÙNG PHA (0°)";
+                    statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-green-900/50 text-green-400 border border-green-500/50 transition-all duration-300";
+                    phaseMessage.innerHTML = "<i class='fa-solid fa-check-circle mr-2'></i>Cộng hưởng tối đa: Hai sóng đồng pha, biên độ tổng tăng gấp đôi. Âm thanh uy lực nhất!";
+                    phaseMessage.className = "mt-4 text-center bg-green-900/20 border border-green-500/30 rounded py-2 px-4 text-green-200 text-sm transition-colors duration-300";
+                    waveSum.setAttribute('stroke', '#10B981'); // Greenish sum
+                    sumLegendColor.className = "inline-block w-3 h-3 bg-emerald-400 rounded-full align-middle mr-1";
+                } else if (phaseShiftDeg == 180) {
+                    statusBadge.textContent = "NGƯỢC PHA (180°)";
+                    statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-red-900/50 text-red-400 border border-red-500/50 transition-all duration-300";
+                    phaseMessage.innerHTML = "<i class='fa-solid fa-triangle-exclamation mr-2'></i>Triệt tiêu hoàn toàn: Hai sóng triệt tiêu lẫn nhau. Mất hoàn toàn âm Bass!";
+                    phaseMessage.className = "mt-4 text-center bg-red-900/20 border border-red-500/30 rounded py-2 px-4 text-red-200 text-sm transition-colors duration-300";
+                    waveSum.setAttribute('stroke', '#EF4444'); // Red flatline
+                    sumLegendColor.className = "inline-block w-3 h-3 bg-red-500 rounded-full align-middle mr-1";
+                } else {
+                    statusBadge.textContent = `LỆCH PHA (${phaseShiftDeg}°)`;
+                    statusBadge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-900/50 text-amber-400 border border-amber-500/50 transition-all duration-300";
+                    phaseMessage.innerHTML = "<i class='fa-solid fa-circle-exclamation mr-2'></i>Lệch pha một phần: Âm thanh bị giảm sút năng lượng, âm hình không rõ ràng.";
+                    phaseMessage.className = "mt-4 text-center bg-amber-900/20 border border-amber-500/30 rounded py-2 px-4 text-amber-200 text-sm transition-colors duration-300";
+                    waveSum.setAttribute('stroke', '#FBBF24'); // Yellow sum
+                    sumLegendColor.className = "inline-block w-3 h-3 bg-amber-400 rounded-full align-middle mr-1";
+                }
+            }
+
+            phaseSlider.addEventListener('input', (e) => {
+                drawWaves(e.target.value);
+            });
+            // Initial draw
+            drawWaves(0);
+
+
+            /* --- 2. KIỂM TRA PHASE (TABS) --- */
+            const tabs = document.querySelectorAll('.step-tab');
+            const detailContent = document.getElementById('step-detail-content');
+            
+            const tipsData = {
+                1: "<strong class='text-blue-300 block mb-1'>MẸO CHUYÊN GIA (BƯỚC 1):</strong> Pink Noise giúp bạn đánh giá toàn dải, nhưng nếu chỉ muốn căn phase giữa Sub và Main tại điểm Crossover, hãy dùng sóng Sine ở tần số cắt (VD: 80Hz hoặc 100Hz) sẽ dễ nghe thấy sự triệt tiêu/cộng hưởng nhất.",
+                2: "<strong class='text-blue-300 block mb-1'>MẸO CHUYÊN GIA (BƯỚC 2):</strong> Vị trí trung tâm (Sweet spot) rất quan trọng. Hãy đảm bảo khoảng cách từ tai bạn đến cụm loa Trái và Phải là bằng nhau. Nếu đo RTA, hãy đặt Mic đúng vị trí này.",
+                3: "<strong class='text-blue-300 block mb-1'>MẸO CHUYÊN GIA (BƯỚC 3):</strong> Thao tác lật pha (đảo cực) là phép thử nhanh nhất. Nếu lật 180° mà nghe tiếng Bass to hơn, tròn hơn -> Cực tính ban đầu bị sai. Nếu tiếng Bass xẹp đi -> Cực tính ban đầu đang đúng.",
+                4: "<strong class='text-blue-300 block mb-1'>MẸO CHUYÊN GIA (BƯỚC 4):</strong> Smaart hay RTA giúp đo Phase Response. Bạn cần tìm độ trễ (Delay) sao cho đường Phase của Sub và Main đè lên nhau (chênh lệch 0°) tại khu vực tần số giao thoa (Crossover region)."
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Reset all
+                    tabs.forEach(t => {
+                        t.classList.remove('active-tab', 'bg-blue-900/30', 'border-blue-500/30');
+                        t.classList.add('bg-slate-900/50', 'border-white/10');
+                        const num = t.querySelector('.step-num');
+                        num.classList.remove('bg-blue-500', 'text-white', 'shadow-[0_0_10px_rgba(59,130,246,0.6)]');
+                        num.classList.add('bg-slate-700', 'text-slate-300');
+                    });
+
+                    // Activate current
+                    tab.classList.remove('bg-slate-900/50', 'border-white/10');
+                    tab.classList.add('active-tab', 'bg-blue-900/30', 'border-blue-500/30');
+                    const activeNum = tab.querySelector('.step-num');
+                    activeNum.classList.remove('bg-slate-700', 'text-slate-300');
+                    activeNum.classList.add('bg-blue-500', 'text-white', 'shadow-[0_0_10px_rgba(59,130,246,0.6)]');
+
+                    // Update detail text with fade effect
+                    detailContent.style.opacity = 0;
+                    setTimeout(() => {
+                        detailContent.innerHTML = tipsData[tab.getAttribute('data-step')];
+                        detailContent.style.opacity = 1;
+                    }, 200);
+                });
+            });
+
+
+            /* --- 3. CÔNG CỤ ĐỒNG BỘ (INTERACTIVE HARDWARE) --- */
+            
+            // A. Sub Switch
+            const subSwitchBtn = document.getElementById('sub-switch-btn');
+            const switchKnob = document.getElementById('sub-switch-knob');
+            const switchStatus = document.getElementById('switch-status');
+            const lbl0 = document.getElementById('switch-lbl-0');
+            const lbl180 = document.getElementById('switch-lbl-180');
+            let is180 = false;
+
+            subSwitchBtn.addEventListener('click', () => {
+                is180 = !is180;
+                if (is180) {
+                    switchKnob.style.transform = 'translateX(52px)';
+                    switchKnob.className = "w-9 h-9 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full shadow-[0_0_10px_rgba(251,191,36,0.6)] transform transition-transform duration-300 border border-amber-200";
+                    switchStatus.textContent = "Reversed (180°)";
+                    switchStatus.className = "text-amber-400 font-bold";
+                    lbl0.classList.replace('text-blue-400', 'text-slate-600');
+                    lbl180.classList.replace('text-slate-600', 'text-amber-400');
+                } else {
+                    switchKnob.style.transform = 'translateX(0)';
+                    switchKnob.className = "w-9 h-9 bg-gradient-to-br from-slate-300 to-slate-500 rounded-full shadow-md transform transition-transform duration-300 border border-slate-200";
+                    switchStatus.textContent = "Normal (0°)";
+                    switchStatus.className = "text-slate-300";
+                    lbl0.classList.replace('text-slate-600', 'text-blue-400');
+                    lbl180.classList.replace('text-amber-400', 'text-slate-600');
+                }
+            });
+
+            // Init label color
+            lbl0.classList.replace('text-slate-400', 'text-blue-400');
+
+            // B. Delay Slider
+            const delaySlider = document.getElementById('delay-slider');
+            const distDisplay = document.getElementById('distance-display');
+            const timeDisplay = document.getElementById('time-display');
+            // Max distance say 10 meters. Slider 0-100 represents 0-10m.
+            
+            delaySlider.addEventListener('input', (e) => {
+                const distanceMeters = (e.target.value / 10).toFixed(1);
+                // Speed of sound approx 343 m/s at 20C. Time(ms) = Distance(m) / 0.343
+                const timeMs = (distanceMeters / 0.343).toFixed(2);
+                
+                distDisplay.textContent = `${distanceMeters}m`;
+                timeDisplay.textContent = `${timeMs} ms`;
+                
+                if(timeMs > 0) {
+                    timeDisplay.classList.replace('text-green-400', 'text-amber-400');
+                } else {
+                    timeDisplay.classList.replace('text-amber-400', 'text-green-400');
+                }
+            });
+
+            // C. Polarity Button
+            const polarityBtn = document.getElementById('polarity-btn');
+            const polarityHw = document.getElementById('polarity-hardware');
+            const polarityLed = document.getElementById('polarity-led');
+            const polarityIcon = document.getElementById('polarity-icon');
+            let isPolarityReversed = false;
+
+            polarityBtn.addEventListener('click', () => {
+                isPolarityReversed = !isPolarityReversed;
+                if(isPolarityReversed) {
+                    polarityHw.classList.replace('bg-slate-800', 'bg-slate-900');
+                    polarityHw.classList.replace('border-slate-600', 'border-red-900');
+                    polarityLed.className = "absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)]";
+                    polarityIcon.classList.replace('text-slate-400', 'text-red-500');
+                } else {
+                    polarityHw.classList.replace('bg-slate-900', 'bg-slate-800');
+                    polarityHw.classList.replace('border-red-900', 'border-slate-600');
+                    polarityLed.className = "absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-slate-600 shadow-inner";
+                    polarityIcon.classList.replace('text-red-500', 'text-slate-400');
+                }
+            });
+
+
+            /* --- 4. QUY TRÌNH (WORKFLOW) --- */
+            window.updateWorkflow = function(stepIndex) {
+                const steps = document.querySelectorAll('.workflow-step');
+                const progressLine = document.getElementById('progress-line');
+                
+                // Calculate width percentage (0 to 4 steps = 0%, 25%, 50%, 75%, 100%)
+                const percentage = ((stepIndex - 1) / (steps.length - 1)) * 100;
+                progressLine.style.width = `${percentage}%`;
+
+                steps.forEach((step, idx) => {
+                    const iconWrap = step.querySelector('.wf-icon');
+                    const icon = step.querySelector('i');
+                    const text = step.querySelector('.wf-text');
+                    
+                    // Reset
+                    iconWrap.className = "wf-icon w-12 h-12 md:w-14 md:h-14 rounded-full bg-[#030712] border-2 border-slate-600 flex items-center justify-center transition-all duration-300 shadow-lg relative";
+                    icon.className = icon.className.replace(/text-(blue|green|slate)-(300|400|500)/g, 'text-slate-400');
+                    text.className = "text-[10px] md:text-xs text-center text-slate-500 font-bold mt-2 wf-text transition-colors";
+
+                    if (idx < stepIndex) {
+                        // Completed or Current
+                        if (idx === stepIndex - 1) {
+                            // Current Active
+                            iconWrap.classList.add('border-blue-500', 'shadow-[0_0_20px_rgba(59,130,246,0.6)]', 'scale-110');
+                            iconWrap.classList.remove('border-slate-600');
+                            icon.classList.replace('text-slate-400', 'text-blue-400');
+                            text.classList.replace('text-slate-500', 'text-blue-300');
+                            text.classList.add('glow-text-blue');
+                        } else {
+                            // Past (Completed)
+                            iconWrap.classList.add('border-green-500', 'bg-green-900/20');
+                            iconWrap.classList.remove('border-slate-600');
+                            icon.classList.replace('text-slate-400', 'text-green-400');
+                            text.classList.replace('text-slate-500', 'text-green-500');
+                        }
+                    }
+                });
+            };
+
+            // Initialize workflow at step 1
+            setTimeout(() => { updateWorkflow(1); }, 500);
+
+
+            /* --- 5. SCROLL REVEAL ANIMATIONS --- */
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+
+        });
+    </script>
+</body>
+</html>

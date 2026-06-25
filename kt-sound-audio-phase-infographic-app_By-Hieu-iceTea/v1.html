@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Mô Phỏng & Phân Tích Âm Thanh (Hi-Tech UI) 🍀 Hiếu iceTea</title>
+    <!-- ===== SEO / Open Graph · 🍀 Tạo & tối ưu bởi Hiếu iceTea ===== -->
+    <meta name="author" content="Hiếu iceTea">
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2674/2674498.png">
+    <meta name="description" content="Trình mô phỏng & phân tích đồng bộ Phase âm thanh với giao diện Hi-Tech. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="KT SOUND — Trình Mô Phỏng & Phân Tích Âm Thanh (Hi-Tech UI) 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <meta property="og:description" content="Trình mô phỏng & phân tích đồng bộ Phase âm thanh với giao diện Hi-Tech. 🍀 Tạo & tối ưu bởi Hiếu iceTea">
+    <!-- Tailwind CSS cho Giao diện -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome cho Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Rajdhani', 'sans-serif'],
+                        mono: ['Orbitron', 'monospace'],
+                    },
+                    colors: {
+                        'navy-dark': '#0a0f1a',
+                        'navy-panel': '#111827',
+                        'cyan-glow': '#00f3ff',
+                        'blue-neon': '#0070f3',
+                        'alert-red': '#ff3366',
+                        'success-green': '#00ff66'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #050810;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 112, 243, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(0, 243, 255, 0.05), transparent 25%);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Hi-Tech Borders & Glows */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 243, 255, 0.02);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(0, 243, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5), 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0f1a; }
+        ::-webkit-scrollbar-thumb { background: #0070f3; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
+
+        /* Custom Sliders (Range Inputs) */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: #00f3ff;
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #1f2937;
+            border-radius: 2px;
+        }
+
+        /* RTA Bars Animation setup */
+        .rta-bar {
+            width: 100%;
+            background: linear-gradient(to top, #0070f3, #00f3ff);
+            border-top-left-radius: 2px;
+            border-top-right-radius: 2px;
+            transition: height 0.1s ease-out;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #00f3ff;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #00f3ff;
+        }
+        
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+        .toast {
+            background: rgba(17, 24, 39, 0.9);
+            border-left: 4px solid #00f3ff;
+            animation: slideIn 0.3s ease-out forwards, fadeOut 0.5s ease-out 2.5s forwards;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; display: none; } }
+
+        /* Canvas Wrapper */
+        #oscilloscope-container {
+            position: relative;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 19px,
+                rgba(0, 243, 255, 0.1) 20px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 19px,
+                rgba(0, 243, 255, 0.1) 20px
+            );
+            background-color: #050810;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen font-sans antialiased text-gray-300">
+
+    <!-- Top Navigation Bar -->
+    <header class="glass-panel mx-4 mt-4 p-4 flex justify-between items-center z-10 sticky top-0">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-satellite-dish text-cyan-glow text-2xl animate-pulse"></i>
+            <h1 class="font-mono text-2xl font-bold text-white tracking-widest neon-text">AUDIO<span class="text-blue-500">SYS</span>.CORE</h1>
+        </div>
+        <nav class="hidden md:flex gap-4">
+            <button onclick="switchTab('phase-sim')" class="tab-btn active px-4 py-2 rounded border border-cyan-500 bg-cyan-900/30 text-cyan-400 font-bold hover:bg-cyan-900/50 transition">
+                <i class="fa-solid fa-wave-square mr-2"></i>Mô Phỏng Phase
+            </button>
+            <button onclick="switchTab('rta-monitor')" class="tab-btn px-4 py-2 rounded border border-transparent text-gray-400 hover:text-cyan-400 hover:border-cyan-500/50 transition">
+                <i class="fa-solid fa-chart-column mr-2"></i>Màn Hình RTA
+            </button>
+            <button onclick="switchTab('mixer-panel')" class="tab-btn px-4 py-2 rounded border border-transparent text-gray-400 hover:text-cyan-400 hover:border-cyan-500/50 transition">
+                <i class="fa-solid fa-sliders mr-2"></i>Bàn Trộn (Mixer)
+            </button>
+        </nav>
+        <div class="flex items-center gap-4">
+            <div class="text-xs font-mono text-right">
+                <p class="text-cyan-400">STATUS: <span class="text-success-green">ONLINE</span></p>
+                <p class="text-gray-500" id="clock">00:00:00</p>
+            </div>
+            <button onclick="showInfoModal()" class="w-10 h-10 rounded-full glass-panel flex justify-center items-center hover:text-cyan-glow transition">
+                <i class="fa-solid fa-circle-info"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-4 overflow-y-auto">
+        
+        <!-- TAB 1: PHASE SIMULATOR -->
+        <section id="phase-sim" class="tab-content h-full flex flex-col xl:flex-row gap-6">
+            <!-- Canvas Cột trái -->
+            <div class="xl:w-2/3 glass-panel p-1 flex flex-col relative h-[500px] xl:h-auto">
+                <div class="p-3 border-b border-gray-800 flex justify-between items-center bg-gray-900/50 rounded-t-xl">
+                    <h2 class="font-mono text-cyan-400 font-bold"><i class="fa-solid fa-display mr-2"></i>MÁY HIỆN SÓNG (OSCILLOSCOPE)</h2>
+                    <span class="text-xs text-gray-500 font-mono">Hiển thị đồ thị thời gian thực</span>
+                </div>
+                <div id="oscilloscope-container" class="flex-grow rounded-b-xl overflow-hidden relative">
+                    <canvas id="waveCanvas" class="w-full h-full"></canvas>
+                    <!-- Chú thích Canvas -->
+                    <div class="absolute top-2 right-2 bg-black/70 p-2 rounded text-xs font-mono border border-gray-700">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#00f3ff] shadow-[0_0_5px_#00f3ff]"></span> Sóng A (Gốc)</div>
+                        <div class="flex items-center gap-2 mt-1"><span class="w-3 h-3 rounded-full bg-[#ff3366] shadow-[0_0_5px_#ff3366]"></span> Sóng B (Tùy chỉnh)</div>
+                        <div class="flex items-center gap-2 mt-1"><span class="w-3 h-3 rounded-full bg-[#00ff66] shadow-[0_0_5px_#00ff66]"></span> Tổng (A + B)</div>
+                    </div>
+                    <!-- Trạng thái Phase -->
+                    <div id="phase-status" class="absolute bottom-4 left-4 text-2xl font-mono font-bold text-success-green bg-black/50 px-4 py-2 rounded border border-green-500/30">
+                        IN-PHASE (Cộng Hưởng)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng Điều Khiển Cột Phải -->
+            <div class="xl:w-1/3 flex flex-col gap-4">
+                <div class="glass-panel p-5">
+                    <h3 class="font-mono text-xl text-white mb-4 border-b border-gray-700 pb-2"><i class="fa-solid fa-gear text-cyan-500 mr-2"></i>THÔNG SỐ SÓNG B</h3>
+                    
+                    <!-- Control: Phase Offset -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="text-sm text-gray-300 font-bold">Độ lệch Pha (Phase Shift)</label>
+                            <span id="phaseVal" class="font-mono text-cyan-400 font-bold bg-gray-800 px-2 py-1 rounded">0°</span>
+                        </div>
+                        <input type="range" id="phaseSlider" min="0" max="360" value="0">
+                        <div class="flex justify-between text-xs text-gray-500 mt-1 font-mono">
+                            <span>0° (Đồng pha)</span>
+                            <span>180° (Ngược pha)</span>
+                            <span>360°</span>
+                        </div>
+                    </div>
+
+                    <!-- Control: Amplitude -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-end mb-2">
+                            <label class="text-sm text-gray-300 font-bold">Biên độ (Amplitude)</label>
+                            <span id="ampVal" class="font-mono text-blue-400 font-bold bg-gray-800 px-2 py-1 rounded">100%</span>
+                        </div>
+                        <input type="range" id="ampSlider" min="0" max="100" value="100">
+                    </div>
+
+                    <!-- Control: Polarity Invert -->
+                    <div class="flex items-center justify-between bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                        <div>
+                            <p class="font-bold text-white">Đảo Cực (Polarity Reverse)</p>
+                            <p class="text-xs text-gray-400">Đảo ngược pha 180° lập tức</p>
+                        </div>
+                        <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+                            <input type="checkbox" name="toggle" id="polarityToggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer transition-transform duration-200 ease-in-out z-10"/>
+                            <label for="polarityToggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-600 cursor-pointer transition-colors duration-200 ease-in-out"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info Box -->
+                <div class="glass-panel p-5 flex-grow">
+                    <h3 class="font-mono text-lg text-white mb-3"><i class="fa-solid fa-book-open text-blue-500 mr-2"></i>KIẾN THỨC BỔ SUNG</h3>
+                    <div class="space-y-3 text-sm text-gray-300 leading-relaxed">
+                        <details class="bg-gray-800/50 p-3 rounded border border-gray-700 cursor-pointer">
+                            <summary class="font-bold text-cyan-400 outline-none">Triệt tiêu Phase là gì?</summary>
+                            <p class="mt-2 text-gray-400">Xảy ra khi hai sóng âm cùng tần số nhưng lệch pha nhau (đặc biệt ở 180°). Khi đó, các đỉnh sóng của âm này sẽ gặp đáy sóng của âm kia, dẫn đến việc chúng triệt tiêu nhau, làm giảm âm lượng hoặc mất hẳn âm thanh (Màu xanh lá trên biểu đồ sẽ phẳng lỳ).</p>
+                        </details>
+                        <details class="bg-gray-800/50 p-3 rounded border border-gray-700 cursor-pointer">
+                            <summary class="font-bold text-cyan-400 outline-none">Ứng dụng thực tế</summary>
+                            <p class="mt-2 text-gray-400">Trong các dàn âm thanh lớn (Line Array + Subwoofer), kỹ sư dùng Delay (trễ thời gian) để bù đắp khoảng cách vật lý giữa các loa, đảm bảo sóng âm từ các loa đến tai người nghe cùng một lúc (Đồng Pha 0°).</p>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: RTA MONITOR -->
+        <section id="rta-monitor" class="tab-content hidden h-full flex flex-col gap-6">
+            <div class="glass-panel p-5 flex flex-col flex-grow">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="font-mono text-2xl text-cyan-400 font-bold"><i class="fa-solid fa-chart-simple mr-2"></i>PHÂN TÍCH TẦN SỐ THỜI GIAN THỰC (RTA)</h2>
+                        <p class="text-sm text-gray-400">Mô phỏng máy quét RTA/Smaart hiển thị các dải tần số âm thanh từ 20Hz đến 20kHz.</p>
+                    </div>
+                    <button id="rtaPlayBtn" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-6 rounded-full shadow-[0_0_15px_rgba(0,112,243,0.5)] transition flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i> Bật Âm Thanh Test
+                    </button>
+                </div>
+                
+                <!-- RTA Bars Container -->
+                <div class="flex-grow bg-gray-900 border border-gray-800 rounded-lg p-4 flex items-end gap-1 relative overflow-hidden h-[400px]">
+                    <!-- Frequency Labels (X-axis) -->
+                    <div class="absolute bottom-0 left-0 w-full flex justify-between px-4 pb-1 text-[10px] text-gray-500 font-mono">
+                        <span>20Hz</span><span>63Hz</span><span>250Hz</span><span>1kHz</span><span>4kHz</span><span>16kHz</span>
+                    </div>
+                    <!-- Grid Lines (Y-axis) -->
+                    <div class="absolute top-0 left-0 w-full h-full flex flex-col justify-between pointer-events-none opacity-20">
+                        <div class="border-b border-cyan-500 w-full h-1/4"></div>
+                        <div class="border-b border-cyan-500 w-full h-1/4"></div>
+                        <div class="border-b border-cyan-500 w-full h-1/4"></div>
+                        <div class="border-b border-cyan-500 w-full h-1/4"></div>
+                    </div>
+                    <!-- Bars generated by JS -->
+                    <div id="rta-bars-wrapper" class="w-full h-[90%] flex items-end gap-[2px] z-10 px-2 pb-4">
+                        <!-- Bars here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MIXER PANEL -->
+        <section id="mixer-panel" class="tab-content hidden h-full">
+            <div class="glass-panel p-6 h-full flex flex-col">
+                <h2 class="font-mono text-2xl text-cyan-400 font-bold mb-2"><i class="fa-solid fa-sliders mr-2"></i>BÀN TRỘN KỸ THUẬT SỐ (DSP MIXER)</h2>
+                <p class="text-sm text-gray-400 mb-8">Điều chỉnh thông số của từng dải loa (Line Array / Subwoofer) để căn chỉnh hệ thống.</p>
+                
+                <div class="flex flex-wrap justify-around gap-8 flex-grow">
+                    
+                    <!-- Channel 1: MAIN PA -->
+                    <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-700 w-48 flex flex-col items-center shadow-lg">
+                        <div class="w-full text-center border-b border-gray-600 pb-2 mb-4">
+                            <h3 class="font-bold text-white">CH 1: MAIN PA</h3>
+                            <span class="text-xs text-green-400 font-mono">ON</span>
+                        </div>
+                        
+                        <!-- Rotary Knob Simulation (Input Range) -->
+                        <div class="w-full mb-6">
+                            <label class="text-xs text-gray-400 block text-center mb-1">Delay (ms)</label>
+                            <input type="range" class="w-full delay-slider" min="0" max="20" step="0.1" value="0" data-target="delay1">
+                            <div class="text-center font-mono text-cyan-400 text-sm mt-1 bg-black/50 rounded py-1"><span id="delay1">0.0</span> ms</div>
+                        </div>
+
+                        <!-- Fader -->
+                        <div class="flex-grow flex flex-col items-center justify-end w-full relative mb-4 h-48">
+                            <input type="range" orient="vertical" class="h-full appearance-none w-2 bg-gray-900 rounded-full cursor-pointer outline-none slider-vertical" min="-60" max="10" value="0" style="writing-mode: bt-lr; -webkit-appearance: slider-vertical;">
+                            <div class="text-xs font-mono text-gray-400 mt-2">Volume</div>
+                        </div>
+                        
+                        <!-- Mute Btn -->
+                        <button class="w-full py-2 bg-red-900/30 text-red-400 border border-red-900 rounded hover:bg-red-900/60 transition mute-btn">MUTE</button>
+                    </div>
+
+                    <!-- Channel 2: SUBWOOFER -->
+                    <div class="bg-gray-800/80 p-4 rounded-xl border border-gray-700 w-48 flex flex-col items-center shadow-lg">
+                        <div class="w-full text-center border-b border-gray-600 pb-2 mb-4">
+                            <h3 class="font-bold text-white">CH 2: SUBWOOFER</h3>
+                            <span class="text-xs text-green-400 font-mono">ON</span>
+                        </div>
+                        
+                        <!-- Rotary Knob Simulation -->
+                        <div class="w-full mb-6">
+                            <label class="text-xs text-gray-400 block text-center mb-1">Delay (ms)</label>
+                            <input type="range" class="w-full delay-slider" min="0" max="20" step="0.1" value="7.3" data-target="delay2">
+                            <div class="text-center font-mono text-cyan-400 text-sm mt-1 bg-black/50 rounded py-1"><span id="delay2">7.3</span> ms</div>
+                        </div>
+
+                        <!-- Fader -->
+                        <div class="flex-grow flex flex-col items-center justify-end w-full relative mb-4 h-48">
+                            <input type="range" orient="vertical" class="h-full appearance-none w-2 bg-gray-900 rounded-full cursor-pointer outline-none slider-vertical" min="-60" max="10" value="3" style="writing-mode: bt-lr; -webkit-appearance: slider-vertical;">
+                            <div class="text-xs font-mono text-gray-400 mt-2">Volume</div>
+                        </div>
+                        
+                        <!-- Mute Btn -->
+                        <button class="w-full py-2 bg-red-900/30 text-red-400 border border-red-900 rounded hover:bg-red-900/60 transition mute-btn">MUTE</button>
+                    </div>
+                    
+                    <!-- Master Info Panel -->
+                    <div class="bg-gray-900 border border-cyan-900/50 p-6 rounded-xl w-64 flex flex-col justify-center">
+                        <h4 class="text-cyan-500 font-bold text-center border-b border-gray-700 pb-2 mb-4">CÔNG THỨC TÍNH DELAY</h4>
+                        <div class="font-mono text-sm text-gray-300 space-y-3">
+                            <p>Khoảng cách lệch: <span class="text-white font-bold">2.5m</span></p>
+                            <p>Tốc độ âm thanh (v): <span class="text-white font-bold">343 m/s</span></p>
+                            <div class="bg-black/50 p-2 rounded text-center my-2 text-blue-400">
+                                Δt = d / v
+                            </div>
+                            <p>Thời gian cần bù (Delay):</p>
+                            <p class="text-xl text-success-green font-bold text-center">~ 7.3 ms</p>
+                        </div>
+                        <button onclick="showToast('Đã lưu cấu hình lên DSP Mixer!')" class="mt-6 w-full bg-cyan-600 hover:bg-cyan-500 text-white py-2 rounded transition">LƯU CÀI ĐẶT</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Thông tin chung -->
+    <div id="infoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 transition-opacity opacity-0">
+        <div class="glass-panel p-8 max-w-2xl w-full mx-4 transform scale-95 transition-transform duration-300 relative">
+            <button onclick="closeInfoModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+            <h2 class="text-2xl font-bold text-cyan-400 mb-4 border-b border-gray-700 pb-2"><i class="fa-solid fa-graduation-cap mr-2"></i>Hướng Dẫn Sử Dụng Trình Mô Phỏng</h2>
+            <div class="space-y-4 text-gray-300 text-sm">
+                <p>Ứng dụng này giúp bạn hiểu rõ nguyên lý hoạt động của <strong class="text-white">Đồng bộ Phase (Phase Alignment)</strong> trong Kỹ thuật âm thanh.</p>
+                <ul class="list-disc pl-5 space-y-2">
+                    <li><strong>Mô Phỏng Phase:</strong> Kéo thanh trượt <em>Độ lệch pha</em> để xem hai sóng âm cộng hưởng (biên độ tăng) hoặc triệt tiêu nhau (biên độ giảm) như thế nào.</li>
+                    <li><strong>Nút Đảo Cực:</strong> Lập tức thay đổi pha 180 độ. Đây là thao tác thường làm trên bàn mixer khi micro hoặc loa bị đấu ngược dây.</li>
+                    <li><strong>Màn Hình RTA:</strong> Mô phỏng giao diện phần mềm phân tích âm thanh chuyên nghiệp (như Smaart, Systune) dùng để đo đạc đáp tuyến tần số.</li>
+                    <li><strong>Bàn Trộn (Mixer):</strong> Trải nghiệm giao diện điều chỉnh Delay (độ trễ) để bù đắp khoảng cách vật lý giữa loa Sub và loa Full.</li>
+                </ul>
+                <div class="bg-blue-900/30 p-3 rounded mt-4 border border-blue-800">
+                    <i class="fa-solid fa-lightbulb text-yellow-400 mr-2"></i> <strong>Mẹo:</strong> Hãy thử kéo thanh trượt pha (Phase Shift) đến chính xác 180° và quan sát sóng màu xanh lá cây (sóng tổng).
+                </div>
+            </div>
+            <div class="mt-6 text-right">
+                <button onclick="closeInfoModal()" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded text-white font-bold transition">Đã Hiểu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="flex flex-col gap-2"></div>
+
+    <script>
+        // --- 1. GENERAL UI LOGIC ---
+
+        // Clock Update
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('vi-VN', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Show target tab
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Update button styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = "tab-btn px-4 py-2 rounded border border-transparent text-gray-400 hover:text-cyan-400 hover:border-cyan-500/50 transition";
+            });
+            const activeBtn = event.currentTarget;
+            activeBtn.className = "tab-btn active px-4 py-2 rounded border border-cyan-500 bg-cyan-900/30 text-cyan-400 font-bold hover:bg-cyan-900/50 transition";
+
+            // Special triggers when entering tabs
+            if (tabId === 'phase-sim') {
+                resizeCanvas(); // Ensure canvas fits
+            }
+        }
+
+        // Modal Logic
+        const modal = document.getElementById('infoModal');
+        function showInfoModal() {
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Slight delay for animation
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 10);
+        }
+        function closeInfoModal() {
+            modal.classList.add('opacity-0');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        }
+
+        // Toast Logic
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast px-4 py-3 rounded text-white text-sm font-mono flex items-center shadow-lg';
+            toast.innerHTML = `<i class="fa-solid fa-check-circle text-cyan-400 mr-2"></i> ${message}`;
+            container.appendChild(toast);
+            
+            // Remove after animation (3s total)
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+
+        // --- 2. PHASE SIMULATOR (CANVAS) LOGIC ---
+        
+        const canvas = document.getElementById('waveCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // State variables
+        let phaseShift = 0; // degrees
+        let amplitudeB_percent = 100;
+        let isPolarityReversed = false;
+        let time = 0;
+        
+        // DOM Elements
+        const phaseSlider = document.getElementById('phaseSlider');
+        const phaseValText = document.getElementById('phaseVal');
+        const ampSlider = document.getElementById('ampSlider');
+        const ampValText = document.getElementById('ampVal');
+        const polarityToggle = document.getElementById('polarityToggle');
+        const phaseStatusDisplay = document.getElementById('phase-status');
+
+        function resizeCanvas() {
+            const container = document.getElementById('oscilloscope-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        // Initial call done after slight delay to ensure DOM is rendered
+        setTimeout(resizeCanvas, 100); 
+
+        // Event Listeners for Controls
+        phaseSlider.addEventListener('input', (e) => {
+            phaseShift = parseInt(e.target.value);
+            updateControlUI();
+        });
+
+        ampSlider.addEventListener('input', (e) => {
+            amplitudeB_percent = parseInt(e.target.value);
+            updateControlUI();
+        });
+
+        polarityToggle.addEventListener('change', (e) => {
+            isPolarityReversed = e.target.checked;
+            showToast(isPolarityReversed ? "Đảo cực (180°) đã BẬT" : "Đảo cực đã TẮT");
+            updateControlUI();
+        });
+
+        function updateControlUI() {
+            // Calculate effective phase
+            let effectivePhase = phaseShift + (isPolarityReversed ? 180 : 0);
+            effectivePhase = effectivePhase % 360;
+            
+            phaseValText.innerText = `${effectivePhase}°`;
+            ampValText.innerText = `${amplitudeB_percent}%`;
+
+            // Update Status Text based on effective phase
+            if (amplitudeB_percent === 0) {
+                phaseStatusDisplay.innerText = "SÓNG B ĐÃ TẮT";
+                phaseStatusDisplay.className = "absolute bottom-4 left-4 text-xl font-mono font-bold text-gray-400 bg-black/50 px-4 py-2 rounded border border-gray-500/30";
+            } else if (effectivePhase === 0 || effectivePhase === 360) {
+                phaseStatusDisplay.innerText = "IN-PHASE (Cộng Hưởng Tối Đa)";
+                phaseStatusDisplay.className = "absolute bottom-4 left-4 text-xl font-mono font-bold text-success-green bg-black/50 px-4 py-2 rounded border border-green-500/30";
+            } else if (effectivePhase === 180) {
+                if(amplitudeB_percent === 100) {
+                    phaseStatusDisplay.innerText = "OUT-OF-PHASE (Triệt Tiêu Hoàn Toàn)";
+                    phaseStatusDisplay.className = "absolute bottom-4 left-4 text-xl font-mono font-bold text-alert-red bg-black/50 px-4 py-2 rounded border border-red-500/30 animate-pulse";
+                } else {
+                    phaseStatusDisplay.innerText = "OUT-OF-PHASE (Triệt Tiêu Một Phần)";
+                    phaseStatusDisplay.className = "absolute bottom-4 left-4 text-xl font-mono font-bold text-orange-400 bg-black/50 px-4 py-2 rounded border border-orange-500/30";
+                }
+            } else {
+                phaseStatusDisplay.innerText = `LỆCH PHA (${effectivePhase}°) - Comb Filtering`;
+                phaseStatusDisplay.className = "absolute bottom-4 left-4 text-xl font-mono font-bold text-yellow-400 bg-black/50 px-4 py-2 rounded border border-yellow-500/30";
+            }
+        }
+
+        // Animation Loop
+        function drawWaves() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Center Line
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            const frequency = 0.02; // How many waves fit on screen
+            const baseAmplitude = (canvas.height / 2) * 0.45; // Max height to fit 2 waves safely
+            const speed = 0.05; // Animation speed
+
+            // Wave settings
+            time += speed;
+            const effectivePhaseRad = (phaseShift + (isPolarityReversed ? 180 : 0)) * (Math.PI / 180);
+            const ampB = baseAmplitude * (amplitudeB_percent / 100);
+
+            ctx.lineWidth = 3;
+
+            // Paths
+            ctx.beginPath(); // Wave A (Cyan)
+            const pathA = new Path2D();
+            const pathB = new Path2D(); // Wave B (Red)
+            const pathSum = new Path2D(); // Sum (Green)
+
+            for (let x = 0; x < canvas.width; x++) {
+                // Wave A Math: sin(x * freq + time)
+                const yA = Math.sin(x * frequency + time) * baseAmplitude;
+                
+                // Wave B Math: sin(x * freq + time + phaseOffset) * amplitude
+                const yB = Math.sin(x * frequency + time + effectivePhaseRad) * ampB;
+                
+                // Sum
+                const ySum = yA + yB;
+
+                // Center Y coords
+                const drawYA = (canvas.height / 2) - yA;
+                const drawYB = (canvas.height / 2) - yB;
+                const drawYSum = (canvas.height / 2) - ySum;
+
+                if (x === 0) {
+                    pathA.moveTo(x, drawYA);
+                    pathB.moveTo(x, drawYB);
+                    pathSum.moveTo(x, drawYSum);
+                } else {
+                    pathA.lineTo(x, drawYA);
+                    pathB.lineTo(x, drawYB);
+                    pathSum.lineTo(x, drawYSum);
+                }
+            }
+
+            // Render A
+            ctx.strokeStyle = '#00f3ff';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#00f3ff';
+            ctx.stroke(pathA);
+
+            // Render B
+            ctx.strokeStyle = '#ff3366';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ff3366';
+            ctx.stroke(pathB);
+
+            // Render Sum
+            ctx.strokeStyle = '#00ff66';
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00ff66';
+            ctx.stroke(pathSum);
+            
+            // Reset shadow for next frame performance
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(drawWaves);
+        }
+        
+        // Start Canvas Loop
+        drawWaves();
+        updateControlUI();
+
+
+        // --- 3. RTA MONITOR LOGIC ---
+
+        const rtaWrapper = document.getElementById('rta-bars-wrapper');
+        const numBars = 64; // Number of frequency bands
+        let rtaInterval;
+        let isRtaPlaying = false;
+        let rtaValues = new Array(numBars).fill(0);
+
+        // Initialize empty bars
+        for (let i = 0; i < numBars; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'rta-bar';
+            bar.style.height = '2%';
+            // Optional: color gradient across bars
+            const hue = 190 + (i * 2); // Blue to Cyan
+            bar.style.background = `linear-gradient(to top, hsl(${hue}, 100%, 40%), hsl(${hue}, 100%, 70%))`;
+            rtaWrapper.appendChild(bar);
+        }
+
+        const rtaPlayBtn = document.getElementById('rtaPlayBtn');
+        rtaPlayBtn.addEventListener('click', () => {
+            isRtaPlaying = !isRtaPlaying;
+            if (isRtaPlaying) {
+                rtaPlayBtn.innerHTML = '<i class="fa-solid fa-stop"></i> Dừng Phân Tích';
+                rtaPlayBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500');
+                rtaPlayBtn.classList.add('bg-alert-red', 'hover:bg-red-500', 'shadow-[0_0_15px_rgba(255,51,102,0.5)]');
+                showToast("Khởi động mô phỏng máy phát Pink Noise");
+                startRTA();
+            } else {
+                rtaPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> Bật Âm Thanh Test';
+                rtaPlayBtn.classList.remove('bg-alert-red', 'hover:bg-red-500', 'shadow-[0_0_15px_rgba(255,51,102,0.5)]');
+                rtaPlayBtn.classList.add('bg-blue-600', 'hover:bg-blue-500');
+                stopRTA();
+            }
+        });
+
+        function startRTA() {
+            const bars = document.querySelectorAll('.rta-bar');
+            rtaInterval = setInterval(() => {
+                for (let i = 0; i < numBars; i++) {
+                    // Simulate frequency response shape (Pink noise curve + randomness)
+                    // Mid frequencies generally higher in this mockup
+                    const bellCurve = Math.sin((i / numBars) * Math.PI); 
+                    const targetValue = (Math.random() * 60) + (bellCurve * 40);
+                    
+                    // Smooth transition (easing)
+                    rtaValues[i] += (targetValue - rtaValues[i]) * 0.3;
+                    
+                    bars[i].style.height = `${rtaValues[i]}%`;
+                }
+            }, 50); // Update every 50ms
+        }
+
+        function stopRTA() {
+            clearInterval(rtaInterval);
+            const bars = document.querySelectorAll('.rta-bar');
+            rtaValues.fill(2); // Reset internal array
+            bars.forEach(bar => {
+                bar.style.height = '2%';
+            });
+        }
+
+
+        // --- 4. MIXER PANEL LOGIC ---
+
+        // Delay Sliders
+        const delaySliders = document.querySelectorAll('.delay-slider');
+        delaySliders.forEach(slider => {
+            slider.addEventListener('input', (e) => {
+                const targetId = e.target.getAttribute('data-target');
+                document.getElementById(targetId).innerText = parseFloat(e.target.value).toFixed(1);
+            });
+            slider.addEventListener('change', () => {
+                showToast("Đã cập nhật Delay Time");
+            });
+        });
+
+        // Mute Buttons
+        const muteBtns = document.querySelectorAll('.mute-btn');
+        muteBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const isMuted = e.target.classList.contains('bg-red-600');
+                if (isMuted) {
+                    // Unmute
+                    e.target.classList.remove('bg-red-600', 'text-white');
+                    e.target.classList.add('bg-red-900/30', 'text-red-400');
+                    e.target.innerText = 'MUTE';
+                    e.target.previousElementSibling.previousElementSibling.previousElementSibling.querySelector('span').innerText = 'ON';
+                    e.target.previousElementSibling.previousElementSibling.previousElementSibling.querySelector('span').className = 'text-xs text-green-400 font-mono';
+                } else {
+                    // Mute
+                    e.target.classList.add('bg-red-600', 'text-white');
+                    e.target.classList.remove('bg-red-900/30', 'text-red-400');
+                    e.target.innerText = 'MUTED';
+                    e.target.previousElementSibling.previousElementSibling.previousElementSibling.querySelector('span').innerText = 'MUTED';
+                    e.target.previousElementSibling.previousElementSibling.previousElementSibling.querySelector('span').className = 'text-xs text-red-500 font-mono animate-pulse';
+                    showToast("Channel đã bị tắt tiếng (Mute)");
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
